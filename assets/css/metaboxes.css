@@ -1,0 +1,11 @@
+
+
+.coverequired input, .coverequired textarea, .coverequired .indicator {
+  background-color: #CCFFCC;
+}
+input[disabled], textarea[disabled] {
+  background-color:#dddddd;
+  opacity:0.6;
+}
+
+

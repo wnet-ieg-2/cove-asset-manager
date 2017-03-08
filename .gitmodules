@@ -1,0 +1,3 @@
+[submodule "assets/php/PBS_Media_Manager_Client"]
+	path = assets/php/PBS_Media_Manager_Client
+	url = https://github.com/tamw-wnet/PBS_Media_Manager_Client

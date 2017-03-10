@@ -39,11 +39,15 @@ class COVE_Asset_Manager_Settings {
 	public function register_settings() {
 		
 		// Add settings section
-		add_settings_section( 'main_settings' , __( 'Modify plugin settings' , 'cove-asset-manager' ) , array( $this , 'main_settings' ) , 'cove_asset_manager_settings' );
+    add_settings_section( 'main_settings' , __( 'Modify plugin settings' , 'cove-asset-manager' ) , array( $this , 'main_settings' ) , 'cove_asset_manager_settings' );
 		
 		// Add settings fields
     add_settings_field( 'coveam_cove_preferred' , __( 'Display COVE video by default' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_cove_preferred', 'Making this false will make YouTube version display when available') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_cove_preferred' );
+
+    add_settings_field( 'coveam_showonposttypes' , __( 'Show the COVE metaboxes on these post types:' , 'cove-asset-manager' ) , array( $this , 'settings_field_allowed_post_types' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_showonposttypes', '') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_showonposttypes' );
+
 
 		add_settings_field( 'coveam_s3_bucket' , __( 'S3 Bucket to use:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_s3_bucket', 'ex: pbs-ingest') );
 		register_setting( 'cove_asset_manager_settings' , 'coveam_s3_bucket' );
@@ -56,26 +60,6 @@ class COVE_Asset_Manager_Settings {
 
     add_settings_field( 'coveam_aws_secret_key' , __( 'AWS Secret Key:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_aws_secret_key', '') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_aws_secret_key' );
-
-
-		add_settings_field( 'coveam_cove_channel' , __( 'COVE Channel:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_cove_channel', '') );
-		register_setting( 'cove_asset_manager_settings' , 'coveam_cove_channel' );
-
-		add_settings_field( 'coveam_cove_key' , __( 'COVE API Key:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_key', 'Must request from PBS Jira') );
-		register_setting( 'cove_asset_manager_settings' , 'coveam_cove_key' );
-
-		add_settings_field( 'coveam_cove_secret' , __( 'COVE API Secret:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_secret', '') );
-		register_setting( 'cove_asset_manager_settings' , 'coveam_cove_secret' );
-
-    add_settings_field( 'coveam_cove_batch_key' , __( 'COVE Batch API Key:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_batch_key', 'Specific to batch ingest, allows job creation in COVE. Ask Edgar Roman @ PBS') );
-    register_setting( 'cove_asset_manager_settings' , 'coveam_cove_batch_key' );
-
-   add_settings_field( 'coveam_cove_batch_secret' , __( 'COVE Batch API Secret:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_batch_secret', '') );
-   register_setting( 'cove_asset_manager_settings' , 'coveam_cove_batch_secret' );
-
-   add_settings_field( 'coveam_cove_taxonomy_name' , __( 'COVE Taxonomy Name:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_taxonomy_name', '') );
-   register_setting( 'cove_asset_manager_settings' , 'coveam_cove_taxonomy_name' );
-
 
     add_settings_field( 'coveam_youtube_username' , __( 'YouTube username:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_youtube_username', 'ex: newshour@gmail.com') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_youtube_username' );
@@ -90,10 +74,17 @@ class COVE_Asset_Manager_Settings {
     add_settings_field( 'coveam_google_redirect_uri' , __( 'Google oAuth Redirect URI:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_google_redirect_uri', 'Get from same page, by default should be ' . $this->plugin_url . 'oauth2callback.php .  This URL MUST be in the app settings page AND be viewable without error in a browser, preferably a blank page') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_google_redirect_uri' );
 
+    add_settings_field( 'coveam_mm_show_id' , 'PBS Media Manager Show ID' , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_show_id', 'content id for this show, get from PBS Media Manager console') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_mm_show_id' );
+
+    add_settings_field( 'coveam_mm_api_key' , 'PBS Media Manager API key' , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_api_key', 'Get from PBS') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_mm_api_key' );
+
+    add_settings_field( 'coveam_mm_api_secret' , 'PBS Media Manager API secret' , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_api_secret', 'Get from PBS') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_mm_api_secret' );
 
 
-   add_settings_field( 'coveam_showonposttypes' , __( 'Show the COVE metaboxes on these post types:' , 'cove-asset-manager' ) , array( $this , 'settings_field_allowed_post_types' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_showonposttypes', '') );
-   register_setting( 'cove_asset_manager_settings' , 'coveam_showonposttypes' );
+
 
 
 	

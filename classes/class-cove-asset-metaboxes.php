@@ -36,7 +36,6 @@ class COVE_Asset_Metaboxes {
     $allowed_post_types = get_option('coveam_showonposttypes');
     if ( in_array( $post_type, $allowed_post_types ) ) {
 		  add_meta_box( 'cove-asset-details', __( 'COVE/YouTube Video Asset' , 'cove_asset_manager' ), array( $this, 'meta_box_content' ), $post_type, 'normal', 'high' );
-		  add_meta_box( 'cove_topics_metabox', __( 'COVE Topics' , 'cove_asset_manager' ), 'post_categories_meta_box', $post_type, 'normal', 'high', array( 'taxonomy' => 'cove_topics') );
     }
 	}
 

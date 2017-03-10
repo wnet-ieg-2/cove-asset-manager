@@ -1,12 +1,12 @@
 <?php
 /*
  * Plugin Name: COVE Asset Manager 
- * Version: 2.1.1
+ * Version: 3.0.0
  * Plugin URI: http://www.thirteen.org/
  * Description: COVE Asset Manager
- * Author: William Tam
- * Author URI: http://www.thirteen.org/
- * Requires at least: 3.0
+ * Author: William Tam, WNET
+ * Author URI: http://ieg.wnet.org/
+ * Requires at least: 4.6
  * Tested up to: 3.5.1
  * 
  * @package WordPress
@@ -20,8 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 require_once( 'classes/class-cove-asset-manager.php' );
 require_once( 'classes/class-cove-asset-manager-settings.php' );
 require_once( 'classes/class-cove-asset-metaboxes.php' );
-if ( !class_exists('COVE_API_Request') ) {
-  require_once( 'classes/class-cove-request-api.php' );
+if ( !class_exists('PBS_Media_Manager_API_Client') ) {
+  require_once( 'assets/php/PBS_Media_Manager_Client/class-PBS-Media-Manager-API-Client.php' );
 }
 
 // Include the COVE ingester scripts

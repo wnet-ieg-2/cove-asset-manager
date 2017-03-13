@@ -23,6 +23,9 @@ require_once( 'classes/class-cove-asset-metaboxes.php' );
 if ( !class_exists('COVE_API_Request') ) {
   require_once( 'classes/class-cove-request-api.php' );
 }
+if ( !class_exists('PBS_Media_Manager_API_Client') ) {
+  require_once( 'assets/php/PBS_Media_Manager_Client/class-PBS-Media-Manager-API-Client.php' );
+}
 
 // Include the COVE ingester scripts
 require_once( 'cove-batch-ingest.php' );

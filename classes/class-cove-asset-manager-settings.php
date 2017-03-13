@@ -103,6 +103,8 @@ class COVE_Asset_Manager_Settings {
     add_settings_field( 'coveam_mm_api_secret' , 'PBS Media Manager API secret' , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_api_secret', 'Get from PBS') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_mm_api_secret' );
 
+    add_settings_field( 'coveam_mm_api_endpoint' , 'PBS Media Manager API endpoint' , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_api_endpoint', 'Staging: https://media-staging.services.pbs.org/api/v1 Prod: https://media.services.pbs.org/api/v1') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_mm_api_endpoint' );
 
 
 

@@ -20,8 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 require_once( 'classes/class-cove-asset-manager.php' );
 require_once( 'classes/class-cove-asset-manager-settings.php' );
 require_once( 'classes/class-cove-asset-metaboxes.php' );
-if ( !class_exists('PBS_Media_Manager_API_Client') ) {
-  require_once( 'assets/php/PBS_Media_Manager_Client/class-PBS-Media-Manager-API-Client.php' );
+if ( !class_exists('COVE_API_Request') ) {
+  require_once( 'classes/class-cove-request-api.php' );
 }
 
 // Include the COVE ingester scripts

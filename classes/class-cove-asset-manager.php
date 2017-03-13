@@ -20,6 +20,7 @@ class COVE_Asset_Manager {
 
 		// setup the tazonomy
 		add_action( 'init', array( $this, 'add_cove_topics_taxonomy' ), 0 );
+    add_action( 'init', array( $this, 'register_post_types' ), 0 );  
 
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -75,6 +76,70 @@ class COVE_Asset_Manager {
       );
     }
   }
+
+  public function register_post_types() {
+    if (!post_type_exists('episodes')) {
+		  register_post_type('episodes', array(
+        'labels' => array(
+            'name' => __('Full Episodes'),
+            'singular_name' => __('Full Episode'),
+            'search_items' => __('Search Episodes'),
+            'add_new_item' => __('Add New Episode'),
+            'edit_item' => __('Edit Episode')
+        ),
+        'public' => true,
+        'has_archive' => true,
+        'rewrite' => array(
+            'slug' => 'episode'
+        ),
+        'query_var' => true,
+        'exclude_from_search' => true,
+        'menu_position' => 5,
+        'menu_icon' => 'dashicons-format-video',
+        'supports' => array(
+            'title',
+            'editor',
+            'author',
+            'excerpt',
+            'thumbnail',
+            'custom-fields',
+            'comments'
+        ),
+        'taxonomies' => array('post_tag')
+      ));
+    }
+    if (!post_type_exists('videos')) {
+	    register_post_type('videos', array(
+        'labels' => array(
+            'name' => __('Videos'),
+            'singular_name' => __('Video'),
+            'search_items' => __('Search Videos'),
+            'add_new_item' => __('Add New Video'),
+            'edit_item' => __('Edit Video')
+        ),
+        'public' => true,
+        'has_archive' => true,
+        'rewrite' => array(
+            'slug' => 'videos'
+        ),
+        'query_var' => true,
+        'exclude_from_search' => true,
+        'menu_position' => 5,
+        'menu_icon' => 'dashicons-video-alt2',
+        'supports' => array(
+            'title',
+            'thumbnail',
+            'author',
+            'custom-fields'
+        ),
+        'taxonomies' => array(
+            'post_tag',
+            'topic'
+        )
+      ));
+    }
+  }
+
   public function cove_player_shortcode( $atts ) {
 	if (is_single() || is_post_type_archive(array('rundown','making_sense','arts','poetry_series')) || (is_feed())) {
 	global $post;

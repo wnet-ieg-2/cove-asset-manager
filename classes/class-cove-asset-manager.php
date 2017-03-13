@@ -18,6 +18,8 @@ class COVE_Asset_Manager {
 		$this->load_plugin_textdomain();
 		add_action( 'init', array( $this, 'load_localisation' ), 0 );
 
+		// setup the tazonomy
+		add_action( 'init', array( $this, 'add_cove_topics_taxonomy' ), 0 );
 
 		// Load public-facing style sheet and JavaScript.
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -44,6 +46,35 @@ class COVE_Asset_Manager {
 	    load_plugin_textdomain( $domain , FALSE , dirname( plugin_basename( $this->file ) ) . '/lang/' );
 	}
 
+	public function add_cove_topics_taxonomy () {
+    if (!taxonomy_exists('cove_topics')) {
+	    $labels = array(
+		    'name'              => _x( 'COVE Topics', 'taxonomy general name' ),
+		    'singular_name'     => _x( 'COVE Topic', 'taxonomy singular name' ),
+		    'search_items'      => __( 'Search COVE Topics' ),
+		    'all_items'         => __( 'All COVE Topics' ),
+		    'parent_item'       => __( 'Parent COVE Topic' ),
+		    'parent_item_colon' => __( 'Parent COVE Topic:' ),
+		    'edit_item'         => __( 'Edit COVE Topic' ),
+		    'update_item'       => __( 'Update COVE Topic' ),
+		    'add_new_item'      => __( 'Add New COVE Topic' ),
+		    'new_item_name'     => __( 'New COVE Topic Name' ),
+		    'menu_name'         => __( 'COVE Topics' ),
+	    );
+      register_taxonomy(
+        'cove_topics',
+        array( 'post' ),
+        array(
+          'labels' => $labels,
+          'hierarchical' => true,
+          'public' => true,
+          'show_ui' => false,
+          'query_var' => false,
+          'rewrite' => false
+        )
+      );
+    }
+  }
   public function cove_player_shortcode( $atts ) {
 	if (is_single() || is_post_type_archive(array('rundown','making_sense','arts','poetry_series')) || (is_feed())) {
 	global $post;

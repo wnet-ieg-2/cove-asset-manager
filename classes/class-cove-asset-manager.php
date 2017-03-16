@@ -178,4 +178,23 @@ class COVE_Asset_Manager {
     return $player;
    } 
   }
+  
+  public function get_media_manager_client( $api_key=false, $api_secret=false, $api_endpoint=false ) {
+    if (!class_exists('PBS_Media_Manager_API_Client')) {
+      return array('errors' => 'Media Manager API Client not present');
+    }
+    $client_key = !empty(get_option('coveamm_mm_api_key')) ? get_option('coveamm_mm_api_key') : false;
+    $client_secret = !empty(get_option('coveamm_mm_api_secret')) ? get_option('coveamm_mm_api_secret') : false;
+    $client_endpoint = !empty(get_option('coveamm_mm_api_endpoint')) ? get_option('coveamm_mm_api_endpoint') : false;
+    if ($api_key && $api_secret && $api_endpoint) {
+      $client_key = $api_key;
+      $client_secret = $api_secret;
+      $client_endpoint = $api_endpoint;
+    }
+    if (!$client_key || !$client_secret || !$client_endpoint) {
+      return array('errors' => 'Missing key, secret, or endpoint');
+    }
+    $client = new PBS_Media_Manager_API_Client($client_key, $client_secret, $client_endpoint);
+    return $client;
+  }
 }

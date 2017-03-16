@@ -9,6 +9,7 @@ class COVE_Asset_Metaboxes {
 	private $assets_dir;
 	private $assets_url;
 	private $token;
+  private $plugin_obj;
 
 	public function __construct( $file ) {
 		$this->dir = dirname( $file );
@@ -16,6 +17,7 @@ class COVE_Asset_Metaboxes {
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', $file ) ) );
 		$this->token = 'cove_asset';
+    $this->plugin_obj = new COVE_Asset_Manager( $file );
 
 		add_action( 'add_meta_boxes', array( $this, 'meta_box_setup' ), 20 );
 		add_action( 'save_post', array( $this, 'meta_box_save' ) );	
@@ -36,18 +38,18 @@ class COVE_Asset_Metaboxes {
     $allowed_post_types = get_option('coveam_showonposttypes');
     if ( in_array( $post_type, $allowed_post_types ) ) {
 		  add_meta_box( 'cove-asset-details', __( 'COVE/YouTube Video Asset' , 'cove_asset_manager' ), array( $this, 'meta_box_content' ), $post_type, 'normal', 'high' );
-		  add_meta_box( 'cove_topics_metabox', __( 'COVE Topics' , 'cove_asset_manager' ), 'post_categories_meta_box', $post_type, 'normal', 'high', array( 'taxonomy' => 'cove_topics') );
+      if (!$this->plugin_obj->use_media_manager) {
+		    add_meta_box( 'cove_topics_metabox', __( 'COVE Topics' , 'cove_asset_manager' ), 'post_categories_meta_box', $post_type, 'normal', 'high', array( 'taxonomy' => 'cove_topics') );
+      }
     }
 	}
 
-  public function use_media_manager() {
-    if (get_option('coveam_use_mm_ingest') == 'true') {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  private function build_media_manager_api_form_section($fields, $field_data) {
+    return 'media manager form';
 
+
+
+  }
 
   private function build_cove_api_form_section($fields, $field_data) {
       if ($fields['_coveam_ingest_task'][0] && (!$fields['_coveam_cove_player_id'][0])){
@@ -184,7 +186,11 @@ class COVE_Asset_Metaboxes {
       // display a shortcode for this video asset 
       $html .= '<tr valign="top"><th scope="row">Shortcode for this video asset:</th><td>[covevideoasset id=' . $post_id . ']</td></tr>' . "\n";
 
-      $html .= $this->build_cove_api_form_section($fields, $field_data);
+      if ($this->plugin_obj->use_media_manager) {
+        $html .= $this->build_media_manager_api_form_section($fields, $field_data);
+      } else {
+        $html .= $this->build_cove_api_form_section($fields, $field_data);
+      }
 
       $html .= $this->build_youtube_upload_form($post_id, $fields['_coveam_youtube_id'][0], $fields['_coveam_youtubestatus'][0]);
    
@@ -198,11 +204,6 @@ class COVE_Asset_Metaboxes {
 		
 		echo $html;	
 	}
-
-
-
-
-
 
 	public function meta_box_save( $post_id ) {
     

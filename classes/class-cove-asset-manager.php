@@ -7,12 +7,14 @@ class COVE_Asset_Manager {
 	private $file;
 	private $assets_dir;
 	private $assets_url;
+  public  $use_media_manager;
 
 	public function __construct( $file ) {
 		$this->dir = dirname( $file );
 		$this->file = $file;
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', $file ) ) );
+    $this->use_media_manager = (get_option('coveam_use_mm_ingest') == 'true') ? true : false;
 
 		// Handle localisation
 		$this->load_plugin_textdomain();

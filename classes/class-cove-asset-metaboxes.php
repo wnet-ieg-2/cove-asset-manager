@@ -40,27 +40,9 @@ class COVE_Asset_Metaboxes {
     }
 	}
 
-	public function meta_box_content() {
-		global $post_id;
-		$fields = get_post_custom( $post_id );
-		$field_data = $this->get_custom_fields_settings();
-    add_thickbox();
-		$html = '<span id="this_post_id" style="display:none;">' . $post_id . '</span>';
-		
-		$html .= '<input type="hidden" name="' . $this->token . '_nonce" id="' . $this->token . '_nonce" value="' . wp_create_nonce( plugin_basename( $this->dir ) ) . '" />';
-    
-    	
-    // no COVE player id AND no ingest task, they can fill out the form or put in a COVE player id
 
-    // ingest task in progress, everything is read only except the ingest task which they can cancel/clear because maybe a bug
 
-		if ( 0 < count( $field_data ) ) {
-			$html .= '<table class="form-table">' . "\n";
-			$html .= '<tbody>' . "\n";
-
-      // display a shortcode for this video asset 
-      $html .= '<tr valign="top"><th scope="row">Shortcode for this video asset:</th><td>[covevideoasset id=' . $post_id . ']</td></tr>' . "\n";
-
+  private function build_cove_api_form_section($fields, $field_data) {
       if ($fields['_coveam_ingest_task'][0] && (!$fields['_coveam_cove_player_id'][0])){
       // ingest task in progress, everything is read only except the ingest task which they can cancel/clear because maybe a bug
         $html .= '<tr><td colspan=2><div style="border:1px solid #330000;"><table><tr><th colspan=2><b>COVE Ingest In Progress</b></th></tr>';
@@ -171,6 +153,32 @@ class COVE_Asset_Metaboxes {
           $html .= $this->build_cove_ingest_form();
         }
       }
+    return $html;
+  }
+
+	public function meta_box_content() {
+		global $post_id;
+		$fields = get_post_custom( $post_id );
+		$field_data = $this->get_custom_fields_settings();
+    add_thickbox();
+		$html = '<span id="this_post_id" style="display:none;">' . $post_id . '</span>';
+		
+		$html .= '<input type="hidden" name="' . $this->token . '_nonce" id="' . $this->token . '_nonce" value="' . wp_create_nonce( plugin_basename( $this->dir ) ) . '" />';
+    
+    	
+    // no COVE player id AND no ingest task, they can fill out the form or put in a COVE player id
+
+    // ingest task in progress, everything is read only except the ingest task which they can cancel/clear because maybe a bug
+
+		if ( 0 < count( $field_data ) ) {
+			$html .= '<table class="form-table">' . "\n";
+			$html .= '<tbody>' . "\n";
+
+      // display a shortcode for this video asset 
+      $html .= '<tr valign="top"><th scope="row">Shortcode for this video asset:</th><td>[covevideoasset id=' . $post_id . ']</td></tr>' . "\n";
+
+      $html .= $this->build_cove_api_form_section($fields, $field_data);
+
       $html .= $this->build_youtube_upload_form($post_id, $fields['_coveam_youtube_id'][0], $fields['_coveam_youtubestatus'][0]);
    
       // always put the video override field at the end.
@@ -183,6 +191,11 @@ class COVE_Asset_Metaboxes {
 		
 		echo $html;	
 	}
+
+
+
+
+
 
 	public function meta_box_save( $post_id ) {
     

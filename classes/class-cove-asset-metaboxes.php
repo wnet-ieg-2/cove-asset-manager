@@ -40,6 +40,13 @@ class COVE_Asset_Metaboxes {
     }
 	}
 
+  public function use_media_manager() {
+    if (get_option('coveam_use_mm_ingest') == 'true') {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
 
   private function build_cove_api_form_section($fields, $field_data) {

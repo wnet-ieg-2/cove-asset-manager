@@ -221,4 +221,41 @@ class COVE_Asset_Manager {
     return $text;
   }
 
+
+  public function create_media_manager_episode( $post_id = false, $season_id = false, $attribs = array() ) {
+    /* function can be called either saving an episode post or via wp_cron.
+     * defaults to creating a new episode with today's date in the current season 
+     * function saves the returned cid as a postmeta field for the given post */
+    if (!$post_id) {
+      return array('errors' => 'no post_id' );
+    }
+    $season_id = !$season_id ? get_option('coveam_mm_season_id') : false;
+    if (!$season_id) {
+      return array( 'errors' => 'no season_id' ); 
+    }
+    // default values for the episode
+    $datestring = get_the_date('M j, Y');
+    if (empty($attribs['title'])) {
+       $attribs['title'] = 'Full Episode for ' . $datestring;
+    }
+    if (empty($attribs['slug'])) {
+      $attribs['slug'] = $this->COVEslugify($attribs['title']);
+    }
+    if (empty($attribs['description_short'])) {
+      $attribs['description_short'] = $attribs['title'];
+    } 
+    if (empty($attribs['description_long'])) {
+      $attribs['description_long'] = $attribs['title'];
+    } 
+
+    $client = $this->get_media_manager_client();
+    $result = $client->create_child($season_id, 'season', 'episode', $attribs);
+    if (!empty($result['errors'])) {
+      return $result;
+    }
+    // note that update_post_meta returns false on failure and also on an unchanged value
+    // this will give me a literal true if an update, and a meta id if a new field
+    return update_post_meta($post_id, 'pbs_media_manager_episode_cid', $result);
+  }
+
 }

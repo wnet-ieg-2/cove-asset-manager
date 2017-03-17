@@ -42,7 +42,22 @@ class COVE_Asset_Metaboxes {
 		    add_meta_box( 'cove_topics_metabox', __( 'COVE Topics' , 'cove_asset_manager' ), 'post_categories_meta_box', $post_type, 'normal', 'high', array( 'taxonomy' => 'cove_topics') );
       }
     }
+    // special case for the episoder
+    if ( $post_type == 'episodes' && $this->plugin_obj->use_media_manager ) {
+      add_meta_box( 'media_manager_episode_details', 'Media Manager Episode Details', array( $this, 'episode_metabox_content' ), 'episodes', 'normal', 'high' );
+    }
 	}
+
+  public function episode_metabox_content() {
+    global $post_id;
+		$fields = get_post_custom( $post_id );
+		$html .= '<input type="hidden" name="' . $this->token . '_nonce" id="' . $this->token . '_nonce" value="' . wp_create_nonce( plugin_basename( $this->dir ) ) . '" />';
+	  if (!empty($fields['media_manager_episode_cid'][0])) {
+      $html .= 'current media manager episode = ' . $fields['media_manager_episode_cid'][0];
+    }	
+		echo $html;	
+  }
+
 
   private function build_media_manager_api_form_section($fields, $field_data) {
     return 'media manager form';

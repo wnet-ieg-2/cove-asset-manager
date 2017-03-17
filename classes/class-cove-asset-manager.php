@@ -21,7 +21,11 @@ class COVE_Asset_Manager {
 		add_action( 'init', array( $this, 'load_localisation' ), 0 );
 
 		// setup the tazonomy
-		add_action( 'init', array( $this, 'add_cove_topics_taxonomy' ), 0 );
+    if ($this->use_media_manager) {
+		  add_action( 'init', array( $this, 'add_cove_topics_taxonomy' ), 0 );
+    }
+
+    // setup the post types
     add_action( 'init', array( $this, 'register_post_types' ), 0 );  
 
 		// Load public-facing style sheet and JavaScript.

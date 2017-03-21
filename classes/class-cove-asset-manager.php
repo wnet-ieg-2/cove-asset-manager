@@ -325,7 +325,6 @@ class COVE_Asset_Manager {
 
 
   public function update_media_manager_asset( $postid = false, $asset_id = '' ) {
-    error_log('updating ' . $asset_id);
     if (!$postid) {
       return array('errors' => 'no post_id');
     }

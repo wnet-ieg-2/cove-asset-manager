@@ -291,7 +291,7 @@ class COVE_Asset_Manager {
     }
     $client = $this->get_media_manager_client();
     if (!empty($client->errors)) { return $client; }
-    $asset = $client->get_asset($asset_id);
+    $asset = $client->get_asset($asset_id, true);
     if (!empty($asset['errors'])) { return $asset; }
     update_post_meta($postid, '_coveam_video_asset_guid', $asset_id);
     $temp_obj = $asset['data'];

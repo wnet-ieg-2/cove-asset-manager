@@ -221,6 +221,28 @@ class COVE_Asset_Manager {
     return $text;
   }
 
+  public function MediaManagerTranslateTypeToNumber($str) {
+    /* this is a stupid system that is left over for translating between our old data and new */
+    if (strtolower($str) == 'full_length') {
+      return '0';
+    } elseif (strtolower($str) == 'preview') {
+      return '1';
+    } elseif (strtolower($str) == 'clip') {
+      return '4';
+    } 
+  }
+
+  public function COVETranslateNumberToType($num) {
+    /* this is a stupid system that is left over for translating between our old data and new */
+    if ($num == 0) {
+      return 'full_length'; 
+    } elseif ($num == 1) {
+      return 'preview';
+    } else { 
+      return 'clip';
+    }
+  }
+
 
   public function create_media_manager_episode( $post_id = false, $season_id = false, $attribs = array() ) {
     /* function can be called either saving an episode post or via wp_cron.
@@ -277,11 +299,11 @@ class COVE_Asset_Manager {
     update_post_meta($postid, '_coveam_description', $temp_obj['attributes']['description_long']);
     update_post_meta($postid, '_coveam_shortdescription', $temp_obj['attributes']['description_short']);
     update_post_meta($postid, '_coveam_video_slug', $temp_obj['attributes']['slug']);
-    update_post_meta($postid, '_coveam_video_player_id', $temp_obj['attributes']['legacy_tp_media_id']);
+    update_post_meta($postid, '_coveam_cove_player_id', $temp_obj['attributes']['legacy_tp_media_id']);
     update_post_meta($postid, '_coveam_airdate', $temp_obj['attributes']['premiered_on'] . ' 19:00:00');
 
     //translate to our system
-    //update_post_meta($postid, '_coveam_video_fullprogram', COVETranslateTypeToNumber($temp_obj[type]));
+    update_post_meta($postid, '_coveam_video_fullprogram', $this->MediaManagerTranslateTypeToNumber($temp_obj['attributes']['object_type']));
 
     //update_post_meta($postid, '_coveam_covestatus', $temp_obj[availability]);
 

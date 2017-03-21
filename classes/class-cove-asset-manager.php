@@ -189,9 +189,9 @@ class COVE_Asset_Manager {
     if (!class_exists('PBS_Media_Manager_API_Client')) {
       return array('errors' => 'Media Manager API Client not present');
     }
-    $client_key = !empty(get_option('coveamm_mm_api_key')) ? get_option('coveamm_mm_api_key') : false;
-    $client_secret = !empty(get_option('coveamm_mm_api_secret')) ? get_option('coveamm_mm_api_secret') : false;
-    $client_endpoint = !empty(get_option('coveamm_mm_api_endpoint')) ? get_option('coveamm_mm_api_endpoint') : false;
+    $client_key = !empty(get_option('coveam_mm_api_key')) ? get_option('coveam_mm_api_key') : false;
+    $client_secret = !empty(get_option('coveam_mm_api_secret')) ? get_option('coveam_mm_api_secret') : false;
+    $client_endpoint = !empty(get_option('coveam_mm_api_endpoint')) ? get_option('coveam_mm_api_endpoint') : false;
     if ($api_key && $api_secret && $api_endpoint) {
       $client_key = $api_key;
       $client_secret = $api_secret;
@@ -256,6 +256,37 @@ class COVE_Asset_Manager {
     // note that update_post_meta returns false on failure and also on an unchanged value
     // this will give me a literal true if an update, and a meta id if a new field
     return update_post_meta($post_id, 'pbs_media_manager_episode_cid', $result);
+  }
+
+  public function import_media_manager_asset( $postid = false, $asset_id = '') {
+    /* function imports data based on the PBS Content ID and saves it to postmeta.  Returns the retrieved object or 'errors' array
+     */
+    if (!$postid) {
+      return array('errors' => 'no post_id');
+    }
+    if (!$asset_id ) {
+      return array('errors' => 'no asset_id');
+    }
+    $client = $this->get_media_manager_client();
+    if (!empty($client->errors)) { return $client; }
+    $asset = $client->get_asset($asset_id);
+    if (!empty($asset['errors'])) { return $asset; }
+    update_post_meta($postid, '_coveam_video_asset_guid', $asset_id);
+    $temp_obj = $asset['data'];
+    update_post_meta($postid, '_coveam_video_title', $temp_obj['attributes']['title']); 
+    update_post_meta($postid, '_coveam_description', $temp_obj['attributes']['description_long']);
+    update_post_meta($postid, '_coveam_shortdescription', $temp_obj['attributes']['description_short']);
+    update_post_meta($postid, '_coveam_video_slug', $temp_obj['attributes']['slug']);
+    update_post_meta($postid, '_coveam_video_player_id', $temp_obj['attributes']['legacy_tp_media_id']);
+    update_post_meta($postid, '_coveam_airdate', $temp_obj['attributes']['premiered_on'] . ' 19:00:00');
+
+    //translate to our system
+    //update_post_meta($postid, '_coveam_video_fullprogram', COVETranslateTypeToNumber($temp_obj[type]));
+
+    //update_post_meta($postid, '_coveam_covestatus', $temp_obj[availability]);
+
+
+    return $asset;
   }
 
 }

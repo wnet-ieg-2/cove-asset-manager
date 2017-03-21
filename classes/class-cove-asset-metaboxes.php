@@ -60,9 +60,65 @@ class COVE_Asset_Metaboxes {
 
 
   private function build_media_manager_api_form_section($fields, $field_data) {
-    return 'media manager form';
+    $html .= 'media manager form';
+    /* unlike in the COVE Ingest API case, most fields are writable
+     * and we can get the status directly from the created object 
+     * including during ingest.  So the 'suppress' case and during-ingest cases 
+     * are no longer used, but the 'video id' and 'video guid' fields are either null or read-only  */
 
+    if ( empty($fields['_coveam_cove_player_id'][0]) && empty($fields['_coveam_video_asset_guid'][0]) ) {
+      // once populated, these fields are read-only.  so prompt to either create a new asset or pull in asset data 
+      $html .= '<tr valign="top"><th scope="row">New record creation</th><td>Either <br /><input type="radio" name="media_manager_action" value="noaction"><b>do nothing</b> or<br /><input type="radio" name="media_manager_action" value="create"><b>create</b> a new asset record in the Media Manager or <br /><input type="radio" name="media_manager_action" value="import"><b>import</b> an existing Media Manager record with the following PBS Content ID: <input name="media_manager_import_content_id" type="text" class="regular-text" /></td></tr>';
 
+    }
+
+    foreach ( $field_data as $k => $v ) {
+      if ( $k == '_coveam_cove_player_id' || $k == '_coveam_video_asset_guid' ) {
+        $v['type'] = 'readonly';
+      }
+      $data = $v['default'];
+		  if ( isset( $fields[$k] ) && isset( $fields[$k][0] ) ) {
+				$data = $fields[$k][0];
+			}
+      // automated formatting switches 
+  	  if( $v['type'] == 'checkbox' ) {
+        $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row">' . $v['name'] . '</th><td><input name="' . esc_attr( $k ) . '" type="checkbox" value="1" id="' . esc_attr( $k ) . '" ' . checked( 'on' , $data , false ) . ' /> <label for="' . esc_attr( $k ) . '"><span class="description">' . $v['description'] . '</span></label>' . "\n";
+  		 	$html .= '</td></tr>' . "\n";
+      } else if( $v['type'] == 'radio' ) {
+        $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row">' . $v['name'] . '</th><td>';
+        foreach ( $v['options'] as $option ) {
+          $html .= '<input name="' . esc_attr( $k ) . '" type="radio" id="' . esc_attr( $option['value'] ) . '" value="' . esc_attr( $option['value'] ) . '" ';
+          if ($data == $option['value']) $html .= ' checked="checked"';
+            $html .= ' /><label for="' . esc_attr( $option['value'] ) . '">' . $option['label'] . '</label>&nbsp;  ' . "\n";
+        }
+			  $html .= '<p class="description">' . $v['description'] . '</p></td></tr>' . "\n";
+      } else if( $v['type'] == 'textarea' ) {
+        $maxinput = '';
+        if ($v['maxlength']) { $maxinput = ' data-limit-input="' . $v['maxlength'] . '" '; }
+          $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><textarea class="widefat" name="' . esc_attr( $k ) . '" id="' . esc_attr( $k ) . '"' . $maxinput . '>' . esc_attr( $data ) . '</textarea>' . "\n";
+          $html .= '<span></span><p class="description">' . $v['description'] . '</p>' . "\n";
+		  	  $html .= '</td></tr>' . "\n";
+      } else if( $v['type'] == 'datetime' ) {
+  		  $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><input name="' . esc_attr( $k ) . '" type="datetime" class="datetimepicker" id="' . esc_attr( $k ) . '" value="' . esc_attr( $data ) . '" />' . "\n";
+  		  $html .= '<p class="description">' . $v['description'] . '</p>' . "\n";
+	  	 	$html .= '</td></tr>' . "\n";
+      } else if( $v['type'] == 'readonly' ) {
+        $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><input name="' . esc_attr( $k ) . '" type="hidden" id="' . esc_attr( $k ) . '" value="' . esc_attr( $data ) . '" />' . esc_attr( $data ) . "\n";
+        $html .= '<p class="description">' . $v['description'] . '</p>' . "\n";
+        $html .= '</td></tr>' . "\n";
+      } else if( $v['type'] == 'spanonly' ) {
+        $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><span id="' . esc_attr( $k ) . '">' . esc_attr( $data ) . '</span>' . "\n";
+        $html .= '<p class="description">' . $v['description'] . '</p>' . "\n";
+        $html .= '</td></tr>' . "\n";
+  		} else {
+        if ($v['maxlength']) { $maxinput = ' data-limit-input="' . $v['maxlength'] . '" '; }
+	  	  $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><input name="' . esc_attr( $k ) . '" type="text" id="' . esc_attr( $k ) . '" class="regular-text" value="' . esc_attr( $data ) . '"' . $maxinput . ' />' . "\n";
+        $html .= '<span></span><p class="description">' . $v['description'] . '</p>' . "\n";
+			  $html .= '</td></tr>' . "\n";
+  	  } // end formatting switches
+    } // end foreach
+
+    return $html;
 
   }
 
@@ -262,11 +318,29 @@ class COVE_Asset_Metaboxes {
       if ($f == '_coveam_cove_player_id' && ${$f} != '') {
         $coveid = ${$f};
       }
+      if ($f == '_coveam_video_asset_guid' && ${$f} != '') {
+        $assetid = ${$f};
+      }
+
       if ($f == '_coveam_youtube_id' && ${$f} != '') {
         $youtubeid = ${$f};
       }
     }
-    if ($coveid != '') {
+
+    if ($this->plugin_obj->use_media_manager ) {
+      if ( !empty($_POST['media_manager_action'] )) {
+        $importid = !empty($_POST['media_manager_import_content_id']) ? $_POST['media_manager_import_content_id'] : false;
+        if ( $_POST['media_manager_action'] == 'import' && $importid ) {
+          $assetid = $importid;
+        }
+      }
+      $returnval = $this->plugin_obj->import_media_manager_asset($post_id, $assetid);
+      if (!empty($returnval['errors'])) { 
+        error_log(json_encode($returnval));
+      }
+    }
+
+    if ($coveid != '' && !$this->plugin_obj->use_media_manager) {
       if (function_exists('coveam_update_asset_metafields_from_cove')) {
         coveam_update_asset_metafields_from_cove($post_id, $coveid);
       }
@@ -332,13 +406,15 @@ class COVE_Asset_Metaboxes {
         'description' => '<span id="_coveam_covestatus_long"></span><a id="check-cove-status-from-guid" style="display:none;" >Get the latest status</a>',
         'section' => 'cove-asset-details'
     );
+
     $fields['_coveam_video_asset_guid'] = array(
-        'name' => __( 'COVE video asset GUID:' , 'cove_asset_manager' ),
+        'name' => 'PBS Content ID:',
         'type' => 'spanonly',
         'default' => '',
-        'description' => 'Unique ID for this media in COVE',
+        'description' => 'Unique ID for this asset in COVE and the Media Manager',
         'section' => 'cove-asset-details'
     );
+
 
 		$fields['_coveam_rights'] = array(
 		    'name' => __( 'Rights:' , 'cove_asset_manager' ),

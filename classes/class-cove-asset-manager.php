@@ -311,4 +311,16 @@ class COVE_Asset_Manager {
     return $asset;
   }
 
+  private function map_metadata_fields_to_asset_array($postid) {
+    $fields = get_post_custom($postid);
+    $attribs = array();
+    // required fields first
+    $attribs['title'] = maybe_unserialize($fields['_coveam_video_title'][0]);
+    $attribs['description_long'] =  maybe_unserialize($fields['_coveam_description'][0]);
+    $attribs['description_short'] =  maybe_unserialize($fields['_coveam_shortdescription'][0]);
+    $attribs['object_type'] = $this->COVETranslateNumberToType($fields['_coveam_video_fullprogram']);
+    // much more tk
+    return $attribs;
+  }
+
 }

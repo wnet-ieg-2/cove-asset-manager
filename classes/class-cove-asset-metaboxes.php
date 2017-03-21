@@ -27,9 +27,10 @@ class COVE_Asset_Metaboxes {
   public function setup_custom_scripts() {
     wp_enqueue_script( 'youtube_cors', $this->assets_url . 'js/youtube_cors.js', array( 'jquery' ), 2, true );
     wp_enqueue_script( 'amazon_cors', $this->assets_url . 'js/amazon_cors.js', array( 'jquery' ), 2, true );
-    wp_enqueue_script( 'cove_ingest', $this->assets_url . 'js/cove_ingest.js', array( 'jquery' ), 1, true );
-    wp_enqueue_style( 'cove_asset', $this->assets_url . 'css/metaboxes.css' );
-    
+    if (!$this->plugin_obj->use_media_manager) { 
+      wp_enqueue_script( 'cove_ingest', $this->assets_url . 'js/cove_ingest.js', array( 'jquery' ), 1, true );
+      wp_enqueue_style( 'cove_asset', $this->assets_url . 'css/metaboxes.css' );
+    } 
     wp_enqueue_media();
     wp_enqueue_script( 'wp_mediamanager_select', $this->assets_url . 'js/wp-mediamanager-select.js', array( 'jquery' ), 1, true );
   }
@@ -75,6 +76,7 @@ class COVE_Asset_Metaboxes {
     foreach ( $field_data as $k => $v ) {
       if ( $k == '_coveam_cove_player_id' || $k == '_coveam_video_asset_guid' ) {
         $v['type'] = 'readonly';
+        $v['description'] = '';
       }
       $data = $v['default'];
 		  if ( isset( $fields[$k] ) && isset( $fields[$k][0] ) ) {

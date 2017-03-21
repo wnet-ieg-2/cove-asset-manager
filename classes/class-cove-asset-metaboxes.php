@@ -335,10 +335,23 @@ class COVE_Asset_Metaboxes {
         if ( $_POST['media_manager_action'] == 'import' && $importid ) {
           $assetid = $importid;
         }
+        // create case later
+
+      } else {
+        if ( $assetid ) {
+          $returnval = $this->plugin_obj->update_media_manager_asset($post_id, $assetid);
+          if (!empty($returnval['errors'])) { 
+            error_log(json_encode($returnval));
+          }
+        }
       }
-      $returnval = $this->plugin_obj->import_media_manager_asset($post_id, $assetid);
-      if (!empty($returnval['errors'])) { 
-        error_log(json_encode($returnval));
+
+      // always get the latest data from the API
+      if ($assetid) {
+        $returnval = $this->plugin_obj->import_media_manager_asset($post_id, $assetid);
+        if (!empty($returnval['errors'])) { 
+          error_log(json_encode($returnval));
+        }
       }
     }
 

@@ -323,4 +323,21 @@ class COVE_Asset_Manager {
     return $attribs;
   }
 
+
+  public function update_media_manager_asset( $postid = false, $asset_id = '' ) {
+    error_log('updating ' . $asset_id);
+    if (!$postid) {
+      return array('errors' => 'no post_id');
+    }
+    if (!$asset_id ) {
+      return array('errors' => 'no asset_id');
+    }
+    $client = $this->get_media_manager_client();
+    if (!empty($client->errors)) { return $client; }
+    $attribs = $this->map_metadata_fields_to_asset_array($postid); 
+    $response = $client->update_object($asset_id, 'asset', $attribs);
+    return $response;
+  }
+
+
 }

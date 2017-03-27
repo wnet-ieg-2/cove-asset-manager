@@ -64,7 +64,7 @@ class COVE_Asset_Metaboxes {
     $html .= 'media manager form';
     /* unlike in the COVE Ingest API case, most fields are writable
      * and we can get the status directly from the created object 
-     * including during ingest.  So the 'suppress' case and during-ingest cases 
+     * including during ingest.  So the during-ingest cases 
      * are no longer used, but the 'video id' and 'video guid' fields are either null or read-only  */
 
     if ( empty($fields['_coveam_cove_player_id'][0]) && empty($fields['_coveam_video_asset_guid'][0]) ) {
@@ -87,6 +87,9 @@ class COVE_Asset_Metaboxes {
 		  if ( isset( $fields[$k] ) && isset( $fields[$k][0] ) ) {
 				$data = $fields[$k][0];
 			}
+      if ( $v['suppress'] == true ) {
+        continue;
+      }
       // automated formatting switches 
   	  if( $v['type'] == 'checkbox' ) {
         $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row">' . $v['name'] . '</th><td><input name="' . esc_attr( $k ) . '" type="checkbox" value="1" id="' . esc_attr( $k ) . '" ' . checked( 'on' , $data , false ) . ' /> <label for="' . esc_attr( $k ) . '"><span class="description">' . $v['description'] . '</span></label>' . "\n";
@@ -502,6 +505,36 @@ class COVE_Asset_Metaboxes {
         'suppress' => true,
 		    'section' => 'cove-ingest-fields coverequired'
 		);
+    if ($this->plugin_obj->use_media_manager) {
+		  $fields['_coveam_video_fullprogram'] = array(
+		    'name' => 'Asset type:',
+		    'type' => 'radio',
+        'options' => array (
+          'episode' => array (
+            'label' => 'full_length',
+            'value' => '0'
+          ),
+          'promotion' => array (
+            'label' => 'preview',
+            'value' => '1'
+          ),
+          'clip' => array (
+            'label' => 'clip',
+            'value' => '4'
+          ),
+        ),
+        'default' => '4',
+		    'section' => 'cove-asset-details coverequired youtuberequired'
+		  );
+
+ 		  $fields['_coveam_caption_file'] = array(
+		    'name' => 'Uploaded Caption File:',
+		    'type' => 'url',
+		    'default' => '',
+        'suppress' => true,
+		    'section' => 'cove-ingest-fields coverequired'
+		  );
+    }
     $fields['_coveam_ingest_task'] = array(
         'name' => __( 'Cove Ingest Task SUPPRESSED:' , 'cove_asset_manager' ),
         'type' => 'url',

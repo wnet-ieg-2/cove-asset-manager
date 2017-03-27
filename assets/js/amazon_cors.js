@@ -52,6 +52,8 @@ function AWSuploadFile() {
   var file = $('#video_file_to_upload').get(0).files[0];
   if (whichfile == "image") {
     file = $('#image_file_to_upload').get(0).files[0];
+  } else if (whichfile == "caption") {
+    file = $('#caption_file_to_upload').get(0).files[0];
   }
   AWSexecuteOnSignedUrl(file, function(signedURL){
     AWSuploadToS3(file, signedURL);
@@ -80,6 +82,8 @@ function AWSuploadToS3(file, url) {
         uploadedfile = uploadedfile + '/' + slug;
         if (COVEAMFILETYPE == 'image') {
           $('#_coveam_video_image').val(uploadedfile);
+        } else if  (COVEAMFILETYPE == 'caption') {
+          $('#_coveam_video_caption').val(uploadedfile);
         } else {
           $('#_coveam_video_url').val(uploadedfile);
         }
@@ -87,6 +91,7 @@ function AWSuploadToS3(file, url) {
         $('#submit_cove_ingest').append('<p>You must save your changes before submitting to COVE</p>');
         $('#s3-upload-image').show();
         $('#s3-upload-video').show();
+        $('#s3-upload-caption').show();
       }
       else
       {
@@ -132,6 +137,7 @@ function AWSsetProgress(percentage, statusLabel) {
        AWSuploadFile();
        $('#s3-upload-image').hide();
        $('#s3-upload-video').hide();
+       $('#s3-upload-caption').hide();
       });
    $('#s3-upload-image').click(function(event) {
        event.preventDefault();
@@ -139,6 +145,15 @@ function AWSsetProgress(percentage, statusLabel) {
        AWSuploadFile();
        $('#s3-upload-image').hide();
        $('#s3-upload-video').hide();
+       $('#s3-upload-caption').hide();
+      });
+    $('#s3-upload-caption').click(function(event) {
+       event.preventDefault();
+       COVEAMFILETYPE = "caption";
+       AWSuploadFile();
+       $('#s3-upload-image').hide();
+       $('#s3-upload-video').hide();
+       $('#s3-upload-caption').hide(); 
       });
   });
 });

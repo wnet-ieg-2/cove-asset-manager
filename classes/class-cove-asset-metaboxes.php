@@ -128,6 +128,20 @@ class COVE_Asset_Metaboxes {
   	  } // end formatting switches
     } // end foreach
 
+    // inline replacement for 'build s3 section' function 
+    $currentvideourl = !empty($fields['_coveam_video_url'][0]) ? $fields['_coveam_video_url'][0] : '';
+    $currentimageurl = !empty($fields['_coveam_video_image'][0]) ? $fields['_coveam_video_image'][0] : '';
+    $currentcaptionurl = !empty($fields['_coveam_video_caption'][0]) ? $fields['_coveam_video_caption'][0] : '';
+    $html .= '<tr valign="top" style="display:none;"><th></th><td><span id="plugin_assets_url">' .  $this->assets_url . '</span><span id="s3_bucket">' . get_option( 'coveam_s3_bucket' ) . '</span><span id="s3_bucket_dir">' . get_option( 'coveam_s3_bucket_dir' ) . '</span></td></tr>' . "\n";
+    $html .= '<tr valign="top" class="cove-ingest-fields coverequired"><th scope="row"><label for="_coveam_video_url">COVE Mezzanine Video URL</label></th><td><input name="_coveam_video_url" type="text" id="_coveam_video_url" class="widefat" value="' . $currentvideourl . '"/>' . "\n";
+    $html .= '<br /><label for="video_file_to_upload">Upload a new mezzanine video file:</label> <input name="video_file_to_upload" type="file" id="video_file_to_upload" /><p class="description"><a id="s3-upload-video"><button class="button">Click to upload the <b>video</b> file you selected</button></a> Video file will replace the current uploaded video file.</p></td></tr>' . "\n";
+    $html .= '<tr valign="top" class="video-during-s3-upload" style="display:none;"><th scope="row">Upload status: <span id="video-s3-post-upload-status"></span></th><td><span id="video-s3-percent-transferred"></span>% done <progress id="video-s3-upload-progress" max="1" value="0"></progress></td></tr>' . "\n";
+    //caption file
+    $html .= '<tr valign="top" class="cove-ingest-fields coverequired"><th scope="row"><label for="_coveam_video_caption">COVE Caption File URL</label></th><td><input name="_coveam_video_caption" type="text" id="_coveam_video_caption" class="widefat" value="' . $currentcaptionurl . '"/>' . "\n";
+    $html .= '<br /><label for "caption_file_to_upload">Upload a new caption file:</label> <input name="caption_file_to_upload" type="file" id="caption_file_to_upload" /><p class="description"><a id="s3-upload-caption"><button class="button">Click to upload the <b>caption</b> file you selected </button></a> Caption file will replace the current uploaded caption file</p></td></tr>' . "\n";
+    //image file
+    $html .= '<tr valign="top" class="cove-ingest-fields coverequired"><th scope="row"><label for="_coveam_video_image">COVE Mezzanine Image URL</label></th><td><input name="_coveam_video_image" type="text" id="_coveam_video_image" class="widefat" value="' . $currentimageurl . '"/><button id="_coveam_image_mediamanager" class="button">Click to open the Wordpress Media Library to select or upload an <b>image</b> </button> <p class="description">Select a JPG file (at least 1920x1080).</p></td></tr>' . "\n";
+
     return $html;
 
   }
@@ -456,7 +470,7 @@ class COVE_Asset_Metaboxes {
         'description' => 'Videos with limited rights will become unavailable after 30 days.',
 		    'section' => 'cove-asset-details coverequired youtuberequired'
 		);
-
+    
 		$fields['_coveam_video_fullprogram'] = array(
 		    'name' => __( 'Video type:' , 'cove_asset_manager' ),
 		    'type' => 'radio',
@@ -490,6 +504,7 @@ class COVE_Asset_Metaboxes {
         'description' => 'Full episodes must be submitted for ingest via Merlin, not this tool.  This is because closed captioning is required for full epsiodes and the API provided by PBS does not currently support captioning.',
 		    'section' => 'cove-asset-details coverequired youtuberequired'
 		);
+    
 
 		$fields['_coveam_video_url'] = array(
 		    'name' => __( 'Uploaded S3 Video Asset File:' , 'cove_asset_manager' ),

@@ -132,15 +132,33 @@ class COVE_Asset_Metaboxes {
     $currentvideourl = !empty($fields['_coveam_video_url'][0]) ? $fields['_coveam_video_url'][0] : '';
     $currentimageurl = !empty($fields['_coveam_video_image'][0]) ? $fields['_coveam_video_image'][0] : '';
     $currentcaptionurl = !empty($fields['_coveam_video_caption'][0]) ? $fields['_coveam_video_caption'][0] : '';
+
     $html .= '<tr valign="top" style="display:none;"><th></th><td><span id="plugin_assets_url">' .  $this->assets_url . '</span><span id="s3_bucket">' . get_option( 'coveam_s3_bucket' ) . '</span><span id="s3_bucket_dir">' . get_option( 'coveam_s3_bucket_dir' ) . '</span></td></tr>' . "\n";
-    $html .= '<tr valign="top" class="cove-ingest-fields coverequired"><th scope="row"><label for="_coveam_video_url">COVE Mezzanine Video URL</label></th><td><input name="_coveam_video_url" type="text" id="_coveam_video_url" class="widefat" value="' . $currentvideourl . '"/>' . "\n";
-    $html .= '<br /><label for="video_file_to_upload">Upload a new mezzanine video file:</label> <input name="video_file_to_upload" type="file" id="video_file_to_upload" /><p class="description"><a id="s3-upload-video"><button class="button">Click to upload the <b>video</b> file you selected</button></a> Video file will replace the current uploaded video file.</p></td></tr>' . "\n";
-    $html .= '<tr valign="top" class="video-during-s3-upload" style="display:none;"><th scope="row">Upload status: <span id="video-s3-post-upload-status"></span></th><td><span id="video-s3-percent-transferred"></span>% done <progress id="video-s3-upload-progress" max="1" value="0"></progress></td></tr>' . "\n";
-    //caption file
-    $html .= '<tr valign="top" class="cove-ingest-fields coverequired"><th scope="row"><label for="_coveam_video_caption">COVE Caption File URL</label></th><td><input name="_coveam_video_caption" type="text" id="_coveam_video_caption" class="widefat" value="' . $currentcaptionurl . '"/>' . "\n";
-    $html .= '<br /><label for "caption_file_to_upload">Upload a new caption file:</label> <input name="caption_file_to_upload" type="file" id="caption_file_to_upload" /><p class="description"><a id="s3-upload-caption"><button class="button">Click to upload the <b>caption</b> file you selected </button></a> Caption file will replace the current uploaded caption file</p></td></tr>' . "\n";
+    $html .= '<tr valign="top" class="cove-ingest-fields"><th scope="row">';
+    if ( $currentvideourl) {
+      $html .= 'Archive Video URL</th><td>' . $currentvideourl . '<p class="description">Current asset status: <b>' . $fields['_coveam_covestatus'][0] . '</b><br />NOTE: Don\'t delete an in-progress deletion.  Deletion may take a few minutes to complete, and will unpublish a published asset. <br /> Save/update the post to get the most recent asset status.</p><label for="delete_current_video">Submitting a new video file requires deleting the current video file. Delete file?</label> <input type="checkbox" name="delete_current_video" value="true" /></td></tr>';
+    } else {
+      $html .= '<tr valign="top" class="cove-ingest-fields coverequired"><th scope="row"><label for="_coveam_video_url">Video URL to submit for ingest</label></th><td><input name="_coveam_video_url" type="text" id="_coveam_video_url" class="widefat" value=""/>' . "\n";
+      $html .= '<br /><label for="video_file_to_upload">Upload a new mezzanine video file to AWS:</label> <input name="video_file_to_upload" type="file" id="video_file_to_upload" /><p class="description"><a id="s3-upload-video"><button class="button">Click to upload the <b>video</b> file you selected to AWS</button></a>  Save or update the post to submit the file to COVE for ingestion.</p></td></tr>' . "\n";
+      $html .= '<tr valign="top" class="video-during-s3-upload" style="display:none;"><th scope="row">Upload status: <span id="video-s3-post-upload-status"></span></th><td><span id="video-s3-percent-transferred"></span>% done <progress id="video-s3-upload-progress" max="1" value="0"></progress></td></tr>' . "\n";
+    }
     //image file
-    $html .= '<tr valign="top" class="cove-ingest-fields coverequired"><th scope="row"><label for="_coveam_video_image">COVE Mezzanine Image URL</label></th><td><input name="_coveam_video_image" type="text" id="_coveam_video_image" class="widefat" value="' . $currentimageurl . '"/><button id="_coveam_image_mediamanager" class="button">Click to open the Wordpress Media Library to select or upload an <b>image</b> </button> <p class="description">Select a JPG file (at least 1920x1080).</p></td></tr>' . "\n";
+    $html .= '<tr valign="top" class="cove-ingest-fields coverequired"><th scope="row"><label for="_coveam_video_image">COVE Image URL</label></th><td>';
+    if ($currentimageurl) {
+      $html .= 'Current Image URL: ' . $currentimageurl . '<br />Entering a value below to replace the current image<br />';
+    } 
+    $html .= '<input name="_coveam_video_image" type="text" id="_coveam_video_image" class="widefat" value=""/><p class="description"><button id="_coveam_image_mediamanager" class="button">Click to open the Wordpress Media Library to select or upload an <b>image</b> </button> Select a JPG file (at least 1920x1080).  Save/update the post to update the asset in COVE.</p></td></tr>' . "\n";
+
+
+    //caption file
+    $html .= '<tr valign="top" class="cove-ingest-fields"><th scope="row">';
+    if ( $currentcaptionurl) {
+      $html .= 'Archive Caption URL</th><td>' . $currentcaptionurl . '<br /><label for="delete_current_caption">Submitting a new caption file requires deleting the current caption file. Delete file?</label> <input type="checkbox" name="delete_current_caption" value="true" /><p class="description">NOTE: Deletion may take a few minutes to complete, and will unpublish a published asset. <br />Current asset status: <b>' . $fields['_coveam_covestatus'][0] . '</b> Save/update the post to get the most recent asset status.</td></tr>';
+    } else {
+      $html .= '<tr valign="top" class="cove-ingest-fields coverequired"><th scope="row"><label for="_coveam_video_caption">Caption URL to submit for ingest</label></th><td><input name="_coveam_video_caption" type="text" id="_coveam_video_caption" class="widefat" value=""/>' . "\n";
+      $html .= '<br /><label for="caption_file_to_upload">Upload a new caption file to AWS:</label> <input name="caption_file_to_upload" type="file" id="caption_file_to_upload" /><p class="description"><a id="s3-upload-caption"><button class="button">Click to upload the <b>caption</b> file you selected to AWS</button></a>  Save or update the post to submit the file for ingestion.</p></td></tr>' . "\n";
+      $html .= '<tr valign="top" class="caption-during-s3-upload" style="display:none;"><th scope="row">Upload status: <span id="caption-s3-post-upload-status"></span></th><td><span id="caption-s3-percent-transferred"></span>% done <progress id="caption-s3-upload-progress" max="1" value="0"></progress></td></tr>' . "\n";
+    }
 
     return $html;
 

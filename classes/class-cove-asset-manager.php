@@ -234,7 +234,7 @@ class COVE_Asset_Manager {
 
   public function COVETranslateNumberToType($num) {
     /* this is a stupid system that is left over for translating between our old data and new */
-    if ($num == 0) {
+    if ($num === 0) {
       return 'full_length'; 
     } elseif ($num == 1) {
       return 'preview';
@@ -361,27 +361,57 @@ class COVE_Asset_Manager {
     update_post_meta($postid, '_coveam_video_fullprogram', $this->MediaManagerTranslateTypeToNumber($temp_obj['attributes']['object_type']));
     update_post_meta($postid, '_coveam_covestatus', $this->determineMediaManagerStatus($temp_obj));
 
-    //update_post_meta($postid, '_coveam_covestatus', $temp_obj[availability]);
+    //ingest related fields
+    // Note that for video and caption, the object name will probably change to 'source' from 'destination'
+    $archive_video = !empty($temp_obj['attributes']['original_video']['destination']) ? $temp_obj['attributes']['original_video']['destination'] : '';
+    update_post_meta($postid, '_coveam_video_url', $archive_video);
 
+    $archive_caption = !empty($temp_obj['attributes']['original_caption']['destination']) ? $temp_obj['attributes']['original_caption']['destination'] : '';
+    update_post_meta($postid, '_coveam_video_caption', $archive_caption);
+
+    $archive_image = !empty($temp_obj['attributes']['images'][0]['image']) ? $temp_obj['attributes']['images'][0]['image'] : '';
+    update_post_meta($postid, '_coveam_video_image', $archive_image);
 
     return $asset;
   }
 
-  private function map_metadata_fields_to_asset_array($postid) {
-    $fields = get_post_custom($postid);
+  private function map_post_fields_to_asset_array($fields) {
     $attribs = array();
     // required fields first
-    $attribs['title'] = maybe_unserialize($fields['_coveam_video_title'][0]);
-    $attribs['description_long'] =  maybe_unserialize($fields['_coveam_description'][0]);
-    $attribs['description_short'] =  maybe_unserialize($fields['_coveam_shortdescription'][0]);
+    $attribs['title'] = $fields['_coveam_video_title'];
+    $attribs['description_long'] =  $fields['_coveam_description'];
+    $attribs['description_short'] =  $fields['_coveam_shortdescription'];
     $attribs['object_type'] = $this->COVETranslateNumberToType($fields['_coveam_video_fullprogram']);
-    // much more tk
+    $attribs['auto_publish'] = true;
+    //ingest related -- submitting a null video or caption entry triggers a file delete, not submitting it at all does nothing
+    if (!empty($fields['_coveam_video_url'])){
+      $attribs['video'] = array("profile" => "hd-1080p-mezzanine-16x9", "source" => $fields['_coveam_video_url']);
+    } else if ($fields['delete_current_video'] == true) {
+      $attribs['video'] = null;
+    }
+    if (!empty($fields['_coveam_video_caption'])){
+      $attribs['caption'] = $fields['_coveam_video_caption'];
+    } else if ($fields['delete_current_caption'] == true) {
+      $attribs['caption'] = null;
+    }
+    // images are automatically just replaced
+    if (!empty($fields['_coveam_video_image'])){
+      $attribs['images'][] = array("profile" => "asset-mezzanine-16x9", "source" => $fields['_coveam_video_image'] );
+    }
+
+    //tk better date stuff
+    $date = new DateTime('now');
+    $formatted_date = $date->format('Y-m-d');
+    $attribs['premiered_on'] = $formatted_date;
+    $attribs['encored_on'] = $formatted_date;
+
     return $attribs;
   }
 
 
-  public function update_media_manager_asset( $postid = false, $asset_id = '' ) {
-    if (!$postid) {
+  public function update_media_manager_asset( $post_id, $asset_id, $postary ) {
+    /* this function expects $_POST data */
+    if (!$post_id) {
       return array('errors' => 'no post_id');
     }
     if (!$asset_id ) {
@@ -389,7 +419,7 @@ class COVE_Asset_Manager {
     }
     $client = $this->get_media_manager_client();
     if (!empty($client->errors)) { return $client; }
-    $attribs = $this->map_metadata_fields_to_asset_array($postid); 
+    $attribs = $this->map_post_fields_to_asset_array($postary); 
     $response = $client->update_object($asset_id, 'asset', $attribs);
     return $response;
   }

@@ -359,6 +359,7 @@ class COVE_Asset_Manager {
 
     //translate to our system
     update_post_meta($postid, '_coveam_video_fullprogram', $this->MediaManagerTranslateTypeToNumber($temp_obj['attributes']['object_type']));
+    update_post_meta($postid, '_coveam_covestatus', $this->determineMediaManagerStatus($temp_obj));
 
     //update_post_meta($postid, '_coveam_covestatus', $temp_obj[availability]);
 

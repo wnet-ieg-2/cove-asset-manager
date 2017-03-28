@@ -243,6 +243,59 @@ class COVE_Asset_Manager {
     }
   }
 
+  public function determineMediaManagerStatus($obj) {
+    /* this function takes the complex data array from Media Manager and works out if the asset is actually available somehow */
+    $data = $obj['attributes'];
+    $ingest_status = array();
+    if (!empty($data['original_video'])) {
+      if (!empty($data['original_video']['ingestion_error'])){
+        $ingest_status['ingestion error'] = $data['original_video']['ingestion_error'];
+      }
+      if ($data['original_video']['ingestion_status'] !== 'done') {
+        $ingest_status['ingestion status'] = $data['original_video']['ingestion_status'];
+      }
+    }
+    if (!empty($data['original_caption'])) {
+      if (!empty($data['original_caption']['ingestion_error'])){
+        $ingest_status['caption error'] = $data['original_caption']['ingestion_error'];
+      }
+    } 
+    if (empty($data['images'][0]['image'])) {
+      $ingest_status['image'] = 'no image';
+    }
+
+    // wrap it up and return a stringafied array if not null
+    if (count($ingest_status) > 0) {
+      $out = '';  
+      foreach ($ingest_status as $k => $v) {
+        $out .= $k . ' : ' . $v . ', ';
+      }
+      return $out; 
+    }
+ 
+    if (!$data['is_published']) {
+      return "not_published";
+    }
+    // date restrictions
+    $now = time();
+    $endtimeobj = !empty($data['availabilities']['public']['end']) ? new DateTime($data['availabilities']['public']['end']) : false;
+    $endtime = is_object($endtimeobj) ? $endtimeobj->format('U') : false;
+    $starttimeobj = !empty($data['availabilities']['public']['start']) ?  new DateTime($data['availabilities']['public']['start']) : false;
+    $starttime = is_object($starttimeobj) ? $starttimeobj->format('U') : false;
+
+    if ($starttime > $now) {
+      return "not_yet_available";
+    }
+    if ($endtime && $endtime < $now) {
+      return "no_longer_available";
+    }
+
+    if (!$data['can_embed_player']) {
+      return "not_embeddable_video";
+    }
+    // because this is the status that WP uses for good posts
+    return 'publish';
+  }
 
   public function create_media_manager_episode( $post_id = false, $season_id = false, $attribs = array() ) {
     /* function can be called either saving an episode post or via wp_cron.

@@ -52,16 +52,44 @@ class COVE_Asset_Metaboxes {
   public function episode_metabox_content() {
     global $post_id;
 		$fields = get_post_custom( $post_id );
+		$field_data = $this->get_episode_fields_settings();
+    $html = "<table>";
 		$html .= '<input type="hidden" name="' . $this->token . '_nonce" id="' . $this->token . '_nonce" value="' . wp_create_nonce( plugin_basename( $this->dir ) ) . '" />';
-	  if (!empty($fields['media_manager_episode_cid'][0])) {
-      $html .= 'current media manager episode = ' . $fields['media_manager_episode_cid'][0];
+	  if (!empty($fields['_pbs_media_manager_episode_cid'][0])) {
+      $html .= '<tr><th scope="row">Media Manager episode Content ID</th><td>' .  '<input type=text class="regular-text" name="_pbs_media_manager_episode_cid" value="' . $fields['_pbs_media_manager_episode_cid'][0] . '" /><p class="description">Be VERY careful about editing or deleting this value.  No two Full Episode posts should have the same Content ID</p><input type=hidden name="media_manager_episode_action" value="update" /></td></tr>';
+    }	else {
+      // once populated, these fields are read-only.  so prompt to either create a new asset or pull in asset data 
+      $html .= '<tr valign="top"><th scope="row">New Media Manager Episode record creation</th><td>Either <br /><input type="radio" name="media_manager_episode_action" value="noaction" checked><b>Neither create nor import</b> a Media Manager episode record, or<br /><input type="radio" name="media_manager_episode_action" value="create"><b>create</b> a new episode record in the Media Manager or <br /><input type="radio" name="media_manager_episode_action" value="import"><b>import</b> an existing Media Manager record with the following PBS Content ID: <input name="media_manager_import_episode_id" type="text" class="regular-text" /></td></tr>';
     }	
+    foreach ( $field_data as $k => $v ) {
+      $data = $v['default'];
+		  if ( isset( $fields[$k] ) && isset( $fields[$k][0] ) ) {
+				$data = $fields[$k][0];
+			}
+      // automated formatting switches 
+      if( $v['type'] == 'textarea' ) {
+        $maxinput = '';
+        if ($v['maxlength']) { $maxinput = ' data-limit-input="' . $v['maxlength'] . '" '; }
+          $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><textarea class="widefat" name="' . esc_attr( $k ) . '" id="' . esc_attr( $k ) . '"' . $maxinput . '>' . esc_attr( $data ) . '</textarea>' . "\n";
+          $html .= '<span></span><p class="description">' . $v['description'] . '</p>' . "\n";
+		  	  $html .= '</td></tr>' . "\n";
+      } else if( $v['type'] == 'readonly' ) {
+        $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><input name="' . esc_attr( $k ) . '" type="hidden" id="' . esc_attr( $k ) . '" value="' . esc_attr( $data ) . '" />' . esc_attr( $data ) . "\n";
+        $html .= '<p class="description">' . $v['description'] . '</p>' . "\n";
+        $html .= '</td></tr>' . "\n";
+  		} else {
+        if ($v['maxlength']) { $maxinput = ' data-limit-input="' . $v['maxlength'] . '" '; }
+	  	  $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><input name="' . esc_attr( $k ) . '" type="text" id="' . esc_attr( $k ) . '" class="regular-text" value="' . esc_attr( $data ) . '"' . $maxinput . ' />' . "\n";
+        $html .= '<span></span><p class="description">' . $v['description'] . '</p>' . "\n";
+			  $html .= '</td></tr>' . "\n";
+  	  } // end formatting switches
+    } // end foreach
+    $html .= "</table>";
 		echo $html;	
   }
 
 
   private function build_media_manager_api_form_section($fields, $field_data) {
-    $html .= 'media manager form';
     /* unlike in the COVE Ingest API case, most fields are writable
      * and we can get the status directly from the created object 
      * including during ingest.  So the during-ingest cases 
@@ -69,14 +97,16 @@ class COVE_Asset_Metaboxes {
 
     if ( empty($fields['_coveam_cove_player_id'][0]) && empty($fields['_coveam_video_asset_guid'][0]) ) {
       // once populated, these fields are read-only.  so prompt to either create a new asset or pull in asset data 
-      $html .= '<tr valign="top"><th scope="row">New Media Manager record creation</th><td>Either <br /><input type="radio" name="media_manager_action" value="noaction"><b>Neither create nor import</b> a Media Manager record, or<br /><input type="radio" name="media_manager_action" value="create"><b>create</b> a new asset record in the Media Manager or <br /><input type="radio" name="media_manager_action" value="import"><b>import</b> an existing Media Manager record with the following PBS Content ID: <input name="media_manager_import_content_id" type="text" class="regular-text" /></td></tr>';
+      $html .= '<tr valign="top"><th scope="row">New Media Manager record creation</th><td>Either <br /><input type="radio" name="media_manager_action" value="noaction" checked><b>Neither create nor import</b> a Media Manager record, or<br /><input type="radio" name="media_manager_action" value="create"><b>create</b> a new asset record in the Media Manager or <br /><input type="radio" name="media_manager_action" value="import"><b>import</b> an existing Media Manager record with the following PBS Content ID: <input name="media_manager_import_content_id" type="text" class="regular-text" /></td></tr>';
 
-    }
 
     $html .= '<tr valign="top"><th scope="row">Media Manager Episode</th><td><select name="pbs_media_manager_episode_cid"><option value="'. $fields['pbs_media_manager_episode_cid'][0] . '" selected>' . $fields['_pbs_media_manager_episode_title'][0] . '</option>';
     // tk lookup
     $html .= '</select></td></tr>';
+    } else {
+      $html .= '<tr valign="top"><th scope="row">Media Manager Episode</th><td>' . $fields['_pbs_media_manager_episode_title'][0] . '</td></tr>';
 
+    }
 
     foreach ( $field_data as $k => $v ) {
       if ( $k == '_coveam_cove_player_id' || $k == '_coveam_video_asset_guid' ) {
@@ -618,6 +648,50 @@ class COVE_Asset_Metaboxes {
 
 		return $fields;
 	}
+
+
+
+	public function get_episode_fields_settings() {
+		$fields = array();
+ 		$fields['_pbs_media_manager_season_cid'] = array(
+		    'name' => 'Season CID',
+		    'type' => 'text',
+		    'default' => get_option('coveam_mm_season_id'),
+        'description' => 'The content ID of the season this episode is part of.  Defaults to the current season' 
+		);
+    $fields['_pbs_media_manager_episode_title'] = array(
+        'name' => 'Episode title',
+        'type' => 'text',
+        'maxlength' => '60',
+        'default' => wp_kses_post(get_the_title()) 
+    );
+		$fields['_pbs_media_manager_episode_desc_long'] = array(
+		    'name' => 'Long Description',
+		    'type' => 'textarea',
+		    'default' => '',
+        'maxlength' => '400'
+		);
+		$fields['_pbs_media_manager_episode_desc_short'] = array(
+		    'name' => 'Short Description',
+		    'type' => 'text',
+		    'default' => '',
+        'maxlength' => '90'
+		);
+		$fields['_pbs_media_manager_episode_airdate'] = array(
+		    'name' => 'Air Date',
+		    'type' => 'text',
+		    'default' => '',
+        'description' => 'All times Eastern, using 24hr clock. Format as YYYY-MM-DD. Will default to todays date' 
+		);
+ 		$fields['_pbs_media_manager_episode_ordinal'] = array(
+		    'name' => 'Ordinal',
+		    'type' => 'text',
+		    'default' => '',
+        'description' => 'What order this episode appears in relative to others in the season. Will default to 1 greater than the most recent episode' 
+		);
+
+    return $fields;
+  }
 
 
   /* youtube stuff */

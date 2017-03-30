@@ -393,7 +393,7 @@ class COVE_Asset_Manager {
     update_post_meta($postid, '_coveam_video_slug', $temp_obj['attributes']['slug']);
     update_post_meta($postid, '_coveam_cove_player_id', $temp_obj['attributes']['legacy_tp_media_id']);
     update_post_meta($postid, '_coveam_airdate', $temp_obj['attributes']['premiered_on'] . ' 19:00:00');
-    update_post_meta($postid, 'pbs_media_manager_episode_cid', $temp_obj['attributes']['episode']['id']);
+    update_post_meta($postid, '_pbs_media_manager_episode_cid', $temp_obj['attributes']['episode']['id']);
     update_post_meta($postid, '_pbs_media_manager_episode_title', $temp_obj['attributes']['episode']['attributes']['title']);
 
     //translate to our system

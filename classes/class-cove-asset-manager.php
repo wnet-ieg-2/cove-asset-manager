@@ -290,9 +290,6 @@ class COVE_Asset_Manager {
       return "no_longer_available";
     }
 
-    if (!$data['can_embed_player']) {
-      return "not_embeddable_video";
-    }
     // because this is the status that WP uses for good posts
     return 'publish';
   }

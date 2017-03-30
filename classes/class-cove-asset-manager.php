@@ -298,6 +298,20 @@ class COVE_Asset_Manager {
   }
 
   public function create_media_manager_episode( $post_id = false, $season_id = false, $attribs = array() ) {
+  public function get_latest_media_manager_episode($season_id = false) {
+    $client = $this->get_media_manager_client();
+    $result = $client->get_season_episodes($season_id);
+    if (!empty($result['errors'])) {
+      return $result;
+    }
+    foreach ($results as $episode) {
+      if (!empty($episode['attributes']['ordinal'])) {
+        // just return the first one, don't care about the others
+        return $episode['attributes'];
+      }
+    }
+  }
+
     /* function can be called either saving an episode post or via wp_cron.
      * defaults to creating a new episode with today's date in the current season 
      * function saves the returned cid as a postmeta field for the given post */

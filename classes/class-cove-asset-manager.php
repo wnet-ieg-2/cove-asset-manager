@@ -347,6 +347,31 @@ class COVE_Asset_Manager {
     return update_post_meta($post_id, 'pbs_media_manager_episode_cid', $result);
   }
 
+  public function import_media_manager_episode( $postid = false, $episode_id = '') {
+    /* function imports data based on the PBS Content ID and saves it to postmeta.  Returns the retrieved object or 'errors' array
+     */
+    error_log('importing');
+    if (!$postid) {
+      return array('errors' => 'no post_id');
+    }
+    if (!$episode_id ) {
+      return array('errors' => 'no asset_id');
+    }
+    $client = $this->get_media_manager_client();
+    if (!empty($client->errors)) { return $client; }
+    $episode = $client->get_episode($episode_id);
+    if (!empty($episode['errors'])) { return $episode; }
+    update_post_meta($postid, '_pbs_media_manager_episode_cid', $episode_id);
+    $temp_obj = $episode['data'];
+    update_post_meta($postid, '_pbs_media_manager_season_cid', $temp_obj['attributes']['season']['id']);
+    update_post_meta($postid, '_pbs_media_manager_season_title', (empty($temp_obj['attributes']['season']['attributes']['title']) ? $temp_obj['attributes']['season']['attributes']['ordinal'] : $temp_obj['attributes']['season']['attributes']['title']) );
+    update_post_meta($postid, '_pbs_media_manager_episode_title', $temp_obj['attributes']['title']); 
+    update_post_meta($postid, '_pbs_media_manager_episode_desc_long', $temp_obj['attributes']['description_long']);
+    update_post_meta($postid, '_pbs_media_manager_episode_desc_short', $temp_obj['attributes']['description_short']);
+    update_post_meta($postid, '_pbs_media_manager_episode_ordinal', $temp_obj['attributes']['ordinal']);
+    update_post_meta($postid, '_pbs_media_manager_episode_airdate', $temp_obj['attributes']['premiered_on']);
+    return $episode;
+  }
   public function import_media_manager_asset( $postid = false, $asset_id = '') {
     /* function imports data based on the PBS Content ID and saves it to postmeta.  Returns the retrieved object or 'errors' array
      */

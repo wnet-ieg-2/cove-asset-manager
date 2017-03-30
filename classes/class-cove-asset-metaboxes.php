@@ -60,7 +60,7 @@ class COVE_Asset_Metaboxes {
     }	else {
       // once populated, these fields are read-only.  so prompt to either create a new asset or pull in asset data 
       $html .= '<tr valign="top"><th scope="row">New Media Manager Episode record creation</th><td>Either <br /><input type="radio" name="media_manager_episode_action" value="noaction" checked><b>Neither create nor import</b> a Media Manager episode record, or<br /><input type="radio" name="media_manager_episode_action" value="create"><b>create</b> a new episode record in the Media Manager or <br /><input type="radio" name="media_manager_episode_action" value="import"><b>import</b> an existing Media Manager record with the following PBS Content ID: <input name="media_manager_import_episode_id" type="text" class="regular-text" /></td></tr>';
-    }	
+    }
     foreach ( $field_data as $k => $v ) {
       $data = $v['default'];
 		  if ( isset( $fields[$k] ) && isset( $fields[$k][0] ) ) {
@@ -100,9 +100,9 @@ class COVE_Asset_Metaboxes {
       $html .= '<tr valign="top"><th scope="row">New Media Manager record creation</th><td>Either <br /><input type="radio" name="media_manager_action" value="noaction" checked><b>Neither create nor import</b> a Media Manager record, or<br /><input type="radio" name="media_manager_action" value="create"><b>create</b> a new asset record in the Media Manager or <br /><input type="radio" name="media_manager_action" value="import"><b>import</b> an existing Media Manager record with the following PBS Content ID: <input name="media_manager_import_content_id" type="text" class="regular-text" /></td></tr>';
 
 
-    $html .= '<tr valign="top"><th scope="row">Media Manager Episode</th><td><select name="pbs_media_manager_episode_cid"><option value="'. $fields['pbs_media_manager_episode_cid'][0] . '" selected>' . $fields['_pbs_media_manager_episode_title'][0] . '</option>';
-    // tk lookup
-    $html .= '</select></td></tr>';
+      $html .= '<tr valign="top"><th scope="row">Media Manager Episode</th><td><select name="pbs_media_manager_episode_cid"><option value="'. $fields['pbs_media_manager_episode_cid'][0] . '" selected>' . $fields['_pbs_media_manager_episode_title'][0] . '</option>';
+      // tk lookup
+      $html .= '</select></td></tr>';
     } else {
       $html .= '<tr valign="top"><th scope="row">Media Manager Episode</th><td>' . $fields['_pbs_media_manager_episode_title'][0] . '</td></tr>';
 
@@ -421,6 +421,39 @@ class COVE_Asset_Metaboxes {
         $returnval = $this->plugin_obj->import_media_manager_asset($post_id, $assetid);
         if (!empty($returnval['errors'])) { 
           error_log(json_encode($returnval));
+        }
+      }
+
+      // episode stuff
+      if ( !empty($_POST['media_manager_episode_action'] )) {
+        $episode_id = !empty($_POST['_pbs_media_manager_episode_cid']) ? $_POST['_pbs_media_manager_episode_cid'] : false;
+        $ep_importid = !empty($_POST['media_manager_import_episode_id']) ? $_POST['media_manager_import_episode_id'] : false;
+        if ( $_POST['media_manager_episode_action'] == 'import' && $ep_importid ) {
+          $episode_id = $ep_importid;
+        } else if ($_POST['media_manager_episode_action'] == 'create' && !empty($_POST['_pbs_media_manager_season_cid'])) {
+          $returnval = $this->plugin_obj->create_media_manager_episode($post_id, $_POST['_pbs_media_manager_season_cid'], $_POST);
+          if (!empty($returnval['errors'])) { 
+            error_log(json_encode($returnval));
+            $episode_id = false;
+          } else {
+            $episode_id = $returnval;
+          }
+        }
+
+        /* API doesn't support updates for episodes yet
+        if ( $episode_id && $_POST['media_manager_episode_action'] == 'update') {
+          $returnval = $this->plugin_obj->update_media_manager_episode($post_id, $episode_id, $_POST);
+          if (!empty($returnval['errors'])) { 
+            error_log(json_encode($returnval));
+          }
+        }
+        */
+        // always get the latest data from the API
+        if ($episode_id) {
+          $returnval = $this->plugin_obj->import_media_manager_episode($post_id, $episode_id);
+          if (!empty($returnval['errors'])) { 
+            error_log(json_encode($returnval));
+          }
         }
       }
     }

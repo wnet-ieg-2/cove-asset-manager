@@ -297,7 +297,6 @@ class COVE_Asset_Manager {
     return 'publish';
   }
 
-  public function create_media_manager_episode( $post_id = false, $season_id = false, $attribs = array() ) {
   public function get_latest_media_manager_episode($season_id = false) {
     $client = $this->get_media_manager_client();
     $result = $client->get_season_episodes($season_id);
@@ -312,23 +311,25 @@ class COVE_Asset_Manager {
     }
   }
 
+  public function create_media_manager_episode( $post_id = false, $season_id = false, $postary ) {
     /* function can be called either saving an episode post or via wp_cron.
      * defaults to creating a new episode with today's date in the current season 
      * function saves the returned cid as a postmeta field for the given post */
     if (!$post_id) {
       return array('errors' => 'no post_id' );
     }
-    $season_id = !$season_id ? get_option('coveam_mm_season_id') : false;
+    if (!$season_id) {
+      $season_id = get_option('coveam_mm_season_id');
+    }
     if (!$season_id) {
       return array( 'errors' => 'no season_id' ); 
     }
+    $attribs = $this->map_post_fields_to_episode_array($postary); 
+
     // default values for the episode
     $datestring = get_the_date('M j, Y');
     if (empty($attribs['title'])) {
        $attribs['title'] = 'Full Episode for ' . $datestring;
-    }
-    if (empty($attribs['slug'])) {
-      $attribs['slug'] = $this->COVEslugify($attribs['title']);
     }
     if (empty($attribs['description_short'])) {
       $attribs['description_short'] = $attribs['title'];
@@ -336,15 +337,26 @@ class COVE_Asset_Manager {
     if (empty($attribs['description_long'])) {
       $attribs['description_long'] = $attribs['title'];
     } 
-
-    $client = $this->get_media_manager_client();
+    if (empty($attribs['slug'])) {
+      $attribs['slug'] = uniqid($this->COVEslugify($attribs['title']));
+    }
+    if (empty($attribs['ordinal'])) {
+      $latest = $this->get_latest_media_manager_episode($season_id);
+      $attribs['ordinal'] = ($latest['ordinal'] + 1);
+    } 
+        $client = $this->get_media_manager_client();
     $result = $client->create_child($season_id, 'season', 'episode', $attribs);
     if (!empty($result['errors'])) {
       return $result;
     }
     // note that update_post_meta returns false on failure and also on an unchanged value
     // this will give me a literal true if an update, and a meta id if a new field
-    return update_post_meta($post_id, '_pbs_media_manager_episode_cid', $result);
+    $meta_create = update_post_meta($post_id, '_pbs_media_manager_episode_cid', $result);
+    if (! $meta_create ) {
+      return array('errors' => 'new meta value not created');
+    }
+    // this will be the cid;
+    return $result;
   }
 
   
@@ -353,7 +365,6 @@ class COVE_Asset_Manager {
   public function import_media_manager_episode( $postid = false, $episode_id = '') {
     /* function imports data based on the PBS Content ID and saves it to postmeta.  Returns the retrieved object or 'errors' array
      */
-    error_log('importing');
     if (!$postid) {
       return array('errors' => 'no post_id');
     }
@@ -375,6 +386,9 @@ class COVE_Asset_Manager {
     update_post_meta($postid, '_pbs_media_manager_episode_airdate', $temp_obj['attributes']['premiered_on']);
     return $episode;
   }
+
+
+
   public function import_media_manager_asset( $postid = false, $asset_id = '') {
     /* function imports data based on the PBS Content ID and saves it to postmeta.  Returns the retrieved object or 'errors' array
      */

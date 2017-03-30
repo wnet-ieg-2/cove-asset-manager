@@ -344,8 +344,11 @@ class COVE_Asset_Manager {
     }
     // note that update_post_meta returns false on failure and also on an unchanged value
     // this will give me a literal true if an update, and a meta id if a new field
-    return update_post_meta($post_id, 'pbs_media_manager_episode_cid', $result);
+    return update_post_meta($post_id, '_pbs_media_manager_episode_cid', $result);
   }
+
+  
+
 
   public function import_media_manager_episode( $postid = false, $episode_id = '') {
     /* function imports data based on the PBS Content ID and saves it to postmeta.  Returns the retrieved object or 'errors' array

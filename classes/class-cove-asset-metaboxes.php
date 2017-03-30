@@ -56,10 +56,11 @@ class COVE_Asset_Metaboxes {
     $html = "<table>";
 		$html .= '<input type="hidden" name="' . $this->token . '_nonce" id="' . $this->token . '_nonce" value="' . wp_create_nonce( plugin_basename( $this->dir ) ) . '" />';
 	  if (!empty($fields['_pbs_media_manager_episode_cid'][0])) {
-      $html .= '<tr><th scope="row">Media Manager episode Content ID</th><td>' .  '<input type=text class="regular-text" name="_pbs_media_manager_episode_cid" value="' . $fields['_pbs_media_manager_episode_cid'][0] . '" /><p class="description">Be VERY careful about editing or deleting this value.  No two Full Episode posts should have the same Content ID</p><input type=hidden name="media_manager_episode_action" value="update" /></td></tr>';
+      $html .= '<tr><th scope="row">Media Manager episode Content ID</th><td>' . $fields['_pbs_media_manager_episode_cid'][0] . ' <p class="description">The PBS API currently doesnt yet support updating an episode.  NO VALUES ENTERED BELOW WILL SAVE.</p><input type=hidden name="media_manager_episode_action" value="update" /></td></tr>';
     }	else {
       // once populated, these fields are read-only.  so prompt to either create a new asset or pull in asset data 
       $html .= '<tr valign="top"><th scope="row">New Media Manager Episode record creation</th><td>Either <br /><input type="radio" name="media_manager_episode_action" value="noaction" checked><b>Neither create nor import</b> a Media Manager episode record, or<br /><input type="radio" name="media_manager_episode_action" value="create"><b>create</b> a new episode record in the Media Manager or <br /><input type="radio" name="media_manager_episode_action" value="import"><b>import</b> an existing Media Manager record with the following PBS Content ID: <input name="media_manager_import_episode_id" type="text" class="regular-text" /></td></tr>';
+      $html .= '<tr valign="top"><th scope="row"></th><td><b>NOTE -- The PBS API currently doesnt yet support updating an episode after initially creating it, so FINALIZE ALL VALUES BEFORE CLICKING "CREATE"</b></td></tr>';
     }
     foreach ( $field_data as $k => $v ) {
       $data = $v['default'];

@@ -303,7 +303,7 @@ class COVE_Asset_Manager {
     if (!empty($result['errors'])) {
       return $result;
     }
-    foreach ($results as $episode) {
+    foreach ($result as $episode) {
       if (!empty($episode['attributes']['ordinal'])) {
         // just return the first one, don't care about the others
         return $episode['attributes'];

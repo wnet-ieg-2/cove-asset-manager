@@ -103,7 +103,7 @@ class COVE_Asset_Metaboxes {
     $currentVal = $fields['_pbs_media_manager_episode_cid'][0];
   	if (!empty($currentVal)) {
       $html .= $currentVal . "<br /><i>" . $fields['_pbs_media_manager_episode_title'][0] . "</i>";
-    } else {
+    } else { 
       $html .= '<select name="_pbs_media_manager_episode_cid" id="_pbs_media_manager_episode_cid">';
 		  $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'desc', 'posts_per_page' => 50);
 		  $my_query = new WP_Query($args); 
@@ -512,7 +512,7 @@ class COVE_Asset_Metaboxes {
 
 		$fields['_coveam_video_title'] = array(
 		    'name' => __( 'Video Title:' , 'cove_asset_manager' ),
-                    'description' => __( 'This field must be present and saved before ingesting to either YouTube or COVE' , 'cove_asset_manager' ),
+         'description' => __( 'This field must be present and saved before ingesting to either YouTube or COVE' , 'cove_asset_manager' ),
 		    'type' => 'text',
 		    'default' => wp_kses_post(get_the_title()),
         'maxlength' => '60',
@@ -579,7 +579,7 @@ class COVE_Asset_Metaboxes {
           )
         ),
 		    'default' => 'Public',
-        'description' => 'Videos with limited rights will become unavailable after 30 days.',
+        'description' => 'Videos with limited rights will become unavailable 30 days after airdate.',
 		    'section' => 'cove-asset-details coverequired youtuberequired'
 		);
     

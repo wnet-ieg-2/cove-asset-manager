@@ -112,6 +112,7 @@ class COVE_Asset_Metaboxes {
         $html .= "<option value='". $thiscid . "'>".get_the_title(get_the_ID())."</option>";
 		  endwhile; 
 	    $html .= "</select>";
+      /* still need to hook up the ajax
 	    $html .= "&nbsp;&nbsp; Search: <select id='epyearselect'><option value=''>Year</option>";
 		  $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'asc', 'posts_per_page' => 1);
 		  $my_query = new WP_Query($args); 
@@ -128,6 +129,7 @@ class COVE_Asset_Metaboxes {
     		$html .= "<option value='$month'>$month</option>";
 		  }
 	    $html .= "</select>";
+      */
       $html .= '<p class="description">NOTE: Episode assignment cannot be changed after initial asset creation.</p>';
     }
     $html .= '</td></tr>';

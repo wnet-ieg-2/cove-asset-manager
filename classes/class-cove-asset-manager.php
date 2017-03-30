@@ -436,6 +436,10 @@ class COVE_Asset_Manager {
     $attribs['description_short'] =  $fields['_coveam_shortdescription'];
     $attribs['object_type'] = $this->COVETranslateNumberToType($fields['_coveam_video_fullprogram']);
     $attribs['auto_publish'] = true;
+
+    if (!empty($fields['_pbs_media_manager_episode_cid'])) {
+      $attribs['episode'] = $fields['_pbs_media_manager_episode_cid'];
+    }
     //ingest related -- submitting a null video or caption entry triggers a file delete, not submitting it at all does nothing
     if (!empty($fields['_coveam_video_url'])){
       $attribs['video'] = array("profile" => "hd-1080p-mezzanine-16x9", "source" => $fields['_coveam_video_url']);

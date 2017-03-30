@@ -483,7 +483,7 @@ class COVE_Asset_Metaboxes {
 		    'name' => __( 'Video Title:' , 'cove_asset_manager' ),
                     'description' => __( 'This field must be present and saved before ingesting to either YouTube or COVE' , 'cove_asset_manager' ),
 		    'type' => 'text',
-		    'default' => '',
+		    'default' => wp_kses_post(get_the_title()),
         'maxlength' => '60',
 		    'section' => 'cove-asset-details coverequired youtuberequired'
 		);

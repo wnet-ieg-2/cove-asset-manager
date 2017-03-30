@@ -341,7 +341,7 @@ class COVE_Asset_Manager {
       $latest = $this->get_latest_media_manager_episode($season_id);
       $attribs['ordinal'] = ($latest['ordinal'] + 1);
     } 
-        $client = $this->get_media_manager_client();
+    $client = $this->get_media_manager_client();
     $result = $client->create_child($season_id, 'season', 'episode', $attribs);
     if (!empty($result['errors'])) {
       return $result;
@@ -414,6 +414,9 @@ class COVE_Asset_Manager {
     update_post_meta($postid, '_coveam_video_fullprogram', $this->MediaManagerTranslateTypeToNumber($temp_obj['attributes']['object_type']));
     update_post_meta($postid, '_coveam_covestatus', $this->determineMediaManagerStatus($temp_obj));
 
+    $rights = (!is_null($temp_obj['attributes']['availabilities']['public']['end'])) ? 'Limited' : 'Public';
+    update_post_meta($postid, '_coveam_rights', $rights);
+
     //ingest related fields
     // Note that for video and caption, the object name will probably change to 'source' from 'destination'
     $archive_video = !empty($temp_obj['attributes']['original_video']['destination']) ? $temp_obj['attributes']['original_video']['destination'] : '';
@@ -484,11 +487,27 @@ class COVE_Asset_Manager {
       $attribs['images'][] = array("profile" => "asset-mezzanine-16x9", "source" => $fields['_coveam_video_image'] );
     }
 
-    //tk better date stuff
-    $date = new DateTime('now');
+    if (empty($fields['_coveam_airdate'])) {
+      $date = new DateTime('now');
+    } else {
+      $date = new DateTime($fields['_coveam_airdate']);
+    } 
     $formatted_date = $date->format('Y-m-d');
     $attribs['premiered_on'] = $formatted_date;
     $attribs['encored_on'] = $formatted_date;
+
+    $attribs['availabilities']['public']['start'] = $date->format('Y-m-d\TH:i:s.u\Z');
+    $attribs['availabilities']['all_members']['start'] = $attribs['availabilities']['public']['start'];
+    $attribs['availabilities']['station_members']['start'] = $attribs['availabilities']['public']['start'];
+    if (!empty($fields['_coveam_rights']) && $fields['_coveam_rights'] == 'Limited') {
+      $date->modify('+30 day');
+      $attribs['availabilities']['public']['end'] = $date->format('Y-m-d\TH:i:s.u\Z');
+    } else {
+      $attribs['availabilities']['public']['end'] = null;
+    }
+    $attribs['availabilities']['all_members']['end'] = $attribs['availabilities']['public']['end'];
+    $attribs['availabilities']['station_members']['end'] = $attribs['availabilities']['public']['end'];
+        
 
     return $attribs;
   }

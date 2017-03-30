@@ -422,6 +422,37 @@ class COVE_Asset_Manager {
     return $attribs;
   }
 
+  private function map_post_fields_to_episode_array($fields) {
+    $attribs = array();
+    // required fields first
+    $attribs['title'] = $fields['_pbs_media_manager_episode_title'];
+    $attribs['description_long'] =  $fields['_pbs_media_manager_episode_desc_long'];
+    $attribs['description_short'] =  $fields['_pbs_media_manager_episode_desc_short'];
+    $attribs['ordinal'] = $fields['_pbs_media_manager_episode_ordinal'];
+    $airdate = (!empty( $fields['_pbs_media_manager_episode_airdate'])) ? $fields['_pbs_media_manager_episode_airdate'] : false;
+    if (!$airdate) {
+      $date = new DateTime('now');
+      $airdate = $date->format('Y-m-d');
+    }
+    $attribs['premiered_on'] = $airdate;
+    $attribs['encored_on'] = $airdate;
+    return $attribs;
+  }
+
+  public function update_media_manager_episode( $post_id, $episode_id, $postary ) {
+    /* this function expects $_POST data */
+    if (!$post_id) {
+      return array('errors' => 'no post_id');
+    }
+    if (!$episode_id ) {
+      return array('errors' => 'no episode_id');
+    }
+    $client = $this->get_media_manager_client();
+    if (!empty($client->errors)) { return $client; }
+    $attribs = $this->map_post_fields_to_episode_array($postary); 
+    $response = $client->update_object($episode_id, 'episode', $attribs);
+    return $response;
+  }
 
   public function update_media_manager_asset( $post_id, $asset_id, $postary ) {
     /* this function expects $_POST data */

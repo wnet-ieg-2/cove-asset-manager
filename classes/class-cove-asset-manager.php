@@ -234,7 +234,7 @@ class COVE_Asset_Manager {
 
   public function COVETranslateNumberToType($num) {
     /* this is a stupid system that is left over for translating between our old data and new */
-    if ($num === 0) {
+    if ($num == 0) {
       return 'full_length'; 
     } elseif ($num == 1) {
       return 'preview';

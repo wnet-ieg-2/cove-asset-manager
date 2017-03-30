@@ -427,6 +427,34 @@ class COVE_Asset_Manager {
 
     return $asset;
   }
+  public function create_media_manager_asset( $post_id = false, $episode_id = false, $postary ) {
+    if (!$post_id) {
+      return array('errors' => 'no post_id' );
+    }
+    if (!$episode_id) {
+      return array('errors' => 'no episode_id' );
+    }
+    $attribs = $this->map_post_fields_to_asset_array($postary); 
+
+    if (empty($attribs['title'])) {
+      return array('errors' => 'required field title missing');
+    }
+    $attribs['slug'] = uniqid($this->COVEslugify($attribs['title']));
+
+    $client = $this->get_media_manager_client();
+    $result = $client->create_child($episode_id, 'episode', 'asset', $attribs);
+    if (!empty($result['errors'])) {
+      return $result;
+    }
+    // note that update_post_meta returns false on failure and also on an unchanged value
+    // this will give me a literal true if an update, and a meta id if a new field
+    $meta_create = update_post_meta($post_id, '_coveam_video_asset_guid', $result);
+    if (! $meta_create ) {
+      return array('errors' => 'new meta value not created');
+    }
+    // this will be the cid;
+    return $result;
+  }
 
   private function map_post_fields_to_asset_array($fields) {
     $attribs = array();

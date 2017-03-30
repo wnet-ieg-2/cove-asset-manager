@@ -98,15 +98,40 @@ class COVE_Asset_Metaboxes {
     if ( empty($fields['_coveam_cove_player_id'][0]) && empty($fields['_coveam_video_asset_guid'][0]) ) {
       // once populated, these fields are read-only.  so prompt to either create a new asset or pull in asset data 
       $html .= '<tr valign="top"><th scope="row">New Media Manager record creation</th><td>Either <br /><input type="radio" name="media_manager_action" value="noaction" checked><b>Neither create nor import</b> a Media Manager record, or<br /><input type="radio" name="media_manager_action" value="create"><b>create</b> a new asset record in the Media Manager or <br /><input type="radio" name="media_manager_action" value="import"><b>import</b> an existing Media Manager record with the following PBS Content ID: <input name="media_manager_import_content_id" type="text" class="regular-text" /></td></tr>';
-
-
-      $html .= '<tr valign="top"><th scope="row">Media Manager Episode</th><td><select name="pbs_media_manager_episode_cid"><option value="'. $fields['pbs_media_manager_episode_cid'][0] . '" selected>' . $fields['_pbs_media_manager_episode_title'][0] . '</option>';
-      // tk lookup
-      $html .= '</select></td></tr>';
+    }  
+    $html .= '<tr valign="top"><th scope="row">Media Manager Episode</th><td>';
+    $currentVal = $fields['_pbs_media_manager_episode_cid'][0];
+  	if (!empty($currentVal)) {
+      $html .= $currentVal . "<br /><i>" . $fields['_pbs_media_manager_episode_title'][0] . "</i>";
     } else {
-      $html .= '<tr valign="top"><th scope="row">Media Manager Episode</th><td>' . $fields['_pbs_media_manager_episode_title'][0] . '</td></tr>';
-
+      $html .= '<select name="_pbs_media_manager_episode_cid" id="_pbs_media_manager_episode_cid">';
+		  $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'desc', 'posts_per_page' => 50);
+		  $my_query = new WP_Query($args); 
+		  while ($my_query->have_posts()) : $my_query->the_post(); 
+        $thiscid = get_post_meta(get_the_ID(), '_pbs_media_manager_episode_cid', true);
+        $html .= "<option value='". $thiscid . "'>".get_the_title(get_the_ID())."</option>";
+		  endwhile; 
+	    $html .= "</select>";
+	    $html .= "&nbsp;&nbsp; Search: <select id='epyearselect'><option value=''>Year</option>";
+		  $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'asc', 'posts_per_page' => 1);
+		  $my_query = new WP_Query($args); 
+		  while ($my_query->have_posts()) : $my_query->the_post(); 
+			  $oldest = get_the_date('Y');
+		  endwhile; 
+		  foreach (range( date('Y'), $oldest) as $year) {
+    		$html .= "<option value='$year'>$year</option>";
+		  }
+	    $html .= "</select>";
+	
+	    $html .= "<select id='epmonthselect'><option value=''>Month</option>";
+		  foreach (range(01, 12) as $month) {
+    		$html .= "<option value='$month'>$month</option>";
+		  }
+	    $html .= "</select>";
+      $html .= '<p class="description">NOTE: Episode assignment cannot be changed after initial asset creation.</p>';
     }
+    $html .= '</td></tr>';
+
 
     foreach ( $field_data as $k => $v ) {
       if ( $k == '_coveam_cove_player_id' || $k == '_coveam_video_asset_guid' ) {
@@ -404,9 +429,15 @@ class COVE_Asset_Metaboxes {
         $importid = !empty($_POST['media_manager_import_content_id']) ? $_POST['media_manager_import_content_id'] : false;
         if ( $_POST['media_manager_action'] == 'import' && $importid ) {
           $assetid = $importid;
+        } else if ($_POST['media_manager_action'] == 'create' && !empty($_POST['_pbs_media_manager_episode_cid'])) {
+          $returnval = $this->plugin_obj->create_media_manager_asset($post_id, $_POST['_pbs_media_manager_episode_cid'], $_POST);
+          if (!empty($returnval['errors'])) { 
+            error_log(json_encode($returnval));
+            $assetid = false;
+          } else {
+            $assetid = $returnval;
+          }
         }
-        // create case later
-
       } else {
         if ( $assetid ) {
           $returnval = $this->plugin_obj->update_media_manager_asset($post_id, $assetid, $_POST);

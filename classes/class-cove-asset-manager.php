@@ -422,10 +422,10 @@ class COVE_Asset_Manager {
 
     //ingest related fields
     // Note that for video and caption, the object name will probably change to 'source' from 'destination'
-    $archive_video = !empty($temp_obj['attributes']['original_video']['destination']) ? $temp_obj['attributes']['original_video']['destination'] : '';
+    $archive_video = !empty($temp_obj['attributes']['original_video']['source']) ? $temp_obj['attributes']['original_video']['source'] : '';
     update_post_meta($postid, '_coveam_video_url', $archive_video);
 
-    $archive_caption = !empty($temp_obj['attributes']['original_caption']['destination']) ? $temp_obj['attributes']['original_caption']['destination'] : '';
+    $archive_caption = !empty($temp_obj['attributes']['original_caption']['source']) ? $temp_obj['attributes']['original_caption']['source'] : '';
     update_post_meta($postid, '_coveam_video_caption', $archive_caption);
 
     $archive_image = !empty($temp_obj['attributes']['images'][0]['image']) ? $temp_obj['attributes']['images'][0]['image'] : '';

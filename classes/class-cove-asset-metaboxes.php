@@ -72,6 +72,12 @@ class COVE_Asset_Metaboxes {
 		  if ( isset( $fields[$k] ) && isset( $fields[$k][0] ) ) {
 				$data = $fields[$k][0];
 			}
+      if ( $k == '_pbs_media_manager_episode_cid' || $k == '_pbs_media_manager_season_cid' ) {
+        if (!empty($fields[$k][0])) {
+          $v['type'] = 'readonly';
+        }
+      }
+
       // automated formatting switches 
       if( $v['type'] == 'textarea' ) {
         $maxinput = '';

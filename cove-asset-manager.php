@@ -16,6 +16,9 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+register_activation_hook(__FILE__ , 'cove_asset_manager_install');
+register_deactivation_hook(__FILE__ , 'cove_asset_manager_uninstall');
+
 // Include plugin class files
 require_once( 'classes/class-cove-asset-manager.php' );
 require_once( 'classes/class-cove-asset-manager-settings.php' );
@@ -545,5 +548,21 @@ function coveam_setup_schedule() {
   }
 
 }
+
+# on install/activate
+function cove_asset_manager_install() {
+  $plugin_obj = new COVE_Asset_Manager( __FILE__ );
+  $season_update = $plugin_obj->update_media_manager_season_list();
+  if (!empty($season_update['errors'])) {
+    error_log(json_encode($season_update));
+  } else {
+    error_log('updated list of media manager seasons');
+  } 
+}
+# on uninstall/deactivate
+function cove_asset_manager_uninstall() {
+  delete_option('coveam_mm_season_id_list');
+}
+
 
 

@@ -105,21 +105,18 @@ class COVE_Asset_Metaboxes {
   	if (!empty($currentVal)) {
       $html .= $currentVal . "<br /><i>" . $fields['_pbs_media_manager_episode_title'][0] . "</i>";
     } else { 
-      $html .= '<select name="_pbs_media_manager_episode_cid" id="_pbs_media_manager_episode_cid">';
-		  $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'desc', 'posts_per_page' => 50);
-		  $my_query = new WP_Query($args); 
-		  while ($my_query->have_posts()) : $my_query->the_post(); 
-        $thiscid = get_post_meta(get_the_ID(), '_pbs_media_manager_episode_cid', true);
-        $html .= "<option value='". $thiscid . "'>".get_the_title(get_the_ID())."</option>";
-		  endwhile; 
-	    $html .= "</select>";
-	    $html .= "&nbsp;&nbsp; Search: <select id='epyearselect'><option value=''>Year</option>";
 		  $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'asc', 'posts_per_page' => 1);
 		  $my_query = new WP_Query($args); 
+      $thisyear = date('Y');
 		  while ($my_query->have_posts()) : $my_query->the_post(); 
 			  $oldest = get_the_date('Y');
 		  endwhile; 
-		  foreach (range( date('Y'), $oldest) as $year) {
+      $html .= '<select name="_pbs_media_manager_episode_cid" id="_pbs_media_manager_episode_cid">';
+      $html .= $this->plugin_obj->get_episode_option_list(0, $thisyear);
+		  $html .= "</select>";
+	    $html .= "<br />Search: <select id='epyearselect'><option value=''>Year</option>";
+		  
+		  foreach (range( $thisyear, $oldest) as $year) {
     		$html .= "<option value='$year'>$year</option>";
 		  }
 	    $html .= "</select>";

@@ -587,4 +587,24 @@ class COVE_Asset_Manager {
     }
     wp_die($html);
   }
+
+  public function update_media_manager_season_list() {
+    $show_id = get_option('coveam_mm_show_id');
+    if (empty($show_id)) { return array('errors' => 'no show id set!'); }
+    $client = $this->get_media_manager_client();
+    if (!empty($client->errors)) { return $client; }
+    $seasons = $client->get_show_seasons($show_id);
+    if (!empty($seasons['errors'])) { return $seasons; }
+    $seasonary = array();
+    foreach ($seasons as $season => $ary) {
+      $label = !empty($ary['attributes']['title']) ? $ary['attributes']['title'] : $ary['attributes']['ordinal'] ;
+      $seasonary[$ary['id']] = array('value' => $ary['id'], 'label' => $label);
+    }
+    $result = false;
+    if (!empty($seasonary)) {
+      $result = update_option('coveam_mm_season_id_list', $seasonary, false);
+    }
+    return $result;
+  }
+
 }

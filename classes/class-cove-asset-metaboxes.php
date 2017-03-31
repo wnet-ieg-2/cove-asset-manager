@@ -736,10 +736,11 @@ class COVE_Asset_Metaboxes {
 
 	public function get_episode_fields_settings() {
 		$fields = array();
+    
  		$fields['_pbs_media_manager_season_cid'] = array(
-		    'name' => 'Season CID',
-		    'type' => 'text',
-		    'default' => get_option('coveam_mm_season_id'),
+		    'name' => 'Season',
+		    'type' => 'select',
+        'options' => get_option('coveam_mm_season_id_list'),
         'description' => 'The content ID of the season this episode is part of.  Defaults to the current season' 
 		);
     $fields['_pbs_media_manager_episode_title'] = array(

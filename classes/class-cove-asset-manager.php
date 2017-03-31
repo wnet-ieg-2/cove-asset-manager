@@ -291,9 +291,8 @@ class COVE_Asset_Manager {
     if ($endtime && $endtime < $now) {
       return "no_longer_available";
     }
-
-    // because this is the status that WP uses for good posts
-    return 'publish';
+    // because in the old COVE API this was the good string.  Good as anything else
+    return 'available';
   }
 
   public function get_latest_media_manager_episode($season_id = false) {

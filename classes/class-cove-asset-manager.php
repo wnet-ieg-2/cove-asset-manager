@@ -337,7 +337,7 @@ class COVE_Asset_Manager {
       $attribs['description_long'] = $attribs['title'];
     } 
     if (empty($attribs['slug'])) {
-      $attribs['slug'] = uniqid($this->COVEslugify($attribs['title']));
+      $attribs['slug'] = $this->COVEslugify($attribs['title']) . "-" . time();
     }
     if (empty($attribs['ordinal'])) {
       $latest = $this->get_latest_media_manager_episode($season_id);
@@ -445,7 +445,7 @@ class COVE_Asset_Manager {
     if (empty($attribs['title'])) {
       return array('errors' => 'required field title missing');
     }
-    $attribs['slug'] = uniqid($this->COVEslugify($attribs['title']));
+    $attribs['slug'] = $this->COVEslugify($attribs['title']) . '-' . time();
 
     $client = $this->get_media_manager_client();
     $result = $client->create_child($episode_id, 'episode', 'asset', $attribs);

@@ -275,7 +275,7 @@ class COVE_Asset_Manager {
       return $out; 
     }
  
-    if (!$data['is_published']) {
+    if (!$data['publish_state']) {
       return "not_published";
     }
     // date restrictions

@@ -22,6 +22,8 @@ class COVE_Asset_Metaboxes {
 		add_action( 'add_meta_boxes', array( $this, 'meta_box_setup' ), 20 );
 		add_action( 'save_post', array( $this, 'meta_box_save' ) );	
     add_action( 'admin_enqueue_scripts', array( $this, 'setup_custom_scripts' ) );
+
+
 	}
 
   public function setup_custom_scripts() {
@@ -30,7 +32,9 @@ class COVE_Asset_Metaboxes {
     if (!$this->plugin_obj->use_media_manager) { 
       wp_enqueue_script( 'cove_ingest', $this->assets_url . 'js/cove_ingest.js', array( 'jquery' ), 1, true );
       wp_enqueue_style( 'cove_asset', $this->assets_url . 'css/metaboxes.css' );
-    } 
+    }  else {
+      wp_enqueue_script( 'pbs_media_manager_admin', $this->assets_url . 'js/media_manager_admin.js', array( 'jquery'), 1, true);
+    }
     wp_enqueue_media();
     wp_enqueue_script( 'wp_mediamanager_select', $this->assets_url . 'js/wp-mediamanager-select.js', array( 'jquery' ), 1, true );
   }
@@ -48,6 +52,7 @@ class COVE_Asset_Metaboxes {
       add_meta_box( 'media_manager_episode_details', 'Media Manager Episode Details', array( $this, 'episode_metabox_content' ), 'episodes', 'normal', 'high' );
     }
 	}
+
 
   public function episode_metabox_content() {
     global $post_id;
@@ -105,8 +110,8 @@ class COVE_Asset_Metaboxes {
   	if (!empty($currentVal)) {
       $html .= $currentVal . "<br /><i>" . $fields['_pbs_media_manager_episode_title'][0] . "</i>";
     } else { 
-		  $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'asc', 'posts_per_page' => 1);
-		  $my_query = new WP_Query($args); 
+      $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'asc', 'posts_per_page' => 1);
+ 		  $my_query = new WP_Query($args); 
       $thisyear = date('Y');
 		  while ($my_query->have_posts()) : $my_query->the_post(); 
 			  $oldest = get_the_date('Y');

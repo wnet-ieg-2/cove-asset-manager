@@ -318,7 +318,8 @@ class COVE_Asset_Manager {
       return array('errors' => 'no post_id' );
     }
     if (!$season_id) {
-      $season_id = get_option('coveam_mm_season_id');
+      $seasons = get_option('coveam_mm_season_id_list');
+      $season_id = $seasons[0]['id'];
     }
     if (!$season_id) {
       return array( 'errors' => 'no season_id' ); 

@@ -34,6 +34,8 @@ class COVE_Asset_Manager {
     // Setup the shortcode
     add_shortcode( 'covevideoasset', array($this, 'cove_player_shortcode') );
 
+    add_action( 'wp_ajax_coveam_get_episode_option_list', array( $this, 'ajax_get_episode_option_list'));
+
 	}
 	public function enqueue_scripts () {
         $scriptPath = $this->assets_url . 'js/jquery.cove-videoplayer-1.2.js';
@@ -559,5 +561,30 @@ class COVE_Asset_Manager {
     return $response;
   }
 
+  public function get_episode_option_list($monthnum = 0, $year = 0) {
+    $html = "";
+    $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'desc', 'posts_per_page' => 40);
+    if ($monthnum > 0) {
+      $args['monthnum'] = $monthnum;
+    }
+    if ($year > 0) {
+      $args['year'] = $year;
+    }
+		$my_query = new WP_Query($args); 
+		while ($my_query->have_posts()) : $my_query->the_post(); 
+      $thiscid = get_post_meta(get_the_ID(), '_pbs_media_manager_episode_cid', true);
+      $html .= "<option value='". $thiscid . "'>".get_the_title(get_the_ID())."</option>";
+		endwhile; 
+    return $html;
+  }
 
+  public function ajax_get_episode_option_list() {
+    $html = $this->get_episode_option_list($monthnum = $_GET['month'], $year = $_GET['year']);
+    if (empty($html)) {
+      $html .= "<option value=''>sorry, no results</option>";
+    } else {
+      $html = "<option value=''>select one</option>" . $html;
+    }
+    wp_die($html);
+  }
 }

@@ -89,6 +89,16 @@ class COVE_Asset_Metaboxes {
         $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><input name="' . esc_attr( $k ) . '" type="hidden" id="' . esc_attr( $k ) . '" value="' . esc_attr( $data ) . '" />' . esc_attr( $data ) . "\n";
         $html .= '<p class="description">' . $v['description'] . '</p>' . "\n";
         $html .= '</td></tr>' . "\n";
+      } else if( $v['type'] == 'select' ) {
+        $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><select name="' . esc_attr( $k ) . '" id="' . esc_attr( $k ) . '">';
+        foreach ( $v['options'] as $option ) {
+          $html .= '<option id="' . esc_attr( $option['value'] ) . '" value="' . esc_attr( $option['value'] ) . '" ';
+          if ($data == $option['value']) { $html .= ' selected '; }
+          $html .= ' />' . $option['label'] . '</option>' . "\n";
+        }
+        $html .= '</select>';
+        $html .= '<p class="description">' . $v['description'] . '</p>' . "\n";
+        $html .= '</td></tr>' . "\n";
   		} else {
         if ($v['maxlength']) { $maxinput = ' data-limit-input="' . $v['maxlength'] . '" '; }
 	  	  $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><input name="' . esc_attr( $k ) . '" type="text" id="' . esc_attr( $k ) . '" class="regular-text" value="' . esc_attr( $data ) . '"' . $maxinput . ' />' . "\n";

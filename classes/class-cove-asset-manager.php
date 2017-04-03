@@ -431,8 +431,10 @@ class COVE_Asset_Manager {
     $archive_image = !empty($temp_obj['attributes']['images'][0]['image']) ? $temp_obj['attributes']['images'][0]['image'] : '';
     update_post_meta($postid, '_coveam_video_image', $archive_image);
 
+    coveam_update_video_status($postid);
     return $asset;
   }
+
   public function create_media_manager_asset( $post_id = false, $episode_id = false, $postary ) {
     if (!$post_id) {
       return array('errors' => 'no post_id' );

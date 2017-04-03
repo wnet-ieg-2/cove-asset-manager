@@ -82,7 +82,7 @@ class COVE_Asset_Metaboxes {
       if( $v['type'] == 'textarea' ) {
         $maxinput = '';
         if ($v['maxlength']) { $maxinput = ' data-limit-input="' . $v['maxlength'] . '" '; }
-          $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><textarea class="widefat" name="' . esc_attr( $k ) . '" id="' . esc_attr( $k ) . '"' . $maxinput . '>' . esc_attr( $data ) . '</textarea>' . "\n";
+          $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><textarea class="widefat" name="' . esc_attr( $k ) . '" id="' . esc_attr( $k ) . '"' . $maxinput . '>' . esc_textarea( $data ) . '</textarea>' . "\n";
           $html .= '<span></span><p class="description">' . $v['description'] . '</p>' . "\n";
 		  	  $html .= '</td></tr>' . "\n";
       } else if( $v['type'] == 'readonly' ) {
@@ -179,7 +179,7 @@ class COVE_Asset_Metaboxes {
       } else if( $v['type'] == 'textarea' ) {
         $maxinput = '';
         if ($v['maxlength']) { $maxinput = ' data-limit-input="' . $v['maxlength'] . '" '; }
-          $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><textarea class="widefat" name="' . esc_attr( $k ) . '" id="' . esc_attr( $k ) . '"' . $maxinput . '>' . esc_attr( $data ) . '</textarea>' . "\n";
+          $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><textarea class="widefat" name="' . esc_attr( $k ) . '" id="' . esc_attr( $k ) . '"' . $maxinput . '>' . esc_textarea( $data ) . '</textarea>' . "\n";
           $html .= '<span></span><p class="description">' . $v['description'] . '</p>' . "\n";
 		  	  $html .= '</td></tr>' . "\n";
       } else if( $v['type'] == 'datetime' ) {

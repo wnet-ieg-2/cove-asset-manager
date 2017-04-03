@@ -377,10 +377,10 @@ class COVE_Asset_Manager {
     update_post_meta($postid, '_pbs_media_manager_episode_cid', $episode_id);
     $temp_obj = $episode['data'];
     update_post_meta($postid, '_pbs_media_manager_season_cid', $temp_obj['attributes']['season']['id']);
-    update_post_meta($postid, '_pbs_media_manager_season_title', (empty($temp_obj['attributes']['season']['attributes']['title']) ? $temp_obj['attributes']['season']['attributes']['ordinal'] : $temp_obj['attributes']['season']['attributes']['title']) );
-    update_post_meta($postid, '_pbs_media_manager_episode_title', $temp_obj['attributes']['title']); 
-    update_post_meta($postid, '_pbs_media_manager_episode_desc_long', $temp_obj['attributes']['description_long']);
-    update_post_meta($postid, '_pbs_media_manager_episode_desc_short', $temp_obj['attributes']['description_short']);
+    update_post_meta($postid, '_pbs_media_manager_season_title', sanitize_text_field((empty($temp_obj['attributes']['season']['attributes']['title']) ? $temp_obj['attributes']['season']['attributes']['ordinal'] : $temp_obj['attributes']['season']['attributes']['title'])) );
+    update_post_meta($postid, '_pbs_media_manager_episode_title', sanitize_text_field($temp_obj['attributes']['title'])); 
+    update_post_meta($postid, '_pbs_media_manager_episode_desc_long', sanitize_text_field($temp_obj['attributes']['description_long']));
+    update_post_meta($postid, '_pbs_media_manager_episode_desc_short', sanitize_text_field($temp_obj['attributes']['description_short']));
     update_post_meta($postid, '_pbs_media_manager_episode_ordinal', $temp_obj['attributes']['ordinal']);
     update_post_meta($postid, '_pbs_media_manager_episode_airdate', $temp_obj['attributes']['premiered_on']);
     return $episode;
@@ -403,15 +403,15 @@ class COVE_Asset_Manager {
     if (!empty($asset['errors'])) { return $asset; }
     update_post_meta($postid, '_coveam_video_asset_guid', $asset_id);
     $temp_obj = $asset['data'];
-    update_post_meta($postid, '_coveam_video_title', $temp_obj['attributes']['title']); 
-    update_post_meta($postid, '_coveam_description', $temp_obj['attributes']['description_long']);
-    update_post_meta($postid, '_coveam_shortdescription', $temp_obj['attributes']['description_short']);
+    update_post_meta($postid, '_coveam_video_title', sanitize_text_field($temp_obj['attributes']['title'])); 
+    update_post_meta($postid, '_coveam_description', sanitize_text_field($temp_obj['attributes']['description_long']));
+    update_post_meta($postid, '_coveam_shortdescription', sanitize_text_field($temp_obj['attributes']['description_short']));
     update_post_meta($postid, '_coveam_video_slug', $temp_obj['attributes']['slug']);
     update_post_meta($postid, '_coveam_cove_player_id', $temp_obj['attributes']['legacy_tp_media_id']);
     update_post_meta($postid, '_coveam_airdate', $temp_obj['attributes']['premiered_on'] . ' 19:00:00');
     update_post_meta($postid, '_coveam_duration', $temp_obj['attributes']['duration']);
     update_post_meta($postid, '_pbs_media_manager_episode_cid', $temp_obj['attributes']['episode']['id']);
-    update_post_meta($postid, '_pbs_media_manager_episode_title', $temp_obj['attributes']['episode']['attributes']['title']);
+    update_post_meta($postid, '_pbs_media_manager_episode_title', sanitize_text_field($temp_obj['attributes']['episode']['attributes']['title']));
 
     //translate to our system
     update_post_meta($postid, '_coveam_video_fullprogram', $this->MediaManagerTranslateTypeToNumber($temp_obj['attributes']['object_type']));

@@ -36,6 +36,12 @@ class COVE_Asset_Manager {
 
     add_action( 'wp_ajax_coveam_get_episode_option_list', array( $this, 'ajax_get_episode_option_list'));
 
+    if (! has_action( 'coveam_import_media_manager_asset')) {
+      add_action( 'coveam_import_media_manager_asset', array($this, 'import_media_manager_asset'), 10, 2 );
+    }
+
+
+
 	}
 	public function enqueue_scripts () {
         $scriptPath = $this->assets_url . 'js/jquery.cove-videoplayer-1.2.js';
@@ -397,7 +403,34 @@ class COVE_Asset_Manager {
     return $episode;
   }
 
-
+  public function schedule_media_manager_asset_refresh_if_needed($postid = false, $assetary = array()) {
+    if (!$postid) {
+      return array('errors' => 'no post_id');
+    }
+    if (empty($assetary['attributes'])) {
+      return array('errors' => 'no asset');
+    }
+    $assetid = $assetary['id'];
+    $attribs = $assetary['attributes'];
+    $retry = false;
+    if (!empty($attribs['original_video']['ingestion_status'])) {
+      if (!in_array($attribs['original_video']['ingestion_status'], array('done', 'failed', 'deletion_failed') )) {
+        $retry = true;    
+      }
+    }
+    if (!empty($attribs['original_caption']['ingestion_status'])) {
+      if (!in_array($attribs['original_caption']['ingestion_status'], array(1, 0, 11) ) ) {
+        $retry = true;
+      }
+    }
+    if ($retry) {
+      $previous = wp_next_scheduled('coveam_import_media_manager_asset', array( $postid, $assetid ));
+      if ($previous) {
+        wp_unschedule_event( $previous, 'coveam_import_media_manager_asset', array( $postid, $assetid ));
+      }
+      wp_schedule_event((time() + 300), 'coveam_import_media_manager_asset', array( $postid, $assetid ));
+    }
+  }
 
   public function import_media_manager_asset( $postid = false, $asset_id = '') {
     /* function imports data based on the PBS Content ID and saves it to postmeta.  Returns the retrieved object or 'errors' array
@@ -432,6 +465,7 @@ class COVE_Asset_Manager {
       $statusline = $statusobj;
     } else {
       $statusline = json_encode($statusobj);
+      $this->schedule_media_manager_asset_refresh_if_needed($postid, $temp_obj);
     }
     update_post_meta($postid, '_coveam_covestatus', $statusline);
 
@@ -448,8 +482,10 @@ class COVE_Asset_Manager {
 
     $archive_image = !empty($temp_obj['attributes']['images'][0]['image']) ? $temp_obj['attributes']['images'][0]['image'] : '';
     update_post_meta($postid, '_coveam_video_image', $archive_image);
-    
+   
+    // ugly old function that I'll replace someday 
     coveam_update_video_status($postid);
+
     return $asset;
   }
 

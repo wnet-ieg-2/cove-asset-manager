@@ -247,6 +247,9 @@ class COVE_Asset_Manager {
 
   public function determineMediaManagerStatus($obj) {
     /* this function takes the complex data array from Media Manager and works out if the asset is actually available somehow */
+    if (empty($obj['attributes'])) {
+      return 'not_found';
+    }
     $data = $obj['attributes'];
 
     // date restrictions override the publish_state
@@ -272,8 +275,9 @@ class COVE_Asset_Manager {
       if (!empty($data['original_video']['ingestion_error'])){
         $ingest_status['ingestion_error'] = $data['original_video']['ingestion_error'];
       }
-      if ($data['original_video']['ingestion_status'] !== 'done') {
-        $ingest_status['ingestion_status'] = $data['original_video']['ingestion_status'];
+      $video_ingest_status = $data['original_video']['ingestion_status'];
+      if ($video_ingest_status !== 'done') {
+        $ingest_status['ingestion_status'] = $video_ingest_status;
       }
     }
     if (!empty($data['original_caption'])) {
@@ -289,9 +293,9 @@ class COVE_Asset_Manager {
       $ingest_status['image'] = 'no image';
     }
 
-    // wrap it up and return a stringafied array if not null
+    // return an array if not null
     if (count($ingest_status) > 0) {
-      return json_encode($ingest_status);
+      return $ingest_status;
     }
 
     // fallback for other cases 
@@ -422,7 +426,14 @@ class COVE_Asset_Manager {
 
     //translate to our system
     update_post_meta($postid, '_coveam_video_fullprogram', $this->MediaManagerTranslateTypeToNumber($temp_obj['attributes']['object_type']));
-    update_post_meta($postid, '_coveam_covestatus', $this->determineMediaManagerStatus($temp_obj));
+    
+    $statusobj = $this->determineMediaManagerStatus($temp_obj);
+    if (! is_array($statusobj)) {
+      $statusline = $statusobj;
+    } else {
+      $statusline = json_encode($statusobj);
+    }
+    update_post_meta($postid, '_coveam_covestatus', $statusline);
 
     $rights = (!is_null($temp_obj['attributes']['availabilities']['public']['end'])) ? 'Limited' : 'Public';
     update_post_meta($postid, '_coveam_rights', $rights);

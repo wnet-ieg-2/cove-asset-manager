@@ -248,37 +248,8 @@ class COVE_Asset_Manager {
   public function determineMediaManagerStatus($obj) {
     /* this function takes the complex data array from Media Manager and works out if the asset is actually available somehow */
     $data = $obj['attributes'];
-    $ingest_status = array();
-    if (!empty($data['original_video'])) {
-      if (!empty($data['original_video']['ingestion_error'])){
-        $ingest_status['ingestion error'] = $data['original_video']['ingestion_error'];
-      }
-      if ($data['original_video']['ingestion_status'] !== 'done') {
-        $ingest_status['ingestion status'] = $data['original_video']['ingestion_status'];
-      }
-    }
-    if (!empty($data['original_caption'])) {
-      if (!empty($data['original_caption']['ingestion_error'])){
-        $ingest_status['caption error'] = $data['original_caption']['ingestion_error'];
-      }
-    } 
-    if (empty($data['images'][0]['image'])) {
-      $ingest_status['image'] = 'no image';
-    }
 
-    // wrap it up and return a stringafied array if not null
-    if (count($ingest_status) > 0) {
-      $out = '';  
-      foreach ($ingest_status as $k => $v) {
-        $out .= $k . ' : ' . $v . ', ';
-      }
-      return $out; 
-    }
- 
-    if (!$data['publish_state']) {
-      return "not_published";
-    }
-    // date restrictions
+    // date restrictions override the publish_state
     $now = time();
     $endtimeobj = !empty($data['availabilities']['public']['end']) ? new DateTime($data['availabilities']['public']['end']) : false;
     $endtime = is_object($endtimeobj) ? $endtimeobj->format('U') : false;
@@ -291,8 +262,44 @@ class COVE_Asset_Manager {
     if ($endtime && $endtime < $now) {
       return "no_longer_available";
     }
-    // because in the old COVE API this was the good string.  Good as anything else
-    return 'available';
+
+    if ($data['publish_state'] == 1) {
+      // because in the old COVE API this was the good string.  Good as anything else
+      return 'available';
+    }
+    $ingest_status = array();
+    if (!empty($data['original_video'])) {
+      if (!empty($data['original_video']['ingestion_error'])){
+        $ingest_status['ingestion_error'] = $data['original_video']['ingestion_error'];
+      }
+      if ($data['original_video']['ingestion_status'] !== 'done') {
+        $ingest_status['ingestion_status'] = $data['original_video']['ingestion_status'];
+      }
+    }
+    if (!empty($data['original_caption'])) {
+      if (!empty($data['original_caption']['ingestion_error'])){
+        $ingest_status['caption_error'] = $data['original_caption']['ingestion_error'];
+      }
+      // PBS is going to change this value someday
+      if ($data['original_caption']['ingestion_status'] != 1 ) {
+        $ingest_status['caption_status'] = $data['original_caption']['ingestion_status'];
+      }
+    } 
+    if (empty($data['images'][0]['image'])) {
+      $ingest_status['image'] = 'no image';
+    }
+
+    // wrap it up and return a stringafied array if not null
+    if (count($ingest_status) > 0) {
+      return json_encode($ingest_status);
+    }
+
+    // fallback for other cases 
+    if (!$data['publish_state']) {
+      return "not_published";
+    }
+    // final fallback
+    return "could_not_determine";
   }
 
   public function get_latest_media_manager_episode($season_id = false) {
@@ -430,7 +437,7 @@ class COVE_Asset_Manager {
 
     $archive_image = !empty($temp_obj['attributes']['images'][0]['image']) ? $temp_obj['attributes']['images'][0]['image'] : '';
     update_post_meta($postid, '_coveam_video_image', $archive_image);
-
+    
     coveam_update_video_status($postid);
     return $asset;
   }

@@ -260,7 +260,7 @@ class COVE_Asset_Manager {
       return "not_yet_available";
     }
     if ($endtime && $endtime < $now) {
-      return "no_longer_available";
+      return "expired";
     }
 
     if ($data['publish_state'] == 1) {

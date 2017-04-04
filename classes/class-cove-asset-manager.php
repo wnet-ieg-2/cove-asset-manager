@@ -342,12 +342,21 @@ class COVE_Asset_Manager {
     $date = new DateTime('now', new DateTimeZone($tz));
     $yearstring = $date->format('Y');
     $todaystring = $date->format('M j, Y');
-    $unixdate = $date->format('U'); 
-    $tomorrowdate = $unixdate + 86400;
+
+    // current timestamp
+    $current_ts = $date->format('U'); 
+    // set the time to 3am
+    $date->setTime(03, 00);
+    $threeam_ts = $date->format('U'); 
+    if ($current_ts > $threeam_ts) {
+      // threeam_ts was interpreted as in the past, add 1 day to it
+      $threeam_ts += 86400;
+    }
  
     // schedule invoking this script in a day
     $this->clear_scheduled_episode_generation(); 
-    wp_schedule_single_event( $tomorrowdate, 'coveam_do_daily_episode_generate' );
+    wp_schedule_single_event( $threeam_ts, 'coveam_do_daily_episode_generate' );
+    error_log('scheduled for ' . $threeam_ts);
 
     //regen the epsiode list
     $this->update_media_manager_season_list(); 

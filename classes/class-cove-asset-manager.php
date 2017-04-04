@@ -335,7 +335,7 @@ class COVE_Asset_Manager {
     }
     if (!$season_id) {
       $seasons = get_option('coveam_mm_season_id_list');
-      $season_id = $seasons[0]['id'];
+      $season_id = $seasons[0]['value'];
     }
     if (!$season_id) {
       return array( 'errors' => 'no season_id' ); 
@@ -655,7 +655,7 @@ class COVE_Asset_Manager {
     $seasonary = array();
     foreach ($seasons as $season => $ary) {
       $label = !empty($ary['attributes']['title']) ? $ary['attributes']['title'] : $ary['attributes']['ordinal'] ;
-      $seasonary[$ary['id']] = array('value' => $ary['id'], 'label' => $label);
+      $seasonary[] = array('value' => $ary['id'], 'label' => $label);
     }
     $result = false;
     if (!empty($seasonary)) {

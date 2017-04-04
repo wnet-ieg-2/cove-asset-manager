@@ -559,16 +559,21 @@ function coveam_setup_schedule() {
 # on install/activate
 function cove_asset_manager_install() {
   $plugin_obj = new COVE_Asset_Manager( __FILE__ );
-  $season_update = $plugin_obj->update_media_manager_season_list();
-  if (!empty($season_update['errors'])) {
-    error_log(json_encode($season_update));
+
+  // setup the daily episode generation
+  $ep_gen = $plugin_obj->do_daily_episode_generate();
+  if (!empty($ep_gen['errors'])) {
+    error_log(json_encode($ep_gen));
   } else {
-    error_log('updated list of media manager seasons');
-  } 
+    error_log('scheduled daily episode generation');
+  }
 }
 # on uninstall/deactivate
 function cove_asset_manager_uninstall() {
-  delete_option('coveam_mm_season_id_list');
+  $plugin_obj = new COVE_Asset_Manager( __FILE__ );
+ 
+  // remove any scheduled episode generation
+  $plugin_obj->clear_scheduled_episode_generation();
 }
 
 

@@ -36,13 +36,16 @@ class COVE_Asset_Manager {
 
     add_action( 'wp_ajax_coveam_get_episode_option_list', array( $this, 'ajax_get_episode_option_list'));
 
-    if (! has_action( 'coveam_import_media_manager_asset')) {
+    if (! has_action( 'coveam_import_media_manager_asset') ) {
       add_action( 'coveam_import_media_manager_asset', array($this, 'import_media_manager_asset'), 10, 2 );
     }
 
-
-
+    if (! has_action( 'coveam_do_daily_episode_generate' ) ) {
+      add_action( 'coveam_do_daily_episode_generate', array($this, 'do_daily_episode_generate'), 10, 1 );
+    }
 	}
+
+
 	public function enqueue_scripts () {
         $scriptPath = $this->assets_url . 'js/jquery.cove-videoplayer-1.2.js';
 	  wp_register_script( 'coveam_video-player', $scriptPath,  array('jquery'), 1.8, true );
@@ -326,7 +329,79 @@ class COVE_Asset_Manager {
     }
   }
 
-  public function create_media_manager_episode( $post_id = false, $season_id = false, $postary ) {
+  public function do_daily_episode_generate() {
+    /* function designed to be called from wp_cron
+     * and also on plugin activation
+     * to generate a new episode post and the corresponding 
+     * media manager episode.  It imports the season list also. 
+     * It will fail automatically on Jan 1 of each year if 
+     * the new season hasn't yet been created and imported 
+     * Any time it's invoked, it will setup the next scheduled job */
+
+    $tz = !empty(get_option('timezone_string')) ? get_option('timezone_string') : 'America/New_York'; 
+    $date = new DateTime('now', new DateTimeZone($tz));
+    $yearstring = $date->format('Y');
+    $todaystring = $date->format('M j, Y');
+    $unixdate = $date->format('U'); 
+    $tomorrowdate = $unixdate + 86400;
+ 
+    // schedule invoking this script in a day
+    $this->clear_scheduled_episode_generation(); 
+    wp_schedule_single_event( $tomorrowdate, 'coveam_do_daily_episode_generate' );
+
+    //regen the epsiode list
+    $this->update_media_manager_season_list(); 
+    $seasons = get_option('coveam_mm_season_id_list');
+    $season_label = $seasons[0]['label'];
+
+    // make sure that the current season is this year
+    if ((int)$yearstring > (int)$season_label) {
+      $return = 'Latest season is last year so new episode not created!' . $season_label;
+      error_log($return);
+      return array('errors' => $return);
+    }
+
+    // check that there isn't already an episode post with this title 
+    $post_title = 'Full Episode for ' . $todaystring;
+ 
+    $return = new WP_Query( array( 'title' => $post_title, 'post_type' => 'episodes', post_status => 'any' ));
+    if ($return->found_posts) {
+      $return = 'Episode post already exists: ' . $post_title;
+      error_log($return);
+      return array('errors' => $return);
+    }
+
+    $postarr = array(
+      'post_author' => 1,
+      'post_title' => $post_title,
+      'post_type' => 'episodes' 
+    );
+    // create the post
+    $post_id = -1;
+    $post_id = wp_insert_post($postarr); 
+    if ($post_id < 1) {
+      $return = 'Episode post create failed';
+      error_log($return);
+      return array('errors' => $return);
+    }
+
+    // create the mm episode
+    $result = $this->create_media_manager_episode( $post_id );
+    if (!empty($result['errors'])) {
+      error_log($result);
+      return $result;
+    }
+    return 'new episode created: ' . $result;
+  }
+  
+  public function clear_scheduled_episode_generation() {
+    $previous = wp_next_scheduled('coveam_do_daily_episode_generate');
+    if ($previous) {
+      wp_unschedule_event( $previous, 'coveam_do_daily_episode_generate' );
+    }
+  }
+
+  public function create_media_manager_episode( $post_id = false, $season_id = false, $postary = array() ) {
     /* function can be called either saving an episode post or via wp_cron.
      * defaults to creating a new episode with today's date in the current season 
      * function saves the returned cid as a postmeta field for the given post */

@@ -58,10 +58,12 @@ class COVE_Asset_Metaboxes {
     global $post_id;
 		$fields = get_post_custom( $post_id );
 		$field_data = $this->get_episode_fields_settings();
+    $readonly = false;
     $html = "<table>";
 		$html .= '<input type="hidden" name="' . $this->token . '_nonce" id="' . $this->token . '_nonce" value="' . wp_create_nonce( plugin_basename( $this->dir ) ) . '" />';
 	  if (!empty($fields['_pbs_media_manager_episode_cid'][0])) {
-      $html .= '<tr><th scope="row">Media Manager episode Content ID</th><td>' . $fields['_pbs_media_manager_episode_cid'][0] . ' <p class="description">The PBS API currently doesnt yet support updating an episode.  NO VALUES ENTERED BELOW WILL SAVE.</p><input type=hidden name="media_manager_episode_action" value="update" /></td></tr>';
+      $readonly = true;
+      $html .= '<tr><th scope="row"></th><td><p class="description">The PBS API currently doesnt yet support updating an episode via the API, so to update values go to the Media Manager Console, and then "update" this page.</p><input type=hidden name="media_manager_episode_action" value="update" /></td></tr>';
     }	else {
       // once populated, these fields are read-only.  so prompt to either create a new asset or pull in asset data 
       $html .= '<tr valign="top"><th scope="row">New Media Manager Episode record creation</th><td>Either <br /><input type="radio" name="media_manager_episode_action" value="noaction" checked><b>Neither create nor import</b> a Media Manager episode record, or<br /><input type="radio" name="media_manager_episode_action" value="create"><b>create</b> a new episode record in the Media Manager or <br /><input type="radio" name="media_manager_episode_action" value="import"><b>import</b> an existing Media Manager record with the following PBS Content ID: <input name="media_manager_import_episode_id" type="text" class="regular-text" /></td></tr>';
@@ -72,10 +74,8 @@ class COVE_Asset_Metaboxes {
 		  if ( isset( $fields[$k] ) && isset( $fields[$k][0] ) ) {
 				$data = $fields[$k][0];
 			}
-      if ( $k == '_pbs_media_manager_episode_cid' || $k == '_pbs_media_manager_season_cid' ) {
-        if (!empty($fields[$k][0])) {
-          $v['type'] = 'readonly';
-        }
+      if ($readonly) {
+        $v['type'] = 'readonly';
       }
 
       // automated formatting switches 
@@ -736,7 +736,15 @@ class COVE_Asset_Metaboxes {
 
 	public function get_episode_fields_settings() {
 		$fields = array();
-    
+ 
+ 		$fields['_pbs_media_manager_episode_cid'] = array(
+		    'name' => 'PBS Media Manager Episode CID',
+		    'type' => 'text',
+        'default' => '',
+        'description' => 'The content ID of this episode.' 
+		);
+
+ 
  		$fields['_pbs_media_manager_season_cid'] = array(
 		    'name' => 'Season',
 		    'type' => 'select',

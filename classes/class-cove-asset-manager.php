@@ -371,7 +371,7 @@ class COVE_Asset_Manager {
     }
 
     // check that there isn't already an episode post with this title 
-    $post_title = 'Full Episode for ' . $todaystring;
+    $post_title = 'PBS NewsHour full episode ' . $todaystring;
  
     $return = new WP_Query( array( 'title' => $post_title, 'post_type' => 'episodes', post_status => 'any' ));
     if ($return->found_posts) {

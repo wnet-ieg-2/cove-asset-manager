@@ -343,7 +343,7 @@ class COVE_Asset_Manager {
     $attribs = $this->map_post_fields_to_episode_array($postary); 
 
     // default values for the episode
-    $datestring = get_the_date('M j, Y');
+    $datestring = get_the_date('M j, Y', $post_id);
     if (empty($attribs['title'])) {
        $attribs['title'] = 'Full Episode for ' . $datestring;
     }

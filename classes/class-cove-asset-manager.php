@@ -493,14 +493,20 @@ class COVE_Asset_Manager {
 
   public function schedule_media_manager_asset_refresh_if_needed($postid = false, $assetary = array()) {
     if (!$postid) {
-      return array('errors' => 'no post_id');
+      $error = 'no post_id';
+      error_log($error);
+      return array('errors' => $error);
     }
     if (empty($assetary['attributes'])) {
-      return array('errors' => 'no asset');
+      $error = 'no asset';
+      error_log($error);
+      return array('errors' => $error);
     }
     $assetid = $assetary['id'];
     if (empty($assetid)) {
-      return array('errors' => 'cant get asset id');
+      $error = 'cant get asset id';
+      error_log($error);
+      return array('errors' => $error);
     }
     $attribs = $assetary['attributes'];
     $retry = false;

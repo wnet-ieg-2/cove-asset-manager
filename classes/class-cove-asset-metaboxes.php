@@ -680,6 +680,23 @@ class COVE_Asset_Metaboxes {
         'suppress' => true,
 		    'section' => 'cove-ingest-fields coverequired'
 		  );
+
+		  $fields['_coveam_airdate'] = array(
+		    'name' => 'Available Datetime',
+		    'type' => 'datetime',
+		    'default' => '',
+        'description' => 'Time before which this vid is not available.  All times Eastern',
+		    'section' => 'cove-asset-details coverequired youtuberequired'
+		  );
+
+ 		  $fields['_coveam_premiere_date'] = array(
+		    'name' => 'Premiere date',
+		    'type' => 'readonly',
+		    'default' => '',
+        'description' => 'Displayed date for the video, derived by stripping the time from the available datetime.',
+		    'section' => 'cove-asset-details coverequired youtuberequired'
+		  );
+      // end media manager only stuff
     }
     $fields['_coveam_ingest_task'] = array(
         'name' => __( 'Cove Ingest Task SUPPRESSED:' , 'cove_asset_manager' ),

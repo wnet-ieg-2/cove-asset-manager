@@ -549,10 +549,15 @@ class COVE_Asset_Manager {
     update_post_meta($postid, '_coveam_shortdescription', sanitize_text_field($temp_obj['attributes']['description_short']));
     update_post_meta($postid, '_coveam_video_slug', $temp_obj['attributes']['slug']);
     update_post_meta($postid, '_coveam_cove_player_id', $temp_obj['attributes']['legacy_tp_media_id']);
-    update_post_meta($postid, '_coveam_airdate', $temp_obj['attributes']['premiered_on'] . ' 19:00:00');
+    update_post_meta($postid, '_coveam_premiere_date', $temp_obj['attributes']['premiered_on']);
     update_post_meta($postid, '_coveam_duration', $temp_obj['attributes']['duration']);
     update_post_meta($postid, '_pbs_media_manager_episode_cid', $temp_obj['attributes']['episode']['id']);
     update_post_meta($postid, '_pbs_media_manager_episode_title', sanitize_text_field($temp_obj['attributes']['episode']['attributes']['title']));
+
+    $available_date = $temp_obj['attributes']['availabilities']['public']['start'];
+    $airdate_obj = new DateTime($available_date, new DateTimeZone('America/New_York'));
+    
+    update_post_meta($postid, '_coveam_airdate', $airdate_obj->format('Y-m-d H:i A') );
 
     //translate to our system
     update_post_meta($postid, '_coveam_video_fullprogram', $this->MediaManagerTranslateTypeToNumber($temp_obj['attributes']['object_type']));

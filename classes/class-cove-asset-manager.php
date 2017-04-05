@@ -555,10 +555,11 @@ class COVE_Asset_Manager {
     update_post_meta($postid, '_pbs_media_manager_episode_title', sanitize_text_field($temp_obj['attributes']['episode']['attributes']['title']));
 
     $available_date = $temp_obj['attributes']['availabilities']['public']['start'];
-    $tz = !empty(get_option('timezone_string')) ? get_option('timezone_string') : 'America/New_York';
-    $airdate_obj = new DateTime($available_date, new DateTimeZone($tz));
-    
-    update_post_meta($postid, '_coveam_airdate', $airdate_obj->format('Y-m-d H:i A') );
+    $tz = 'America/New_York';
+    //$translated_datetime = strtotime($available_date);
+    $airdate_obj = new DateTime($available_date);
+    $airdate_obj->setTimezone(new DateTimeZone($tz)); 
+    update_post_meta($postid, '_coveam_airdate', $airdate_obj->format('Y-m-d h:i a') );
 
     //translate to our system
     update_post_meta($postid, '_coveam_video_fullprogram', $this->MediaManagerTranslateTypeToNumber($temp_obj['attributes']['object_type']));
@@ -649,16 +650,32 @@ class COVE_Asset_Manager {
       $attribs['images'][] = array("profile" => "asset-mezzanine-16x9", "source" => $fields['_coveam_video_image'] );
     }
 
+    // date translation sucks because the local dates and console dates are displayed in America/New_York
+    // and the local dates are stored in America/New_York historically
+    // but everything from the API is in UTC
+
     if (empty($fields['_coveam_airdate'])) {
-      $date = new DateTime('now');
+      $localdate = new DateTime('now');
     } else {
+      $airdate_format = 'Y-m-d h:i a';
+      $tz = 'America/New_York';
       $raw_airdate = $fields['_coveam_airdate'];
-      if (!( is_numeric($raw_airdate) && (int)$raw_airdate == $raw_airdate )) {
-        $raw_airdate = strtotime($raw_airdate);  
-      }	
-      $date = new DateTime();
-      $date->setTimestamp($raw_airdate);
+      error_log('time is ' . $raw_airdate);
+      if ( is_numeric($raw_airdate) && (int)$raw_airdate == $raw_airdate ) {
+        // some odd ones were set wrong
+        $localdate = new DateTime();
+        $localdate->setTimestamp($raw_airdate);
+      } else {
+        error_log('from format');	
+        $localdate = DateTime::createFromFormat($airdate_format, $raw_airdate, new DateTimeZone($tz));
+      }
     } 
+    $localudate = $localdate->format('U');
+    error_log( $localdate->format($airdate_format) );
+    // and heres where we set the date for the outgoing API
+    $date = new DateTime();
+    $date->setTimestamp($localudate); 
+    $date->setTimezone(new DateTimeZone('UTC'));
     $formatted_date = $date->format('Y-m-d');
     $attribs['premiered_on'] = $formatted_date;
     $attribs['encored_on'] = $formatted_date;

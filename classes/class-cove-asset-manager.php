@@ -660,20 +660,17 @@ class COVE_Asset_Manager {
       $airdate_format = 'Y-m-d h:i a';
       $tz = 'America/New_York';
       $raw_airdate = $fields['_coveam_airdate'];
-      error_log('time is ' . $raw_airdate);
       if ( is_numeric($raw_airdate) && (int)$raw_airdate == $raw_airdate ) {
         // some odd ones were set wrong
         $localdate = new DateTime();
         $localdate->setTimestamp($raw_airdate);
       } else {
-        error_log('from format');	
         $localdate = DateTime::createFromFormat($airdate_format, $raw_airdate, new DateTimeZone($tz));
       }
     }
     if (is_object($localdate)) {
     // on imports it won't exist 
     $localudate = $localdate->format('U');
-    error_log( $localdate->format($airdate_format) );
     // and heres where we set the date for the outgoing API
     $date = new DateTime();
     $date->setTimestamp($localudate); 

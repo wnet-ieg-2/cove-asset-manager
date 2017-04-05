@@ -495,6 +495,9 @@ class COVE_Asset_Manager {
       return array('errors' => 'no asset');
     }
     $assetid = $assetary['id'];
+    if (empty($assetid)) {
+      return array('errors' => 'cant get asset id');
+    }
     $attribs = $assetary['attributes'];
     $retry = false;
     if (!empty($attribs['original_video']['ingestion_status'])) {

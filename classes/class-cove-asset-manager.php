@@ -341,8 +341,12 @@ class COVE_Asset_Manager {
     $tz = !empty(get_option('timezone_string')) ? get_option('timezone_string') : 'America/New_York'; 
     $date = new DateTime('now', new DateTimeZone($tz));
     $yearstring = $date->format('Y');
-    $todaystring = $date->format('M j, Y');
-
+    $todaystring = $date->format('F j, Y');
+    $sitestring = 'PBS NewsHour';
+    //change the string to Weekend if day of week is Sunday or Saturday 
+    if (in_array($date->format('l'), array('Sunday', 'Saturday'))){
+      $sitestring .= " Weekend";
+    }
     // current timestamp
     $current_ts = $date->format('U'); 
     // set the time to 3am
@@ -371,7 +375,7 @@ class COVE_Asset_Manager {
     }
 
     // check that there isn't already an episode post with this title 
-    $post_title = 'PBS NewsHour full episode ' . $todaystring;
+    $post_title = $sitestring . ' full episode ' . $todaystring;
  
     $return = new WP_Query( array( 'title' => $post_title, 'post_type' => 'episodes', post_status => 'any' ));
     if ($return->found_posts) {

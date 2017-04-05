@@ -555,7 +555,8 @@ class COVE_Asset_Manager {
     update_post_meta($postid, '_pbs_media_manager_episode_title', sanitize_text_field($temp_obj['attributes']['episode']['attributes']['title']));
 
     $available_date = $temp_obj['attributes']['availabilities']['public']['start'];
-    $airdate_obj = new DateTime($available_date, new DateTimeZone('America/New_York'));
+    $tz = !empty(get_option('timezone_string')) ? get_option('timezone_string') : 'America/New_York';
+    $airdate_obj = new DateTime($available_date, new DateTimeZone($tz));
     
     update_post_meta($postid, '_coveam_airdate', $airdate_obj->format('Y-m-d H:i A') );
 
@@ -651,7 +652,12 @@ class COVE_Asset_Manager {
     if (empty($fields['_coveam_airdate'])) {
       $date = new DateTime('now');
     } else {
-      $date = new DateTime($fields['_coveam_airdate']);
+      $raw_airdate = $fields['_coveam_airdate'];
+      if (!( is_numeric($raw_airdate) && (int)$raw_airdate == $raw_airdate )) {
+        $raw_airdate = strtotime($raw_airdate);  
+      }	
+      $date = new DateTime();
+      $date->setTimestamp($raw_airdate);
     } 
     $formatted_date = $date->format('Y-m-d');
     $attribs['premiered_on'] = $formatted_date;

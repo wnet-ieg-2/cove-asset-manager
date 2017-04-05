@@ -459,6 +459,8 @@ class COVE_Asset_Metaboxes {
         }
       } else {
         if ( $assetid ) {
+	  // episode is read-only
+          unset($_POST['_pbs_media_manager_episode_cid']);
           $returnval = $this->plugin_obj->update_media_manager_asset($post_id, $assetid, $_POST);
           if (!empty($returnval['errors'])) { 
             error_log(json_encode($returnval));

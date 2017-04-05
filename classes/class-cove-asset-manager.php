@@ -670,7 +670,8 @@ class COVE_Asset_Manager {
         $localdate = DateTime::createFromFormat($airdate_format, $raw_airdate, new DateTimeZone($tz));
       }
     }
-    if (is_object($localdate)) { 
+    if (is_object($localdate)) {
+    // on imports it won't exist 
     $localudate = $localdate->format('U');
     error_log( $localdate->format($airdate_format) );
     // and heres where we set the date for the outgoing API
@@ -693,8 +694,6 @@ class COVE_Asset_Manager {
     $attribs['availabilities']['all_members']['end'] = $attribs['availabilities']['public']['end'];
     $attribs['availabilities']['station_members']['end'] = $attribs['availabilities']['public']['end'];
        
-    } else {
-      error_log('no localdate object, why?'); 
     } 
 
     return $attribs;

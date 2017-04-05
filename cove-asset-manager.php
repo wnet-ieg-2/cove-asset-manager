@@ -137,7 +137,7 @@ function coveam_update_video_status($id) {
         $video_status = $cove_status;
       }
     }
-    if ($cove_status != 'expired') {
+    if (!in_array($cove_status, array('expired', 'not_yet_available'))) {
       if ($youtube_status) {
         if ($youtube_status == 'public') {
           $video_status = 'publish';

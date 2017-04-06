@@ -338,6 +338,7 @@ class COVE_Asset_Manager {
      * the new season hasn't yet been created and imported 
      * Any time it's invoked, it will setup the next scheduled job */
 
+    
     $tz = !empty(get_option('timezone_string')) ? get_option('timezone_string') : 'America/New_York'; 
     $date = new DateTime('now', new DateTimeZone($tz));
     $yearstring = $date->format('Y');
@@ -362,49 +363,59 @@ class COVE_Asset_Manager {
     wp_schedule_single_event( $threeam_ts, 'coveam_do_daily_episode_generate' );
     error_log('scheduled for ' . $threeam_ts);
 
-    //regen the epsiode list
-    $this->update_media_manager_season_list(); 
+    //regen the season list
+    $season_resp = $this->update_media_manager_season_list(); 
+    if (!empty($season_resp['errors'])) {
+      error_log(json_encode($season_resp));
+    }
     $seasons = get_option('coveam_mm_season_id_list');
-    $season_label = $seasons[0]['label'];
 
-    // make sure that the current season is this year
-    if ((int)$yearstring > (int)$season_label) {
-      $return = 'Latest season is last year so new episode not created!' . $season_label;
-      error_log($return);
-      return array('errors' => $return);
-    }
+    //only actually generate a new episode fi create_episode is true
+    $create_episode = get_option('coveam_mm_episode_autocreate') ? get_option('coveam_mm_episode_autocreate') : false;
+    
+    if ($create_episode == 'true') {
+      $season_label = $seasons[0]['label'];
 
-    // check that there isn't already an episode post with this title 
-    $post_title = $sitestring . ' full episode ' . $todaystring;
+      // make sure that the current season is this year
+      if ((int)$yearstring > (int)$season_label) {
+        $return = 'Latest season is last year so new episode not created!' . $season_label;
+        error_log($return);
+        return array('errors' => $return);
+      }
+
+      // check that there isn't already an episode post with this title 
+      $post_title = $sitestring . ' full episode ' . $todaystring;
  
-    $return = new WP_Query( array( 'title' => $post_title, 'post_type' => 'episodes', post_status => 'any' ));
-    if ($return->found_posts) {
-      $return = 'Episode post already exists: ' . $post_title;
-      error_log($return);
-      return array('errors' => $return);
-    }
+      $return = new WP_Query( array( 'title' => $post_title, 'post_type' => 'episodes', post_status => 'any' ));
+      if ($return->found_posts) {
+        $return = 'Episode post already exists: ' . $post_title;
+        error_log($return);
+        return array('errors' => $return);
+      }
 
-    $postarr = array(
-      'post_author' => 1,
-      'post_title' => $post_title,
-      'post_type' => 'episodes' 
-    );
-    // create the post
-    $post_id = -1;
-    $post_id = wp_insert_post($postarr); 
-    if ($post_id < 1) {
-      $return = 'Episode post create failed';
-      error_log($return);
-      return array('errors' => $return);
-    }
-
-    // create the mm episode
-    $result = $this->create_media_manager_episode( $post_id );
-    if (!empty($result['errors'])) {
-      error_log($result);
-      return $result;
-    }
-    return 'new episode created: ' . $result;
+      $postarr = array(
+        'post_author' => 1,
+        'post_title' => $post_title,
+        'post_type' => 'episodes' 
+      );
+      // create the post
+      $post_id = -1;
+      $post_id = wp_insert_post($postarr); 
+      if ($post_id < 1) {
+        $return = 'Episode post create failed';
+        error_log($return);
+        return array('errors' => $return);
+      }
+  
+      // create the mm episode
+      $result = $this->create_media_manager_episode( $post_id );
+      if (!empty($result['errors'])) {
+        error_log($result);
+        return $result;
+      } 
+      return 'new episode created: ' . $result;
+    } 
+    // end conditional            
   }
   
   public function clear_scheduled_episode_generation() {

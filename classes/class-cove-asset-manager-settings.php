@@ -125,6 +125,9 @@ class COVE_Asset_Manager_Settings {
     add_settings_field( 'coveam_use_mm_ingest' , __( 'Use Media Manager for ingest' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_use_mm_ingest', 'Making this true will switch ingest fields displayed and backend to use Media Manager API instead of COVE API') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_use_mm_ingest' );
 
+    add_settings_field( 'coveam_mm_episode_autocreate' , __( 'Auto-create an episode every morning' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autocreate', 'Making this true will automatically generate a new episode post and media manager episode every morning') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_mm_episode_autocreate' );
+
 
 	
 	}

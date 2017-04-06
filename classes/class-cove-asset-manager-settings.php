@@ -8,6 +8,7 @@ class COVE_Asset_Manager_Settings {
   private $plugin_url;
 	private $assets_dir;
 	private $assets_url;
+  private $plugin_obj;
 
 	public function __construct( $file ) {
 		$this->dir = dirname( $file );
@@ -15,6 +16,8 @@ class COVE_Asset_Manager_Settings {
     $this->plugin_url = esc_url( trailingslashit( plugins_url( '/', $file ) ) );
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', $file ) ) );
+    $this->plugin_obj = new COVE_Asset_Manager( $file );
+
 
 		// Register plugin settings
 		add_action( 'admin_init' , array( $this , 'register_settings' ) );

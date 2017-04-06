@@ -113,9 +113,6 @@ class COVE_Asset_Manager_Settings {
     add_settings_field( 'coveam_mm_show_id' , 'PBS Media Manager Show ID' , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_show_id', 'content id for this show, get from PBS Media Manager console') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_mm_show_id' );
 
-    add_settings_field( 'coveam_mm_season_id' , 'PBS Media Manager Season ID' , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_season_id', 'content id for the current season, get from PBS Media Manager console') );
-    register_setting( 'cove_asset_manager_settings' , 'coveam_mm_season_id' );
-
     add_settings_field( 'coveam_mm_api_key' , 'PBS Media Manager API key' , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_api_key', 'Get from PBS') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_mm_api_key' );
 

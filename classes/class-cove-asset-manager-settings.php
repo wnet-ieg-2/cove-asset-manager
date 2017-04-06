@@ -30,8 +30,9 @@ class COVE_Asset_Manager_Settings {
 
     add_action( 'admin_enqueue_scripts', array( $this, 'setup_custom_scripts' ) );
 
-    // bulk importer
+    // bulk importers
     add_action( 'wp_ajax_bulk_import_media_manager_asset_and_episode_ids', array( $this, 'ajax_bulk_import_media_manager_asset_and_episode_ids'), 10, 2);
+    add_action( 'wp_ajax_bulk_match_media_manager_episodes', array( $this, 'ajax_bulk_match_media_manager_episodes'), 10, 3);
 	}
 	
 	public function add_menu_item() {
@@ -196,6 +197,7 @@ class COVE_Asset_Manager_Settings {
     $this->write_out_oAuth_JavaScript();
     if ($this->plugin_obj->use_media_manager) {
       echo '<p>&nbsp;</p><div id = "initiate_batch_import"><button>Batch import media manager data</button><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
+      echo '<p>&nbsp;</p><div id = "initiate_episode_match"><button>Match Episodes for season_id</button><input type="text" name="mm_season_import" /><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
     } 
 	  echo '</div>';
 	}
@@ -251,40 +253,71 @@ class COVE_Asset_Manager_Settings {
     return array('updated' => $videos_to_update, 'failed' => $failed_videos);
   }
 
-  private function bulk_match_media_manager_episodes($season_id) {
+  private function bulk_match_media_manager_episodes($season_id, $pagenum) {
     /* this goes through  season 
      * gets all of the episodes
      * tries to match each episode to a full_episode post by date */
     
     $client = $this->plugin_obj->get_media_manager_client();
-    $season = $client->get_season_episodes($season_id);
-    foreach($season as $episode) {
-
-
+    $season = $client->get_season_episodes($season_id, array('page' => $pagenum));
+    if (!empty($season['errors'])){
+      return $season;
     }
-    $eps_to_update = array();
-    $failed_eps = array();
-    $args = array(
-      'post_status' => 'publish', 
-      'post_type' => 'full_episodes',
-      'meta_query' => array(
-        array(
-          'key' => '_pbs_media_manager_episode_cid',
-          'value' => '',
-          'compare' => '='
-        )
-      ),
-      'posts_per_page' => 1,
-      'paged' => $pagenum
-    );
-    return array('updated' => $videos_to_update, 'failed' => $failed_videos);
+    $found_episodes = array();
+    $not_found_episodes = array();
+    foreach($season as $episode) {
+      $airdate = $episode['attributes']['premiered_on'];
+      $dateary = split('-', $airdate); // input format is 2017-01-01 
+      $args = array(
+        'post_status' => array('publish','private'), 
+        'post_type' => 'episodes',
+        'year' => $dateary[0],
+        'monthnum' => $dateary[1],
+        'day' => $dateary[2]
+      );
+      $this_post_id = false;
+      $episode_id = $episode['id'];
+      $eps = new WP_Query($args);
+      if ($eps->have_posts()) {
+        while ( $eps->have_posts() ) : $eps->the_post();
+          $this_post_id = $eps->post->ID;
+          $curr_ep_mm_id = get_post_meta($this_post_id, '_pbs_media_manager_episode_id', true);
+          if (!empty($curr_ep_mm_id[0])) {
+            if ($curr_ep_mm_id[0] != $episode_id ) {
+              // this is another ep 
+              $this_post_id = false; 
+            }
+          }
+          if ($this_post_id) {
+            $this->plugin_obj->import_media_manager_episode($this_post_id, $episode_id);
+            // don't try to update any more of the have_posts
+            array_push($found_episodes, $this_post_id);
+            break;
+          }
+        endwhile;
+      }
+      if (!$this_post_id) {
+        array_push($not_found_episodes, $episode['attributes']['title']);
+      }
+    }
+    return array('updated' => $found_episodes, 'failed' => $not_found_episodes);
   }
-
-
 
   public function ajax_bulk_import_media_manager_asset_and_episode_ids() {
     $pagenum = ( isset( $_POST['pagenum'] ) ) ? $_POST['pagenum'] : '';
     $returnarray = $this->bulk_import_media_manager_asset_and_episode_ids($pagenum) ;
+    if ($returnarray ) {
+      echo json_encode($returnarray);
+    } else {
+      echo json_encode($error);
+    }
+    die();
+  }
+
+  public function ajax_bulk_match_media_manager_episodes() {
+    $pagenum = ( isset( $_POST['pagenum'] ) ) ? $_POST['pagenum'] : '';
+    $season_id = ( isset( $_POST['season_id'] ) ) ? $_POST['season_id'] : '';
+    $returnarray = $this->bulk_match_media_manager_episodes($season_id, $pagenum) ;
     if ($returnarray ) {
       echo json_encode($returnarray);
     } else {

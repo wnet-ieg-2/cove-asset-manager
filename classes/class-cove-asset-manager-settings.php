@@ -231,8 +231,8 @@ class COVE_Asset_Manager_Settings {
             //retry once
             $asset = $client->get_asset_by_tp_media_id($video_id);
             if (!empty($asset['errors'])) {
-              error_log(json_encode($asset));
-              return array('updated' => $videos_to_update, 'failed' => $failed_videos, 'errors' => $asset);
+              array_push($failed_videos, $post_id);
+              continue;
             }
           }
           if (empty($asset['data']['id'])) {

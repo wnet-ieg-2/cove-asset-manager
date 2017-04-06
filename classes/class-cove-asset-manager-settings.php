@@ -215,7 +215,7 @@ class COVE_Asset_Manager_Settings {
           'compare' => '!='
         )
       ),
-      'posts_per_page' => 50,
+      'posts_per_page' => 25,
       'paged' => $pagenum
     );
     $videos = new WP_Query($args);

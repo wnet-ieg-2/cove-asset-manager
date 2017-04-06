@@ -23,15 +23,11 @@ register_deactivation_hook(__FILE__ , 'cove_asset_manager_uninstall');
 require_once( 'classes/class-cove-asset-manager.php' );
 require_once( 'classes/class-cove-asset-manager-settings.php' );
 require_once( 'classes/class-cove-asset-metaboxes.php' );
-if ( !class_exists('COVE_API_Request') ) {
-  require_once( 'classes/class-cove-request-api.php' );
-}
+
 if ( !class_exists('PBS_Media_Manager_API_Client') ) {
   require_once( 'assets/php/PBS_Media_Manager_Client/class-PBS-Media-Manager-API-Client.php' );
 }
 
-// Include the COVE ingester scripts
-require_once( 'cove-batch-ingest.php' );
 
 // Include the YouTube server scripts
 require_once( 'classes/class-youtube-oauth.php' );
@@ -43,6 +39,13 @@ $plugin_settings_obj = new COVE_Asset_Manager_Settings( __FILE__ );
 
 $youtube_oauth_obj = new WNET_Google_oAuth(__FILE__);
 
+if (!$plugin_obj->use_media_manager) {
+  if ( !class_exists('COVE_API_Request') ) {
+    require_once( 'classes/class-cove-request-api.php' );
+    require_once( 'cove-batch-ingest.php' );
+  }
+}
+
 //load up the metabox admin
 function call_COVE_Asset_Metaboxes() {
   new COVE_Asset_Metaboxes( __FILE__ );
@@ -51,6 +54,7 @@ if ( is_admin() ) {
     add_action( 'load-post.php', 'call_COVE_Asset_Metaboxes' );
     add_action( 'load-post-new.php', 'call_COVE_Asset_Metaboxes' );
 }
+
 
 function coveam_get_video( $id ) {
 // array to eventually return

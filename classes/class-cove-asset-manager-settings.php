@@ -192,7 +192,7 @@ class COVE_Asset_Manager_Settings {
 				</form>';
     $this->write_out_oAuth_JavaScript();
     if ($this->plugin_obj->use_media_manager) {
-      echo '<p>&nbsp;</p><div id = "initiate_batch_import"><button>Batch import media manager data</button><div class="status"></div><div class="success"></div><div class="failed"></div></div>';
+      echo '<p>&nbsp;</p><div id = "initiate_batch_import"><button>Batch import media manager data</button><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
     } 
 	  echo '</div>';
 	}

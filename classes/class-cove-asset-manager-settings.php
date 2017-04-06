@@ -27,6 +27,11 @@ class COVE_Asset_Manager_Settings {
 
 		// Add settings link to plugins page
 		add_filter( 'plugin_action_links_' . plugin_basename( $this->file ) , array( $this , 'add_settings_link' ) );
+
+    add_action( 'admin_enqueue_scripts', array( $this, 'setup_custom_scripts' ) );
+
+    // bulk importer
+    add_action( 'wp_ajax_bulk_import_media_manager_asset_and_episode_ids', array( $this, 'ajax_bulk_import_media_manager_asset_and_episode_ids'), 10, 2);
 	}
 	
 	public function add_menu_item() {
@@ -38,6 +43,14 @@ class COVE_Asset_Manager_Settings {
   		array_push( $links, $settings_link );
   		return $links;
 	}
+
+  public function setup_custom_scripts() {
+    if ($this->plugin_obj->use_media_manager) { 
+      wp_enqueue_script( 'pbs_media_manager_settings_admin', $this->assets_url . 'js/mm_settings_page.js', array( 'jquery'), 1, true);
+    }
+    wp_enqueue_media();
+  }
+
 
 	public function register_settings() {
 		
@@ -173,17 +186,113 @@ class COVE_Asset_Manager_Settings {
 				<h2>COVE Asset Manager Settings</h2>
 				<form method="post" action="options.php" enctype="multipart/form-data">';
 
-				settings_fields( 'cove_asset_manager_settings' );
-				do_settings_sections( 'cove_asset_manager_settings' );
+		settings_fields( 'cove_asset_manager_settings' );
+	  do_settings_sections( 'cove_asset_manager_settings' );
 
-			  echo '<p class="submit">
+	  echo '<p class="submit">
 						<input name="Submit" type="submit" class="button-primary" value="' . esc_attr( __( 'Save Settings' , 'cove-asset-manager' ) ) . '" />
 					</p>
 				</form>';
-        $this->write_out_oAuth_JavaScript();
-        
-			  echo '</div>';
+    $this->write_out_oAuth_JavaScript();
+    if ($this->plugin_obj->use_media_manager) {
+      echo '<p>&nbsp;</p><div id = "initiate_batch_import"><button>Batch import media manager data</button><div class="status"></div><div class="success"></div><div class="failed"></div></div>';
+    } 
+	  echo '</div>';
 	}
+
+  private function bulk_import_media_manager_asset_and_episode_ids($pagenum) {
+    $client = $this->plugin_obj->get_media_manager_client();
+
+    $videos_to_update = array();
+    $failed_videos = array();
+    $args = array(
+      'post_status' => 'publish', 
+      'post_type' => 'videos',
+      'meta_query' => array(
+        array(
+          'key' => '_coveam_cove_player_id',
+          'value' => '',
+          'compare' => '!='
+        )
+      ),
+      'posts_per_page' => 50,
+      'paged' => $pagenum
+    );
+    $videos = new WP_Query($args);
+    if ($videos->have_posts()) {
+      while ( $videos->have_posts() ) : $videos->the_post();
+        $post_id = $videos->post->ID;
+        $video_id = get_post_meta($post_id, '_coveam_cove_player_id', true);
+        if (!$video_id) {
+          array_push($failed_videos, $post_id);
+        } else {
+          $asset = $client->get_asset_by_tp_media_id($video_id);
+          if (!empty($asset['errors'])) {
+            //retry once
+            $asset = $client->get_asset_by_tp_media_id($video_id);
+            if (!empty($asset['errors'])) {
+              error_log(json_encode($asset));
+              return array('updated' => $videos_to_update, 'failed' => $failed_videos, 'errors' => $asset);
+            }
+          }
+          if (empty($asset['data']['id'])) {
+            array_push($failed_videos, $post_id);
+            error_log(json_encode($asset));
+            continue;
+          } 
+          $temp_obj = $asset['data'];
+          update_post_meta($post_id, '_coveam_video_asset_guid', $temp_obj['id']);
+          update_post_meta($post_id, '_pbs_media_manager_episode_cid', $temp_obj['attributes']['episode']['id']);
+          update_post_meta($post_id, '_pbs_media_manager_episode_title', sanitize_text_field($temp_obj['attributes']['episode']['attributes']['title']));
+          array_push($videos_to_update, $post_id);
+        } 
+      endwhile;
+    }
+    return array('updated' => $videos_to_update, 'failed' => $failed_videos);
+  }
+
+  private function bulk_match_media_manager_episodes($season_id) {
+    /* this goes through  season 
+     * gets all of the episodes
+     * tries to match each episode to a full_episode post by date */
+    
+    $client = $this->plugin_obj->get_media_manager_client();
+    $season = $client->get_season_episodes($season_id);
+    foreach($season as $episode) {
+
+
+    }
+    $eps_to_update = array();
+    $failed_eps = array();
+    $args = array(
+      'post_status' => 'publish', 
+      'post_type' => 'full_episodes',
+      'meta_query' => array(
+        array(
+          'key' => '_pbs_media_manager_episode_cid',
+          'value' => '',
+          'compare' => '='
+        )
+      ),
+      'posts_per_page' => 1,
+      'paged' => $pagenum
+    );
+    return array('updated' => $videos_to_update, 'failed' => $failed_videos);
+  }
+
+
+
+  public function ajax_bulk_import_media_manager_asset_and_episode_ids() {
+    $pagenum = ( isset( $_POST['pagenum'] ) ) ? $_POST['pagenum'] : '';
+    $returnarray = $this->bulk_import_media_manager_asset_and_episode_ids($pagenum) ;
+    if ($returnarray ) {
+      echo json_encode($returnarray);
+    } else {
+      echo json_encode($error);
+    }
+    die();
+  }
+
 
 
  private function write_out_oAuth_JavaScript() {

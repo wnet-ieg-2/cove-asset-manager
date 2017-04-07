@@ -536,7 +536,7 @@ class COVE_Asset_Manager {
       if ($previous) {
         wp_unschedule_event( $previous, 'coveam_import_media_manager_asset', array( $postid, $assetid ));
       }
-      wp_schedule_event((time() + 300), 'coveam_import_media_manager_asset', array( $postid, $assetid ));
+      wp_schedule_single_event((time() + 120), 'coveam_import_media_manager_asset', array( $postid, $assetid ));
     }
   }
 

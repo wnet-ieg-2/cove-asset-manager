@@ -49,8 +49,10 @@ function AWSexecuteOnSignedUrl(file, callback) {
 
 function AWSuploadFile() {
   var whichfile = COVEAMFILETYPE;
-  var file = $('#video_file_to_upload').get(0).files[0];
-  if (whichfile == "image") {
+  var file = false;
+  if (whichfile == "video") {
+    file = $('#video_file_to_upload').get(0).files[0];
+  } else if (whichfile == "image") {
     file = $('#image_file_to_upload').get(0).files[0];
   } else if (whichfile == "caption") {
     file = $('#caption_file_to_upload').get(0).files[0];

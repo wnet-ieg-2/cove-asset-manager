@@ -637,8 +637,8 @@ class COVE_Asset_Manager {
     $attribs = array();
     // required fields first
     $attribs['title'] = $fields['_coveam_video_title'];
-    $attribs['description_long'] =  $fields['_coveam_description'];
-    $attribs['description_short'] =  $fields['_coveam_shortdescription'];
+    $attribs['description_short'] =  !empty($fields['_coveam_shortdescription']) ? $fields['_coveam_shortdescription'] : $attribs['title'];
+    $attribs['description_long'] =  !empty($fields['_coveam_description']) ? $fields['_coveam_description'] : $attribs['description_short'];
     $attribs['object_type'] = $this->COVETranslateNumberToType($fields['_coveam_video_fullprogram']);
     $attribs['auto_publish'] = true;
 

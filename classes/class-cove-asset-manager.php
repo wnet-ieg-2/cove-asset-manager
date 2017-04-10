@@ -439,7 +439,7 @@ class COVE_Asset_Manager {
     if (!$season_id) {
       return array( 'errors' => 'no season_id' ); 
     }
-    $attribs = $this->map_post_fields_to_episode_array($postary); 
+    $attribs = wp_unslash($this->map_post_fields_to_episode_array($postary)); 
 
     // default values for the episode
     $datestring = get_the_date('M j, Y', $post_id);
@@ -611,7 +611,7 @@ class COVE_Asset_Manager {
     if (!$episode_id) {
       return array('errors' => 'no episode_id' );
     }
-    $attribs = $this->map_post_fields_to_asset_array($postary); 
+    $attribs = wp_unslash($this->map_post_fields_to_asset_array($postary)); 
 
     if (empty($attribs['title'])) {
       return array('errors' => 'required field title missing');
@@ -734,7 +734,7 @@ class COVE_Asset_Manager {
     }
     $client = $this->get_media_manager_client();
     if (!empty($client->errors)) { return $client; }
-    $attribs = $this->map_post_fields_to_episode_array($postary); 
+    $attribs = wp_unslash($this->map_post_fields_to_episode_array($postary)); 
     $response = $client->update_object($episode_id, 'episode', $attribs);
     return $response;
   }
@@ -749,7 +749,7 @@ class COVE_Asset_Manager {
     }
     $client = $this->get_media_manager_client();
     if (!empty($client->errors)) { return $client; }
-    $attribs = $this->map_post_fields_to_asset_array($postary); 
+    $attribs = wp_unslash($this->map_post_fields_to_asset_array($postary)); 
     $response = $client->update_object($asset_id, 'asset', $attribs);
     return $response;
   }

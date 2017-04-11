@@ -361,7 +361,7 @@ class COVE_Asset_Manager {
     // schedule invoking this script in a day
     $this->clear_scheduled_episode_generation(); 
     wp_schedule_single_event( $threeam_ts, 'coveam_do_daily_episode_generate' );
-    error_log('scheduled for ' . $threeam_ts);
+    //error_log('scheduled for ' . $threeam_ts);
 
     //regen the season list
     $season_resp = $this->update_media_manager_season_list(); 

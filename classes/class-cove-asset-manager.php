@@ -617,7 +617,6 @@ class COVE_Asset_Manager {
       return array('errors' => 'required field title missing');
     }
     $attribs['slug'] = $this->COVEslugify($attribs['title']) . '-' . time();
-
     $client = $this->get_media_manager_client();
     $result = $client->create_child($episode_id, 'episode', 'asset', $attribs);
     if (!empty($result['errors'])) {
@@ -643,7 +642,7 @@ class COVE_Asset_Manager {
     $attribs['auto_publish'] = true;
 
     if (!empty($fields['_pbs_media_manager_episode_cid'])) {
-      $attribs['episode'] = $fields['_pbs_media_manager_episode_cid'];
+      //$attribs['episode'] = $fields['_pbs_media_manager_episode_cid'];
     }
     //ingest related -- submitting a null video or caption entry triggers a file delete, not submitting it at all does nothing
     if (!empty($fields['_coveam_video_url'])){

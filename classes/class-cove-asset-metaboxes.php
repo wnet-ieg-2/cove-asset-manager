@@ -221,7 +221,7 @@ class COVE_Asset_Metaboxes {
     if ($currentimageurl) {
       $html .= 'Current Image URL: ' . $currentimageurl . '<br />Entering a value below to replace the current image<br />';
     } 
-    $html .= '<input name="_coveam_video_image" type="text" id="_coveam_video_image" class="widefat" value=""/><p class="description"><button id="_coveam_image_mediamanager" class="button">Click to open the Wordpress Media Library to select or upload an <b>image</b> </button> Select a JPG file (at least 1920x1080).  Save/update the post to update the asset in COVE.</p></td></tr>' . "\n";
+    $html .= '<input name="_coveam_video_image" type="text" id="_coveam_video_image" class="widefat" value=""/><p class="description"><button id="_coveam_image_mediamanager" class="button">Click to open the Wordpress Media Library to select or upload an <b>image</b> </button> Select a JPG file (at least 1920x1080) but NO LARGER THAN 5MB.  Save/update the post to update the asset in COVE.</p></td></tr>' . "\n";
 
 
     //caption file

@@ -129,6 +129,9 @@ class COVE_Asset_Manager_Settings {
     add_settings_field( 'coveam_mm_episode_autocreate' , __( 'Auto-create an episode every morning' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autocreate', 'Making this true will automatically generate a new episode post and media manager episode every morning') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_mm_episode_autocreate' );
 
+    add_settings_field( 'coveam_notify_email' , __( 'Email notifications to' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_notify_email', 'Comma-delimited list of addresses to send notices regarding ingest, expiration etc to') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_notify_email' );
+
 
 	
 	}

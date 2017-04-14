@@ -254,6 +254,54 @@ class COVE_Asset_Manager {
     }
   }
 
+  public function get_ingest_status_from_attribs($data) {
+    /* this assumes that the 'attributes' array will ha passed */
+    $ingest_status = array();
+    $failure_statuses = array('failed', 'deletion_failed');
+    if (!empty($data['original_video'])) {
+      if (!empty($data['original_video']['ingestion_error'])){
+        $ingest_status['errors']['video'] = $data['original_video']['ingestion_error'];
+      }
+      $ingest_status['ingestion_status'] = $data['original_video']['ingestion_status'];
+    }
+    if (in_array($ingest_status['ingestion_status'], $failure_statuses)) {
+      $ingest_status['errors'][] = $ingest_status['ingestion_status'];
+    }
+    if (!empty($data['original_caption'])) {
+      if (!empty($data['original_caption']['ingestion_error'])){
+        $ingest_status['errors']['caption'] = $data['original_caption']['ingestion_error'];
+      }
+      // PBS is going to do this themselves someday
+      $caption_code = $data['original_caption']['ingestion_status'];
+      switch($caption_code) {
+        case 1:
+          $caption_status = 'done';
+          break;
+        case 0:
+          $caption_status = 'failed';
+          break;
+        case 11:
+          $caption_status = 'deletion_failed';
+          break;
+        default: 
+          $caption_status = 'in_progress';
+      }
+      $ingest_status['caption_status'] = $caption_status;
+    }
+    if (in_array($ingest_status['caption_status'], $failure_statuses)) {
+      $ingest_status['errors'][] = $ingest_status['caption_status'];
+    }
+    if (empty($data['images'][0]['image'])) {
+      $ingest_status['errors']['image'] = 'no image';
+    }
+
+    // return an array if not null
+    if (count($ingest_status) > 0) {
+      return $ingest_status;
+    }
+    return null;
+  }
+
   public function determineMediaManagerStatus($obj) {
     /* this function takes the complex data array from Media Manager and works out if the asset is actually available somehow */
     if (empty($obj['attributes'])) {

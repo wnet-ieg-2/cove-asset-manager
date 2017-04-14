@@ -331,7 +331,12 @@ class COVE_Asset_Manager {
 
     // return an array if not null
     if (!is_null($ingest_status)) {
-      return $ingest_status;
+      if (!empty($ingest_status['ingestion_status']) && ($ingest_status['ingestion_status'] != 'done')) { 
+        return $ingest_status;
+      }
+      if (!empty($ingest_status['caption_status']) && ($ingest_status['caption_status'] != 'done')) {
+        return $ingest_status;
+      }
     }
 
     // fallback for other cases 

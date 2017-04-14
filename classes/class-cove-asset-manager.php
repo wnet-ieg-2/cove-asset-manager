@@ -327,31 +327,10 @@ class COVE_Asset_Manager {
       // because in the old COVE API this was the good string.  Good as anything else
       return 'available';
     }
-    $ingest_status = array();
-    if (!empty($data['original_video'])) {
-      if (!empty($data['original_video']['ingestion_error'])){
-        $ingest_status['ingestion_error'] = $data['original_video']['ingestion_error'];
-      }
-      $video_ingest_status = $data['original_video']['ingestion_status'];
-      if ($video_ingest_status !== 'done') {
-        $ingest_status['ingestion_status'] = $video_ingest_status;
-      }
-    }
-    if (!empty($data['original_caption'])) {
-      if (!empty($data['original_caption']['ingestion_error'])){
-        $ingest_status['caption_error'] = $data['original_caption']['ingestion_error'];
-      }
-      // PBS is going to change this value someday
-      if ($data['original_caption']['ingestion_status'] != 1 ) {
-        $ingest_status['caption_status'] = $data['original_caption']['ingestion_status'];
-      }
-    } 
-    if (empty($data['images'][0]['image'])) {
-      $ingest_status['image'] = 'no image';
-    }
+    $ingest_status = $this->get_ingest_status_from_attribs($data);
 
     // return an array if not null
-    if (count($ingest_status) > 0) {
+    if (!is_null($ingest_status)) {
       return $ingest_status;
     }
 

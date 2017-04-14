@@ -548,15 +548,14 @@ class COVE_Asset_Manager {
     }
     $attribs = $assetary['attributes'];
     $retry = false;
-    if (!empty($attribs['original_video']['ingestion_status'])) {
-      if (!in_array($attribs['original_video']['ingestion_status'], array('done', 'failed', 'deletion_failed') )) {
-        $retry = true;    
-      }
-    }
-    if (!empty($attribs['original_caption']['ingestion_status'])) {
-      if (!in_array($attribs['original_caption']['ingestion_status'], array(1, 0, 11) ) ) {
-        $retry = true;
-      }
+    $ingest_status = $this->get_ingest_status_from_attribs($attribs);
+    if (!empty($ingest_status['errors'])) {
+      $subject = "Ingestion failure";
+      $message = "A video's ingest has ended in failure and needs human intervention.";
+      $message .= "\n The following info was provided:\n" . json_encode($ingest_status);
+      $this->send_post_notice_email($postid, $subject, $message);
+    } else {
+      $retry = true;
     }
     if ($retry) {
       $previous = wp_next_scheduled('coveam_import_media_manager_asset', array( $postid, $assetid ));

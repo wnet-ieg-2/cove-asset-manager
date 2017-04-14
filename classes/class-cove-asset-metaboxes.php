@@ -465,6 +465,10 @@ class COVE_Asset_Metaboxes {
           if (!empty($returnval['errors'])) { 
             error_log(json_encode($returnval));
           }
+          // if updating something that may've caused an error clear the flag for being messaged previsouly
+          if ( !empty($_POST['delete_current_video']) || !empty($_POST['delete_current_caption']) || !empty($_POST['_coveam_video_image']) ) {
+            delete_post_meta($post_id, '_coveam_notice_sent_ts');
+          }
         }
       }
 

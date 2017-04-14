@@ -567,6 +567,29 @@ class COVE_Asset_Manager {
     }
   }
 
+  public function send_post_notice_email($post_id, $subject, $message) {
+    if (empty($post_id)) {
+      return;
+    } 
+    $notice_sent_ts = get_post_meta($post_id, '_coveam_notice_sent_ts', true);
+    $now = time();
+    $yesterday = $now - 86400;
+    if (!empty($notice_sent_ts) && ($notice_sent_ts > $yesterday)) {
+      // don't send the same notice more than once in a day 
+      return;
+    } 
+    $to = get_option('coveam_notify_email');
+    $subject = !empty($subject) ? esc_attr($subject) : "admin notice";
+    $subject .= " : " . wp_title(); 
+    $message .= "\n Edit this post at " . admin_url("post.php?action=edit&post=" . $post_id);
+    $success = wp_mail($to, $subject, $message);
+    if ($success) {
+      update_post_meta($post_id, '_coveam_notice_sent_ts', $now);
+    }
+  }
+
+
+
   public function import_media_manager_asset( $postid = false, $asset_id = '') {
     /* function imports data based on the PBS Content ID and saves it to postmeta.  Returns the retrieved object or 'errors' array
      */

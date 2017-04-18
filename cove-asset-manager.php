@@ -425,7 +425,10 @@ function coveam_daily_expire_videos() {
     if ($youtubelist != '') {
       $message .= "\n these youtube videos were set to private: " . $youtubelist;
     }
-    wp_mail( 'tamw@wnet.org,kkleinman@newshour.org,srohde@newshour.org,vdennis@newshour.org', $subject, $message);
+    $to = get_option('coveam_notify_email');
+    if (!empty($to)) {
+      wp_mail( $to, $subject, $message);
+    }
     return $ids_to_expire;
 }
 

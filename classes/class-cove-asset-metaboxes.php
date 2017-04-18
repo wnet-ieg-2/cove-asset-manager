@@ -702,6 +702,15 @@ class COVE_Asset_Metaboxes {
         'description' => 'Displayed date for the video, derived by stripping the time from the available datetime.',
 		    'section' => 'cove-asset-details coverequired youtuberequired'
 		  );
+
+      $fields['_coveam_notice_sent_ts'] = array(
+        'name' => 'Timestamp of last admin notice',
+        'type' => 'readonly',
+        'default' => '',
+        'description' => 'If there was an error message sent about this asset before, another one wont be sent until 24 hours after this timestamp',
+        'section' => 'cove-asset-details'
+      );
+
       // end media manager only stuff
     }
     $fields['_coveam_ingest_task'] = array(

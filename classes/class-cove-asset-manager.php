@@ -580,9 +580,14 @@ class COVE_Asset_Manager {
     $yesterday = $now - 86400;
     if (!empty($notice_sent_ts) && ($notice_sent_ts > $yesterday)) {
       // don't send the same notice more than once in a day 
+      error_log('previously sent a notice at ' . $notice_sent_ts . ' for ' . $post_id);
       return;
     } 
     $to = get_option('coveam_notify_email');
+    if (empty($to)) {
+      error_log('no admin notice email addresses set');
+      return;
+    }
     $subject = !empty($subject) ? esc_attr($subject) : "admin notice";
     $subject .= " : " . wp_title(); 
     $message .= "\n Edit this post at " . admin_url("post.php?action=edit&post=" . $post_id);

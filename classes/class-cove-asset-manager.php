@@ -292,7 +292,7 @@ class COVE_Asset_Manager {
       $ingest_status['errors'][] = $ingest_status['caption_status'];
     }
     if (empty($data['images'][0]['image'])) {
-      $ingest_status['errors']['image'] = 'no image';
+      $ingest_status['image'] = 'no image';
     }
 
     // return an array if not null

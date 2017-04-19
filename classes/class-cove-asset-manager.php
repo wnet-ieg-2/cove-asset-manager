@@ -441,9 +441,9 @@ class COVE_Asset_Manager {
   
       // create the mm episode
       $postary = array('_pbs_media_manager_episode_title' => $post_title);
-      $result = $this->create_media_manager_episode( $post_id, $postary );
+      $result = $this->create_media_manager_episode( $post_id, false, $postary );
       if (!empty($result['errors'])) {
-        error_log($result);
+        error_log(json_encode($result));
         return $result;
       } 
       return 'new episode created: ' . $result;

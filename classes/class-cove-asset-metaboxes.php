@@ -120,7 +120,7 @@ class COVE_Asset_Metaboxes {
     if ( empty($fields['_coveam_cove_player_id'][0]) && empty($fields['_coveam_video_asset_guid'][0]) ) {
       // once populated, these fields are read-only.  so prompt to either create a new asset or pull in asset data 
       $html .= '<tr valign="top"><th scope="row">New Media Manager record creation</th><td>Either <br /><input type="radio" name="media_manager_action" value="noaction" checked><b>Neither create nor import</b> a Media Manager record, or<br /><input type="radio" name="media_manager_action" value="create"><b>create</b> a new asset record in the Media Manager or <br /><input type="radio" name="media_manager_action" value="import"><b>import</b> an existing Media Manager record with the following PBS Content ID: <input name="media_manager_import_content_id" type="text" class="regular-text" /></td></tr>';
-    }  
+    } 
     $html .= '<tr valign="top"><th scope="row">Media Manager Episode</th><td>';
     $currentVal = $fields['_pbs_media_manager_episode_cid'][0];
   	if (!empty($currentVal)) {
@@ -233,6 +233,13 @@ class COVE_Asset_Metaboxes {
       $html .= '<br /><label for="caption_file_to_upload">Upload a new caption file to AWS:</label> <input name="caption_file_to_upload" type="file" id="caption_file_to_upload" /><p class="description"><a id="s3-upload-caption"><button class="button">Click to upload the <b>caption</b> file you selected to AWS</button></a>  Save or update the post to submit the file for ingestion.</p></td></tr>' . "\n";
       $html .= '<tr valign="top" class="caption-during-s3-upload" style="display:none;"><th scope="row">Upload status: <span id="caption-s3-post-upload-status"></span></th><td><span id="caption-s3-percent-transferred"></span>% done <progress id="caption-s3-upload-progress" max="1" value="0"></progress></td></tr>' . "\n";
     }
+
+
+
+    if ( !empty($fields['_coveam_video_asset_guid'][0]) ) {
+      $html .= '<tr valign="top"><th scope="row"><label for="media_manager_action">Import but don\'t update Media Manager</label></th><td><p><input type="checkbox" name="media_manager_action" value="import">Check this box and update/save the post to <b>import</b> the current data from the PBS Media Manager console and <b>ignore</b> the fields above</p><input name="media_manager_import_content_id" type="hidden" value="' . $fields['_coveam_video_asset_guid'][0]  . '" /><p class="description">Why might I do this?  If you have a custom expiration date setup, or an error in this form. Every time this form is submitted it first overwrites all of the data for the record in the PBS Media Manager with all of the field data on this page, and then imports the latest data from the PBS Media Manager.  Checking this box disables the update part of the process for this one time.  Do not check this box when trying to submit files for ingest.</p></td></tr>';
+    }
+
 
     return $html;
 

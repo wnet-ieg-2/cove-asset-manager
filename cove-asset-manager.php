@@ -39,11 +39,12 @@ $plugin_settings_obj = new COVE_Asset_Manager_Settings( __FILE__ );
 
 $youtube_oauth_obj = new WNET_Google_oAuth(__FILE__);
 
+if ( !class_exists('COVE_API_Request') ) {
+  require_once( 'classes/class-cove-request-api.php' );
+}
+
 if (!$plugin_obj->use_media_manager) {
-  if ( !class_exists('COVE_API_Request') ) {
-    require_once( 'classes/class-cove-request-api.php' );
-    require_once( 'cove-batch-ingest.php' );
-  }
+  require_once( 'cove-batch-ingest.php' );
 }
 
 //load up the metabox admin

@@ -426,9 +426,7 @@ class COVE_Asset_Metaboxes {
   			}
 		
   		 	if ( ${$f} == '' ) { 
-          if ( ($f != '_coveam_video_url') && ($f != '_coveam_video_caption') ) {
-  		 		  delete_post_meta( $post_id , $f , get_post_meta( $post_id , $f , true ) );
-          }
+  		 		delete_post_meta( $post_id , $f , get_post_meta( $post_id , $f , true ) );
   		 	} else {
   		 		update_post_meta( $post_id , $f , ${$f} );
   		 	}

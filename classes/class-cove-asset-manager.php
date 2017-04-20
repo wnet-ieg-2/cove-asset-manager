@@ -677,6 +677,10 @@ class COVE_Asset_Manager {
       return array('errors' => 'required field title missing');
     }
     $attribs['slug'] = $this->COVEslugify($attribs['title']) . '-' . time();
+    $tags_obj = wp_get_object_terms( $post_id, 'post_tag', array('fields' => 'names') );
+    if (is_array($tags_obj) && (count($tags_obj) > 0)) {
+      $attribs['tags'] = $tags_obj;
+    }
     $client = $this->get_media_manager_client();
     $result = $client->create_child($episode_id, 'episode', 'asset', $attribs);
     if (!empty($result['errors'])) {
@@ -809,6 +813,10 @@ class COVE_Asset_Manager {
     $client = $this->get_media_manager_client();
     if (!empty($client->errors)) { return $client; }
     $attribs = wp_unslash($this->map_post_fields_to_asset_array($postary)); 
+    $tags_obj = wp_get_object_terms( $post_id, 'post_tag', array('fields' => 'names') );
+    if (is_array($tags_obj) && (count($tags_obj) > 0)) {
+      $attribs['tags'] = $tags_obj;
+    }
     $response = $client->update_object($asset_id, 'asset', $attribs);
     return $response;
   }

@@ -86,16 +86,6 @@ class COVE_Asset_Manager_Settings {
 		add_settings_field( 'coveam_cove_secret' , __( 'COVE API Secret:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_secret', '') );
 		register_setting( 'cove_asset_manager_settings' , 'coveam_cove_secret' );
 
-    add_settings_field( 'coveam_cove_batch_key' , __( 'COVE Batch API Key:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_batch_key', 'Specific to batch ingest, allows job creation in COVE. Ask Edgar Roman @ PBS') );
-    register_setting( 'cove_asset_manager_settings' , 'coveam_cove_batch_key' );
-
-   add_settings_field( 'coveam_cove_batch_secret' , __( 'COVE Batch API Secret:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_batch_secret', '') );
-   register_setting( 'cove_asset_manager_settings' , 'coveam_cove_batch_secret' );
-
-   add_settings_field( 'coveam_cove_taxonomy_name' , __( 'COVE Taxonomy Name:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_taxonomy_name', '') );
-   register_setting( 'cove_asset_manager_settings' , 'coveam_cove_taxonomy_name' );
-
-
     add_settings_field( 'coveam_youtube_username' , __( 'YouTube username:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_youtube_username', 'ex: newshour@gmail.com') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_youtube_username' );
 

@@ -29,7 +29,7 @@ class COVE_Asset_Metaboxes {
   public function setup_custom_scripts() {
     wp_enqueue_script( 'youtube_cors', $this->assets_url . 'js/youtube_cors.js', array( 'jquery' ), 2, true );
     wp_enqueue_script( 'amazon_cors', $this->assets_url . 'js/amazon_cors.js', array( 'jquery' ), 2, true );
-      wp_enqueue_script( 'pbs_media_manager_admin', $this->assets_url . 'js/media_manager_admin.js', array( 'jquery'), 1, true);
+    wp_enqueue_script( 'pbs_media_manager_admin', $this->assets_url . 'js/media_manager_admin.js', array( 'jquery'), 1, true);
     wp_enqueue_media();
     wp_enqueue_script( 'wp_mediamanager_select', $this->assets_url . 'js/wp-mediamanager-select.js', array( 'jquery' ), 1, true );
   }
@@ -247,7 +247,7 @@ class COVE_Asset_Metaboxes {
 		
 		$html .= '<input type="hidden" name="' . $this->token . '_nonce" id="' . $this->token . '_nonce" value="' . wp_create_nonce( plugin_basename( $this->dir ) ) . '" />';
     
-    	
+
 		if ( 0 < count( $field_data ) ) {
 			$html .= '<table class="form-table">' . "\n";
 			$html .= '<tbody>' . "\n";
@@ -255,7 +255,7 @@ class COVE_Asset_Metaboxes {
       // display a shortcode for this video asset 
       $html .= '<tr valign="top"><th scope="row">Shortcode for this video asset:</th><td>[covevideoasset id=' . $post_id . ']</td></tr>' . "\n";
 
-        $html .= $this->build_media_manager_api_form_section($fields, $field_data);
+      $html .= $this->build_media_manager_api_form_section($fields, $field_data);
 
       $html .= $this->build_youtube_upload_form($post_id, $fields['_coveam_youtube_id'][0], $fields['_coveam_youtubestatus'][0]);
    
@@ -321,80 +321,75 @@ class COVE_Asset_Metaboxes {
       }
     }
 
-      if ( !empty($_POST['media_manager_action'] )) {
-        $importid = !empty($_POST['media_manager_import_content_id']) ? $_POST['media_manager_import_content_id'] : false;
-        if ( $_POST['media_manager_action'] == 'import' && $importid ) {
-          $assetid = $importid;
-        } else if ($_POST['media_manager_action'] == 'create' && !empty($_POST['_pbs_media_manager_episode_cid'])) {
-          $returnval = $this->plugin_obj->create_media_manager_asset($post_id, $_POST['_pbs_media_manager_episode_cid'], $_POST);
-          if (!empty($returnval['errors'])) { 
-            error_log(json_encode($returnval));
-            $assetid = false;
-          } else {
-            $assetid = $returnval;
-          }
+    if ( !empty($_POST['media_manager_action'] )) {
+      $importid = !empty($_POST['media_manager_import_content_id']) ? $_POST['media_manager_import_content_id'] : false;
+      if ( $_POST['media_manager_action'] == 'import' && $importid ) {
+        $assetid = $importid;
+      } else if ($_POST['media_manager_action'] == 'create' && !empty($_POST['_pbs_media_manager_episode_cid'])) {
+        $returnval = $this->plugin_obj->create_media_manager_asset($post_id, $_POST['_pbs_media_manager_episode_cid'], $_POST);
+        if (!empty($returnval['errors'])) { 
+          error_log(json_encode($returnval));
+          $assetid = false;
+        } else {
+          $assetid = $returnval;
         }
-      } else {
-        if ( $assetid ) {
-	  // episode is read-only
-          unset($_POST['_pbs_media_manager_episode_cid']);
-          $returnval = $this->plugin_obj->update_media_manager_asset($post_id, $assetid, $_POST);
-          if (!empty($returnval['errors'])) { 
-            error_log(json_encode($returnval));
-          }
-          // if updating something that may've caused an error clear the flag for being messaged previsouly
-          if ( !empty($_POST['delete_current_video']) || !empty($_POST['delete_current_caption']) || !empty($_POST['_coveam_video_image']) ) {
-            delete_post_meta($post_id, '_coveam_notice_sent_ts');
-          }
+      }
+    } else {
+      if ( $assetid ) {
+	    // episode is read-only
+        unset($_POST['_pbs_media_manager_episode_cid']);
+        $returnval = $this->plugin_obj->update_media_manager_asset($post_id, $assetid, $_POST);
+        if (!empty($returnval['errors'])) { 
+          error_log(json_encode($returnval));
+        }
+        // if updating something that may've caused an error clear the flag for being messaged previsouly
+        if ( !empty($_POST['delete_current_video']) || !empty($_POST['delete_current_caption']) || !empty($_POST['_coveam_video_image']) ) {
+          delete_post_meta($post_id, '_coveam_notice_sent_ts');
+        }
+      }
+    }
+
+    // always get the latest data from the API
+    if ($assetid) {
+      $returnval = $this->plugin_obj->import_media_manager_asset($post_id, $assetid);
+      if (!empty($returnval['errors'])) { 
+        error_log(json_encode($returnval));
+      }
+    }
+
+    // episode stuff
+    if ( !empty($_POST['media_manager_episode_action'] )) {
+      $episode_id = !empty($_POST['_pbs_media_manager_episode_cid']) ? $_POST['_pbs_media_manager_episode_cid'] : false;
+      $ep_importid = !empty($_POST['media_manager_import_episode_id']) ? $_POST['media_manager_import_episode_id'] : false;
+      if ( $_POST['media_manager_episode_action'] == 'import' && $ep_importid ) {
+        $episode_id = $ep_importid;
+      } else if ($_POST['media_manager_episode_action'] == 'create' && !empty($_POST['_pbs_media_manager_season_cid'])) {
+        $returnval = $this->plugin_obj->create_media_manager_episode($post_id, $_POST['_pbs_media_manager_season_cid'], $_POST);
+        if (!empty($returnval['errors'])) { 
+          error_log(json_encode($returnval));
+          $episode_id = false;
+        } else {
+          $episode_id = $returnval;
         }
       }
 
-      // always get the latest data from the API
-      if ($assetid) {
-        $returnval = $this->plugin_obj->import_media_manager_asset($post_id, $assetid);
+      /* API doesn't support updates for episodes yet
+      if ( $episode_id && $_POST['media_manager_episode_action'] == 'update') {
+        $returnval = $this->plugin_obj->update_media_manager_episode($post_id, $episode_id, $_POST);
         if (!empty($returnval['errors'])) { 
           error_log(json_encode($returnval));
         }
       }
-
-      // episode stuff
-      if ( !empty($_POST['media_manager_episode_action'] )) {
-        $episode_id = !empty($_POST['_pbs_media_manager_episode_cid']) ? $_POST['_pbs_media_manager_episode_cid'] : false;
-        $ep_importid = !empty($_POST['media_manager_import_episode_id']) ? $_POST['media_manager_import_episode_id'] : false;
-        if ( $_POST['media_manager_episode_action'] == 'import' && $ep_importid ) {
-          $episode_id = $ep_importid;
-        } else if ($_POST['media_manager_episode_action'] == 'create' && !empty($_POST['_pbs_media_manager_season_cid'])) {
-          $returnval = $this->plugin_obj->create_media_manager_episode($post_id, $_POST['_pbs_media_manager_season_cid'], $_POST);
-          if (!empty($returnval['errors'])) { 
-            error_log(json_encode($returnval));
-            $episode_id = false;
-          } else {
-            $episode_id = $returnval;
-          }
+     */
+      // always get the latest data from the API
+      if ($episode_id) {
+        $returnval = $this->plugin_obj->import_media_manager_episode($post_id, $episode_id);
+        if (!empty($returnval['errors'])) { 
+          error_log(json_encode($returnval));
         }
-
-        /* API doesn't support updates for episodes yet
-        if ( $episode_id && $_POST['media_manager_episode_action'] == 'update') {
-          $returnval = $this->plugin_obj->update_media_manager_episode($post_id, $episode_id, $_POST);
-          if (!empty($returnval['errors'])) { 
-            error_log(json_encode($returnval));
-          }
-        }
-        */
-        // always get the latest data from the API
-        if ($episode_id) {
-          $returnval = $this->plugin_obj->import_media_manager_episode($post_id, $episode_id);
-          if (!empty($returnval['errors'])) { 
-            error_log(json_encode($returnval));
-          }
-        }
-      }
-
-    if ($coveid != '' && !$this->plugin_obj->use_media_manager) {
-      if (function_exists('coveam_update_asset_metafields_from_cove')) {
-        coveam_update_asset_metafields_from_cove($post_id, $coveid);
       }
     }
+
     if ($youtubeid != '') {
       $youtube_oauth= new WNET_Google_oAuth(__FILE__);
       $youtube_oauth->update_youtube_status_from_youtube($post_id);
@@ -435,12 +430,12 @@ class COVE_Asset_Metaboxes {
         'maxlength' => '90',
 		    'section' => 'cove-ingest-fields coverequired'
 		);
-		$fields['_coveam_airdate'] = array(
+    $fields['_coveam_airdate'] = array(
 		  'name' => 'Available Datetime',
-		    'type' => 'datetime',
-		    'default' => '',
+		  'type' => 'datetime',
+		  'default' => '',
       'description' => 'Time before which this vid is not available.  All times Eastern',
-		    'section' => 'cove-asset-details coverequired youtuberequired'
+		  'section' => 'cove-asset-details coverequired youtuberequired'
 		);
     $fields['_coveam_video_status'] = array(
        'name' => __( 'Video Status:' , 'cove_asset_manager' ),
@@ -483,29 +478,29 @@ class COVE_Asset_Metaboxes {
         'description' => 'Videos with limited rights will become unavailable 30 days after airdate.',
 		    'section' => 'cove-asset-details coverequired youtuberequired'
 		);
-    
-		$fields['_coveam_video_fullprogram'] = array(
-      'name' => 'Asset type:',
-		    'type' => 'radio',
-        'options' => array (
-          'episode' => array (
-          'label' => 'full_length',
-            'value' => '0'
-          ),
-          'promotion' => array (
-          'label' => 'preview',
-            'value' => '1'
-          ),
-          'clip' => array (
-            'label' => 'clip',
-            'value' => '4'
-          ),
-        ),
-      'default' => '4',
-		    'section' => 'cove-asset-details coverequired youtuberequired'
-		);
-    
 
+    $fields['_coveam_video_fullprogram'] = array(
+      'name' => 'Asset type:',
+	    'type' => 'radio',
+      'options' => array (
+        'episode' => array (
+          'label' => 'full_length',
+          'value' => '0'
+        ),
+        'promotion' => array (
+          'label' => 'preview',
+          'value' => '1'
+          ),
+        'clip' => array (
+          'label' => 'clip',
+          'value' => '4'
+        ),
+      ),
+      'default' => '4',
+      'section' => 'cove-asset-details coverequired youtuberequired'
+    );
+
+    
 		$fields['_coveam_video_url'] = array(
 		    'name' => __( 'Uploaded S3 Video Asset File:' , 'cove_asset_manager' ),
 		    'type' => 'url',
@@ -521,29 +516,29 @@ class COVE_Asset_Metaboxes {
 		    'section' => 'cove-ingest-fields coverequired'
 		);
 
- 		  $fields['_coveam_caption_file'] = array(
-		    'name' => 'Uploaded Caption File:',
-		    'type' => 'url',
-		    'default' => '',
-        'suppress' => true,
-		    'section' => 'cove-ingest-fields coverequired'
-		  );
+    $fields['_coveam_caption_file'] = array(
+      'name' => 'Uploaded Caption File:',
+		  'type' => 'url',
+		  'default' => '',
+      'suppress' => true,
+		  'section' => 'cove-ingest-fields coverequired'
+		);
 
- 		  $fields['_coveam_premiere_date'] = array(
-		    'name' => 'Premiere date',
-		    'type' => 'readonly',
-		    'default' => '',
-        'description' => 'Displayed date for the video, derived by stripping the time from the available datetime.',
-		    'section' => 'cove-asset-details coverequired youtuberequired'
-		  );
+ 		$fields['_coveam_premiere_date'] = array(
+		  'name' => 'Premiere date',
+		  'type' => 'readonly',
+		  'default' => '',
+      'description' => 'Displayed date for the video, derived by stripping the time from the available datetime.',
+		  'section' => 'cove-asset-details coverequired youtuberequired'
+		);
 
-      $fields['_coveam_notice_sent_ts'] = array(
-        'name' => 'Timestamp of last admin notice',
-        'type' => 'readonly',
-        'default' => '',
-        'description' => 'If there was an error message sent about this asset before, another one wont be sent until 24 hours after this timestamp',
-        'section' => 'cove-asset-details'
-      );
+    $fields['_coveam_notice_sent_ts'] = array(
+      'name' => 'Timestamp of last admin notice',
+      'type' => 'readonly',
+      'default' => '',
+      'description' => 'If there was an error message sent about this asset before, another one wont be sent until 24 hours after this timestamp',
+      'section' => 'cove-asset-details'
+    );
 
     $fields['_coveam_ingest_task'] = array(
         'name' => __( 'Cove Ingest Task SUPPRESSED:' , 'cove_asset_manager' ),

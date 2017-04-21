@@ -43,6 +43,9 @@ if ( !class_exists('COVE_API_Request') ) {
   require_once( 'classes/class-cove-request-api.php' );
 }
 
+if (!$plugin_obj->use_media_manager) {
+  require_once( 'cove-batch-ingest.php' );
+}
 
 //load up the metabox admin
 function call_COVE_Asset_Metaboxes() {

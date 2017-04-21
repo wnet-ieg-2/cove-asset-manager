@@ -29,12 +29,7 @@ class COVE_Asset_Metaboxes {
   public function setup_custom_scripts() {
     wp_enqueue_script( 'youtube_cors', $this->assets_url . 'js/youtube_cors.js', array( 'jquery' ), 2, true );
     wp_enqueue_script( 'amazon_cors', $this->assets_url . 'js/amazon_cors.js', array( 'jquery' ), 2, true );
-    if (!$this->plugin_obj->use_media_manager) { 
-      wp_enqueue_script( 'cove_ingest', $this->assets_url . 'js/cove_ingest.js', array( 'jquery' ), 1, true );
-      wp_enqueue_style( 'cove_asset', $this->assets_url . 'css/metaboxes.css' );
-    }  else {
       wp_enqueue_script( 'pbs_media_manager_admin', $this->assets_url . 'js/media_manager_admin.js', array( 'jquery'), 1, true);
-    }
     wp_enqueue_media();
     wp_enqueue_script( 'wp_mediamanager_select', $this->assets_url . 'js/wp-mediamanager-select.js', array( 'jquery' ), 1, true );
   }

@@ -40,7 +40,7 @@ class COVE_Asset_Metaboxes {
 		  add_meta_box( 'cove-asset-details', __( 'COVE/YouTube Video Asset' , 'cove_asset_manager' ), array( $this, 'meta_box_content' ), $post_type, 'normal', 'high' );
     }
     // special case for the episoder
-    if ( $post_type == 'episodes' && $this->plugin_obj->use_media_manager ) {
+    if ( $post_type == 'episodes' ) {
       add_meta_box( 'media_manager_episode_details', 'Media Manager Episode Details', array( $this, 'episode_metabox_content' ), 'episodes', 'normal', 'high' );
     }
 	}

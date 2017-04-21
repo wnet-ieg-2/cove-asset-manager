@@ -442,7 +442,6 @@ class COVE_Asset_Metaboxes {
       }
     }
 
-    if ($this->plugin_obj->use_media_manager ) {
       if ( !empty($_POST['media_manager_action'] )) {
         $importid = !empty($_POST['media_manager_import_content_id']) ? $_POST['media_manager_import_content_id'] : false;
         if ( $_POST['media_manager_action'] == 'import' && $importid ) {
@@ -511,7 +510,6 @@ class COVE_Asset_Metaboxes {
           }
         }
       }
-    }
 
     if ($coveid != '' && !$this->plugin_obj->use_media_manager) {
       if (function_exists('coveam_update_asset_metafields_from_cove')) {

@@ -14,7 +14,7 @@ class COVE_Asset_Manager {
 		$this->file = $file;
 		$this->assets_dir = trailingslashit( $this->dir ) . 'assets';
 		$this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', $file ) ) );
-    $this->use_media_manager = (get_option('coveam_use_mm_ingest') == 'true') ? true : false;
+    $this->use_media_manager = true;
 
 		// Handle localisation
 		$this->load_plugin_textdomain();

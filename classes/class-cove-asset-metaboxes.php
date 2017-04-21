@@ -372,11 +372,7 @@ class COVE_Asset_Metaboxes {
       // display a shortcode for this video asset 
       $html .= '<tr valign="top"><th scope="row">Shortcode for this video asset:</th><td>[covevideoasset id=' . $post_id . ']</td></tr>' . "\n";
 
-      if ($this->plugin_obj->use_media_manager) {
         $html .= $this->build_media_manager_api_form_section($fields, $field_data);
-      } else {
-        $html .= $this->build_cove_api_form_section($fields, $field_data);
-      }
 
       $html .= $this->build_youtube_upload_form($post_id, $fields['_coveam_youtube_id'][0], $fields['_coveam_youtubestatus'][0]);
    

@@ -46,7 +46,7 @@ class COVE_Asset_Manager_Settings {
 	}
 
   public function setup_custom_scripts() {
-      wp_enqueue_script( 'pbs_media_manager_settings_admin', $this->assets_url . 'js/mm_settings_page.js', array( 'jquery'), 1, true);
+    wp_enqueue_script( 'pbs_media_manager_settings_admin', $this->assets_url . 'js/mm_settings_page.js', array( 'jquery'), 1, true);
     wp_enqueue_media();
   }
 
@@ -193,10 +193,8 @@ class COVE_Asset_Manager_Settings {
 					</p>
 				</form>';
     $this->write_out_oAuth_JavaScript();
-    if ($this->plugin_obj->use_media_manager) {
-      echo '<p>&nbsp;</p><div id = "initiate_batch_import"><button>Batch import media manager data</button><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
-      echo '<p>&nbsp;</p><div id = "initiate_episode_match"><button>Match Episodes for season_id</button><input type="text" name="mm_season_import" /><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
-    } 
+    echo '<p>&nbsp;</p><div id = "initiate_batch_import"><button>Batch import media manager data</button><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
+    echo '<p>&nbsp;</p><div id = "initiate_episode_match"><button>Match Episodes for season_id</button><input type="text" name="mm_season_import" /><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
 	  echo '</div>';
 	}
 

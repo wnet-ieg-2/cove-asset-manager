@@ -34,4 +34,12 @@ jQuery(document).ready(function($) {
       return false;
     }
   });
+
+  if ($('#_coveam_cove_player_id').val() != '' && $('#_coveam_covestatus').text().toLowerCase() == 'available') {
+    covepreviewlink = 'http://player.pbs.org/widget/partnerplayer/' + $('#_coveam_cove_player_id').val() + '/?start=0&end=0&chapterbar=false&endscreen=false&topbar=true&autoplay=false&TB_iframe=true&width=600&height=400';
+    $('#_coveam_cove_player_id').after('<div id="cove-preview-link"><a href="' + covepreviewlink + '" class="thickbox">Preview COVE video <i>(opens new window)</i></a></div>');
+  }
+
+
+
 });

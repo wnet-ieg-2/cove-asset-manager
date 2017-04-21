@@ -46,9 +46,7 @@ class COVE_Asset_Manager_Settings {
 	}
 
   public function setup_custom_scripts() {
-    if ($this->plugin_obj->use_media_manager) { 
       wp_enqueue_script( 'pbs_media_manager_settings_admin', $this->assets_url . 'js/mm_settings_page.js', array( 'jquery'), 1, true);
-    }
     wp_enqueue_media();
   }
 

@@ -99,16 +99,6 @@ function coveam_get_video( $id ) {
 	// see get_intermediate_image_sizes
 	$videofields['thumbnail'] = wp_get_attachment_url( get_post_thumbnail_id($id) );
 
-	// return the list of cove topic slugs assigned to this video
-	$cove_topics = get_the_terms( $id, 'cove_topics' );
-  if ($cove_topics && ! is_wp_error( $cove_topics ) ) {
-    $topic_array = array();
-    foreach ( $cove_topics as $cove_topic ) {
-      $topic_array[] = $cove_topic->slug;
-    }
-  }
-	$videofields['cove_topics'] = $topic_array; 
-
   // return the list of tag slugs assigned to this post
   $thesetags = get_the_terms( $id, 'post_tag' );
   if ($thesetags && ! is_wp_error( $thesetags ) ) {

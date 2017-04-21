@@ -440,10 +440,10 @@ class COVE_Asset_Metaboxes {
 		    'section' => 'cove-ingest-fields coverequired'
 		);
 		$fields['_coveam_airdate'] = array(
-		    'name' => __( 'Air Date and time:' , 'cove_asset_manager' ),
+		  'name' => 'Available Datetime',
 		    'type' => 'datetime',
 		    'default' => '',
-        'description' => 'All times Eastern, using 24hr clock. Format as YYYY-MM-DD HH:MM:SS REQUIRED.  This field must be present and saved before ingesting to either YouTube or COVE',
+      'description' => 'Time before which this vid is not available.  All times Eastern',
 		    'section' => 'cove-asset-details coverequired youtuberequired'
 		);
     $fields['_coveam_video_status'] = array(
@@ -489,36 +489,23 @@ class COVE_Asset_Metaboxes {
 		);
     
 		$fields['_coveam_video_fullprogram'] = array(
-		    'name' => __( 'Video type:' , 'cove_asset_manager' ),
+      'name' => 'Asset type:',
 		    'type' => 'radio',
         'options' => array (
           'episode' => array (
-            'label' => 'full episode',
+          'label' => 'full_length',
             'value' => '0'
           ),
           'promotion' => array (
-            'label' => 'promotion',
+          'label' => 'preview',
             'value' => '1'
-          ),
-          'interstitial' => array (
-            'label' => 'interstitial',
-            'value' => '2'
           ),
           'clip' => array (
             'label' => 'clip',
             'value' => '4'
           ),
-          'other' => array (
-            'label' => 'other',
-            'value' => '5'
-          ),
-          'segment' => array (
-            'label' => 'segment',
-            'value' => '6'
-          )
         ),
-        'default' => '6',
-        'description' => 'Full episodes must be submitted for ingest via Merlin, not this tool.  This is because closed captioning is required for full epsiodes and the API provided by PBS does not currently support captioning.',
+      'default' => '4',
 		    'section' => 'cove-asset-details coverequired youtuberequired'
 		);
     
@@ -537,27 +524,6 @@ class COVE_Asset_Metaboxes {
         'suppress' => true,
 		    'section' => 'cove-ingest-fields coverequired'
 		);
-    if ($this->plugin_obj->use_media_manager) {
-		  $fields['_coveam_video_fullprogram'] = array(
-		    'name' => 'Asset type:',
-		    'type' => 'radio',
-        'options' => array (
-          'episode' => array (
-            'label' => 'full_length',
-            'value' => '0'
-          ),
-          'promotion' => array (
-            'label' => 'preview',
-            'value' => '1'
-          ),
-          'clip' => array (
-            'label' => 'clip',
-            'value' => '4'
-          ),
-        ),
-        'default' => '4',
-		    'section' => 'cove-asset-details coverequired youtuberequired'
-		  );
 
  		  $fields['_coveam_caption_file'] = array(
 		    'name' => 'Uploaded Caption File:',
@@ -565,14 +531,6 @@ class COVE_Asset_Metaboxes {
 		    'default' => '',
         'suppress' => true,
 		    'section' => 'cove-ingest-fields coverequired'
-		  );
-
-		  $fields['_coveam_airdate'] = array(
-		    'name' => 'Available Datetime',
-		    'type' => 'datetime',
-		    'default' => '',
-        'description' => 'Time before which this vid is not available.  All times Eastern',
-		    'section' => 'cove-asset-details coverequired youtuberequired'
 		  );
 
  		  $fields['_coveam_premiere_date'] = array(
@@ -591,8 +549,6 @@ class COVE_Asset_Metaboxes {
         'section' => 'cove-asset-details'
       );
 
-      // end media manager only stuff
-    }
     $fields['_coveam_ingest_task'] = array(
         'name' => __( 'Cove Ingest Task SUPPRESSED:' , 'cove_asset_manager' ),
         'type' => 'url',

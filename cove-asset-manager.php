@@ -429,48 +429,6 @@ function coveam_check_inprogress_ingest_videos() {
     $ignore_vids_before_this_date = strtotime("-3 day", time());
     $inprogress_videos = array();
 
-    // only do this for the legacy stuff
-    if (!$plugin_obj->use_media_manager) {
-      //first lets find the videos that have a task url
-      $args = array(
-        'post_type' => 'videos',
-        'post_status' => array('publish', 'pending', 'draft', 'future'),
-        'meta_key' => '_coveam_ingest_task',
-        'posts_per_page' => 100,
-        'orderby' => 'date',
-        'order' => 'DESC'
-      );
-      $pendingvideos = new WP_Query($args);
-      if ($pendingvideos->have_posts()){
-        while ( $pendingvideos->have_posts() ) : $pendingvideos->the_post();
-          $postid = $pendingvideos->post->ID;
-          array_push($inprogress_videos, $postid);
-          $task_url = get_post_meta($postid, '_coveam_ingest_task', true);
-          coveam_get_batch_ingest_task_status($task_url, $postid);
-        endwhile;
-      }
-      // next lets find the videos that have a success timestamp
-
-      $newargs = array(
-        'post_type' => 'videos',
-        'post_status' => array('publish', 'pending', 'draft', 'future'),
-        'meta_key' => '_coveam_ingest_success_timestamp',
-        'posts_per_page' => 100,
-        'orderby' => 'date',
-        'order' => 'DESC'
-      );
-      $timedvideos = new WP_Query($newargs);
-      $waiting_videos = array();
-      if ($timedvideos->have_posts()){
-        while ( $timedvideos->have_posts() ) : $timedvideos->the_post();
-          $postid = $timedvideos->post->ID;
-          array_push($waiting_videos, $postid);
-          $guid = get_post_meta($postid, '_coveam_video_asset_guid', true);
-          coveam_update_status_from_guid($postid, $guid);
-        endwhile;
-      }
-    // end conditional on legacy stuff
-    } 
 
     // see if there are youtube videos processing 
     $youtubeargs = array(

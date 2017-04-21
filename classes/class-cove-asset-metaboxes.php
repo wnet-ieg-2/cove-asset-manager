@@ -248,10 +248,6 @@ class COVE_Asset_Metaboxes {
 		$html .= '<input type="hidden" name="' . $this->token . '_nonce" id="' . $this->token . '_nonce" value="' . wp_create_nonce( plugin_basename( $this->dir ) ) . '" />';
     
     	
-    // no COVE player id AND no ingest task, they can fill out the form or put in a COVE player id
-
-    // ingest task in progress, everything is read only except the ingest task which they can cancel/clear because maybe a bug
-
 		if ( 0 < count( $field_data ) ) {
 			$html .= '<table class="form-table">' . "\n";
 			$html .= '<tbody>' . "\n";

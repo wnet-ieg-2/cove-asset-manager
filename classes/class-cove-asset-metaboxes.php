@@ -58,7 +58,7 @@ class COVE_Asset_Metaboxes {
     global $post_id;
 		$fields = get_post_custom( $post_id );
 		$field_data = $this->get_episode_fields_settings();
-    $readonly = false;
+    $readonly_epid = false;
     $html = "<table>";
 		$html .= '<input type="hidden" name="' . $this->token . '_nonce" id="' . $this->token . '_nonce" value="' . wp_create_nonce( plugin_basename( $this->dir ) ) . '" />';
 	  if (empty($fields['_pbs_media_manager_episode_cid'][0])) {
@@ -67,13 +67,14 @@ class COVE_Asset_Metaboxes {
       $html .= '<tr valign="top"><th scope="row"></th><td><b>NOTE -- The PBS API currently doesnt yet support updating an episode after initially creating it, so FINALIZE ALL VALUES BEFORE CLICKING "CREATE"</b></td></tr>';
     } else {
       $html .= '<input type="hidden" name="media_manager_episode_action" value="update" />';
+      $readonly_epid = true;
     }
     foreach ( $field_data as $k => $v ) {
       $data = $v['default'];
 		  if ( isset( $fields[$k] ) && isset( $fields[$k][0] ) ) {
 				$data = $fields[$k][0];
 			}
-      if ($k == '_pbs_media_manager_episode_cid') {
+      if ($readonly_epid && ($k == '_pbs_media_manager_episode_cid' || $k == '_pbs_media_manager_season_cid')) {
         $v['type'] = 'readonly';
       }
 

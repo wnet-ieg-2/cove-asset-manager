@@ -453,10 +453,7 @@ class COVE_Asset_Manager {
     if (empty($attribs['slug'])) {
       $attribs['slug'] = $this->COVEslugify($attribs['title']) . "-" . time();
     }
-    if (empty($attribs['ordinal'])) {
-      $latest = $this->get_latest_media_manager_episode($season_id);
-      $attribs['ordinal'] = ($latest['ordinal'] + 1);
-    } 
+
     $client = $this->get_media_manager_client();
     $result = $client->create_child($season_id, 'season', 'episode', $attribs);
     if (!empty($result['errors'])) {
@@ -464,9 +461,15 @@ class COVE_Asset_Manager {
     }
     // note that update_post_meta returns false on failure and also on an unchanged value
     // this will give me a literal true if an update, and a meta id if a new field
-    $meta_create = update_post_meta($post_id, '_pbs_media_manager_episode_cid', $result);
+    if (!empty($postary['_pbs_media_manager_episode_desc_short'])) {
+      // this is being done via a manual update so the fields will be filled
+      $meta_create = update_post_meta($post_id, '_pbs_media_manager_episode_cid', $result);
+    } else {
+      // automated process, only thing in the post array was the title
+      $meta_create = $this->import_media_manager_episode($post_id, $result);
+    }
     if (! $meta_create ) {
-      return array('errors' => 'new meta value not created');
+      return array('errors' => 'new meta values not created');
     }
     // this will be the cid;
     return $result;
@@ -741,7 +744,6 @@ class COVE_Asset_Manager {
     $attribs['title'] = $fields['_pbs_media_manager_episode_title'];
     $attribs['description_long'] =  $fields['_pbs_media_manager_episode_desc_long'];
     $attribs['description_short'] =  $fields['_pbs_media_manager_episode_desc_short'];
-    $attribs['ordinal'] = $fields['_pbs_media_manager_episode_ordinal'];
     $airdate = (!empty( $fields['_pbs_media_manager_episode_airdate'])) ? $fields['_pbs_media_manager_episode_airdate'] : false;
     if (!$airdate) {
       $date = new DateTime('now');
@@ -749,6 +751,11 @@ class COVE_Asset_Manager {
     }
     $attribs['premiered_on'] = $airdate;
     $attribs['encored_on'] = $airdate;
+
+    if (!empty($fields['_pbs_media_manager_episode_ordinal'])) {
+      // if left unset it will auto-increment
+      $attribs['ordinal'] = $fields['_pbs_media_manager_episode_ordinal'];
+    }
     return $attribs;
   }
 

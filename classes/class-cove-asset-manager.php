@@ -488,10 +488,7 @@ class COVE_Asset_Manager {
     if (empty($attribs['slug'])) {
       $attribs['slug'] = $this->COVEslugify($attribs['title']) . "-" . time();
     }
-    if (empty($attribs['ordinal'])) {
-      $latest = $this->get_latest_media_manager_episode($season_id);
-      $attribs['ordinal'] = ($latest['ordinal'] + 1);
-    } 
+
     $client = $this->get_media_manager_client();
     $result = $client->create_child($season_id, 'season', 'episode', $attribs);
     if (!empty($result['errors'])) {
@@ -782,7 +779,6 @@ class COVE_Asset_Manager {
     $attribs['title'] = $fields['_pbs_media_manager_episode_title'];
     $attribs['description_long'] =  $fields['_pbs_media_manager_episode_desc_long'];
     $attribs['description_short'] =  $fields['_pbs_media_manager_episode_desc_short'];
-    $attribs['ordinal'] = $fields['_pbs_media_manager_episode_ordinal'];
     $airdate = (!empty( $fields['_pbs_media_manager_episode_airdate'])) ? $fields['_pbs_media_manager_episode_airdate'] : false;
     if (!$airdate) {
       $date = new DateTime('now');
@@ -790,6 +786,11 @@ class COVE_Asset_Manager {
     }
     $attribs['premiered_on'] = $airdate;
     $attribs['encored_on'] = $airdate;
+
+    if (!empty($fields['_pbs_media_manager_episode_ordinal'])) {
+      // if left unset it will auto-increment
+      $attribs['ordinal'] = $fields['_pbs_media_manager_episode_ordinal'];
+    }
     return $attribs;
   }
 

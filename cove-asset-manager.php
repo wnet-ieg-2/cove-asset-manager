@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: COVE Asset Manager 
- * Version: 3.0.0
+ * Version: 3.1.0
  * Plugin URI: http://www.thirteen.org/
  * Description: COVE Asset Manager
  * Author: William Tam, WNET

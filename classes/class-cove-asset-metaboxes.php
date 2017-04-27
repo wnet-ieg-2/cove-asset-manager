@@ -64,7 +64,6 @@ class COVE_Asset_Metaboxes {
 	  if (empty($fields['_pbs_media_manager_episode_cid'][0])) {
       // prompt to either create a new asset or pull in asset data 
       $html .= '<tr valign="top"><th scope="row">New Media Manager Episode record creation</th><td>Either <br /><input type="radio" name="media_manager_episode_action" value="noaction" checked><b>Neither create nor import</b> a Media Manager episode record, or<br /><input type="radio" name="media_manager_episode_action" value="create"><b>create</b> a new episode record in the Media Manager or <br /><input type="radio" name="media_manager_episode_action" value="import"><b>import</b> an existing Media Manager record with the following PBS Content ID: <input name="media_manager_import_episode_id" type="text" class="regular-text" /></td></tr>';
-      $html .= '<tr valign="top"><th scope="row"></th><td><b>NOTE -- The PBS API currently doesnt yet support updating an episode after initially creating it, so FINALIZE ALL VALUES BEFORE CLICKING "CREATE"</b></td></tr>';
     } else {
       $html .= '<input type="hidden" name="media_manager_episode_action" value="update" />';
       $readonly_epid = true;
@@ -74,13 +73,13 @@ class COVE_Asset_Metaboxes {
 		  if ( isset( $fields[$k] ) && isset( $fields[$k][0] ) ) {
 				$data = $fields[$k][0];
 			}
-      if ($readonly_epid && ($k == '_pbs_media_manager_episode_cid' || $k == '_pbs_media_manager_season_cid')) {
+      if ($readonly_epid && ($k == '_pbs_media_manager_season_cid')) {
         $v['type'] = 'readonly';
       }
 
       // automated formatting switches 
+      $maxinput = '';
       if( $v['type'] == 'textarea' ) {
-        $maxinput = '';
         if ($v['maxlength']) { $maxinput = ' data-limit-input="' . $v['maxlength'] . '" '; }
           $html .= '<tr valign="top" class="' . $v['section'] . '"><th scope="row"><label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label></th><td><textarea class="widefat" name="' . esc_attr( $k ) . '" id="' . esc_attr( $k ) . '"' . $maxinput . '>' . esc_textarea( $data ) . '</textarea>' . "\n";
           $html .= '<span></span><p class="description">' . $v['description'] . '</p>' . "\n";
@@ -776,7 +775,7 @@ class COVE_Asset_Metaboxes {
  
  		$fields['_pbs_media_manager_episode_cid'] = array(
 		    'name' => 'PBS Media Manager Episode CID',
-		    'type' => 'text',
+		    'type' => 'readonly',
         'default' => '',
         'description' => 'The content ID of this episode.' 
 		);

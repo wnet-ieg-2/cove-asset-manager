@@ -674,17 +674,33 @@ class COVE_Asset_Manager {
     if (!$episode_id) {
       return array('errors' => 'no episode_id' );
     }
+
+    $client = $this->get_media_manager_client();
+
     $attribs = wp_unslash($this->map_post_fields_to_asset_array($postary)); 
 
-    if (empty($attribs['title'])) {
+    $slugtitle = $postary['_coveam_video_title'];
+
+    if ($attribs['object_type'] == 'full_length') {
+      $episode = $client->get_episode($episode_id);
+      if (empty($episode['data'])) {
+        return array('errors' => 'episode not found');
+      }
+      $slugtitle = $episode['data']['attributes']['title'];
+      // temp stupid fix
+      $attribs['title'] = $slugtitle;
+      $attribs['description_short'] = $slugtitle;
+      $attribs['description_long'] = $slugtitle;
+    }
+
+    if (empty($slugtitle)) {
       return array('errors' => 'required field title missing');
     }
-    $attribs['slug'] = $this->COVEslugify($attribs['title']) . '-' . time();
+    $attribs['slug'] = $this->COVEslugify($slugtitle) . '-' . time();
     $tags_obj = wp_get_object_terms( $post_id, 'post_tag', array('fields' => 'names') );
     if (is_array($tags_obj) && (count($tags_obj) > 0)) {
       $attribs['tags'] = $tags_obj;
     }
-    $client = $this->get_media_manager_client();
     $result = $client->create_child($episode_id, 'episode', 'asset', $attribs);
     if (!empty($result['errors'])) {
       return $result;
@@ -705,6 +721,13 @@ class COVE_Asset_Manager {
     $attribs['title'] = $fields['_coveam_video_title'];
     $attribs['description_short'] =  !empty($fields['_coveam_shortdescription']) ? $fields['_coveam_shortdescription'] : $attribs['title'];
     $attribs['description_long'] =  !empty($fields['_coveam_description']) ? $fields['_coveam_description'] : $attribs['description_short'];
+
+    foreach (array('title', 'description_short', 'description_long') as $field) {
+      if (empty($attribs[$field])) {
+        unset($attribs[$field]);
+      }
+    }
+
     $attribs['object_type'] = $this->COVETranslateNumberToType($fields['_coveam_video_fullprogram']);
     $attribs['auto_publish'] = true;
 
@@ -746,30 +769,35 @@ class COVE_Asset_Manager {
       }
     }
     if (is_object($localdate)) {
-    // on imports it won't exist 
-    $localudate = $localdate->format('U');
-    // and heres where we set the date for the outgoing API
-    $date = new DateTime();
-    $date->setTimestamp($localudate); 
-    $date->setTimezone(new DateTimeZone('UTC'));
-    $formatted_date = $date->format('Y-m-d');
-    $attribs['premiered_on'] = $formatted_date;
-    $attribs['encored_on'] = $formatted_date;
+      // on imports it won't exist 
+      $localudate = $localdate->format('U');
+      // and heres where we set the date for the outgoing API
+      $date = new DateTime();
+      $date->setTimestamp($localudate); 
+      $date->setTimezone(new DateTimeZone('UTC'));
+      $formatted_date = $date->format('Y-m-d');
+      $attribs['premiered_on'] = $formatted_date;
+      $attribs['encored_on'] = $formatted_date;
 
-    $attribs['availabilities']['public']['start'] = $date->format('Y-m-d\TH:i:s.u\Z');
-    $attribs['availabilities']['all_members']['start'] = $attribs['availabilities']['public']['start'];
-    $attribs['availabilities']['station_members']['start'] = $attribs['availabilities']['public']['start'];
-    if (!empty($fields['_coveam_rights']) && $fields['_coveam_rights'] == 'Limited') {
-      $date->modify('+30 day');
-      $attribs['availabilities']['public']['end'] = $date->format('Y-m-d\TH:i:s.u\Z');
-    } else {
-      $attribs['availabilities']['public']['end'] = null;
-    }
-    $attribs['availabilities']['all_members']['end'] = $attribs['availabilities']['public']['end'];
-    $attribs['availabilities']['station_members']['end'] = $attribs['availabilities']['public']['end'];
+      $attribs['availabilities']['public']['start'] = $date->format('Y-m-d\TH:i:s.u\Z');
+      $attribs['availabilities']['all_members']['start'] = $attribs['availabilities']['public']['start'];
+      $attribs['availabilities']['station_members']['start'] = $attribs['availabilities']['public']['start'];
+      if (!empty($fields['_coveam_rights']) && $fields['_coveam_rights'] == 'Limited') {
+        $date->modify('+30 day');
+        $attribs['availabilities']['public']['end'] = $date->format('Y-m-d\TH:i:s.u\Z');
+      } else {
+        $attribs['availabilities']['public']['end'] = null;
+      }
+      $attribs['availabilities']['all_members']['end'] = $attribs['availabilities']['public']['end'];
+      $attribs['availabilities']['station_members']['end'] = $attribs['availabilities']['public']['end'];
        
-    } 
-
+    }
+    // full length assets inherit this from the episode
+    if ($attribs['object_type'] == 'full_length') {
+      unset($attribs['title']);
+      unset($attribs['description_short']);
+      unset($attribs['description_long']);
+    }
     return $attribs;
   }
 

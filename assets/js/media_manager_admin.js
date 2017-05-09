@@ -39,7 +39,34 @@ jQuery(document).ready(function($) {
     covepreviewlink = '//player.pbs.org/widget/partnerplayer/' + $('#_coveam_cove_player_id').val() + '/?start=0&end=0&chapterbar=false&endscreen=false&topbar=true&autoplay=false&TB_iframe=true&width=600&height=400';
     $('.cove-player-id-selector p.description').before('<div id="cove-preview-link"><a href="' + covepreviewlink + '" class="thickbox">Preview COVE video <i>(opens new window)</i></a></div>');
   }
+  
+  function toggle_asset_fields() {
+    var fullprogram = $('input[type=radio][name=_coveam_video_fullprogram]:checked').val();
+    var createupdate = $('input[type=radio][name=media_manager_action]:checked').val();
+    var toggleaction = 'on';
+    if (fullprogram === '0' && createupdate !== 'noaction') {
+      toggleaction = 'off'; 
+    } 
+    $('.readonly-warning').remove();
+    var assetfields = ["_coveam_video_title", "_coveam_shortdescription", "_coveam_description", "_coveam_airdate"];
+    for (i = 0; i < 3; i++) {
+      var thisinput = '#' + assetfields[i];
+      if (toggleaction == 'off') {
+        $(thisinput).prop('readonly', true);
+        $(thisinput).prop('disabled', true);
+        $(thisinput).after('<span class="readonly-warning">This value will come from the episode and cannot be edited here.</span>');
+      } else {
+        $(thisinput).prop('readonly', false);
+        $(thisinput).prop('disabled', false);
+      }
+    }
+  }
 
+  $('input[type=radio][name=_coveam_video_fullprogram], input[type=radio][name=media_manager_action]').change(function() {
+    toggle_asset_fields();
+  });
 
-
+  // on page load check too 
+  toggle_asset_fields();
+  
 });

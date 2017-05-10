@@ -48,7 +48,7 @@ jQuery(document).ready(function($) {
       toggleaction = 'off'; 
     } 
     $('.readonly-warning').remove();
-    var assetfields = ["_coveam_video_title", "_coveam_shortdescription", "_coveam_description", "_coveam_airdate"];
+    var assetfields = ["_coveam_video_title", "_coveam_shortdescription", "_coveam_description"];
     for (i = 0; i < 3; i++) {
       var thisinput = '#' + assetfields[i];
       if (toggleaction == 'off') {

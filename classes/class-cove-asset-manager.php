@@ -687,10 +687,6 @@ class COVE_Asset_Manager {
         return array('errors' => 'episode not found');
       }
       $slugtitle = $episode['data']['attributes']['title'];
-      // temp stupid fix
-      $attribs['title'] = $slugtitle;
-      $attribs['description_short'] = $slugtitle;
-      $attribs['description_long'] = $slugtitle;
     }
 
     if (empty($slugtitle)) {

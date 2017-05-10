@@ -47,17 +47,17 @@ jQuery(document).ready(function($) {
     if (fullprogram === '0' && createupdate !== 'noaction') {
       toggleaction = 'off'; 
     } 
-    $('.readonly-warning').remove();
     var assetfields = ["_coveam_video_title", "_coveam_shortdescription", "_coveam_description"];
     for (i = 0; i < 3; i++) {
       var thisinput = '#' + assetfields[i];
       if (toggleaction == 'off') {
         $(thisinput).prop('readonly', true);
-        $(thisinput).prop('disabled', true);
-        $(thisinput).after('<span class="readonly-warning">This value will come from the episode and cannot be edited here.</span>');
+        if (!$('span.readonly-warning.' + assetfields[i]).length) {
+          $(thisinput).after('<span class="readonly-warning ' + assetfields[i] +'">This value will come from the episode and cannot be edited here.</span>');
+        }
       } else {
         $(thisinput).prop('readonly', false);
-        $(thisinput).prop('disabled', false);
+        $('span.readonly-warning.' + assetfields[i]).remove();
       }
     }
   }

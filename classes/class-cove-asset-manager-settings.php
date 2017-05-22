@@ -190,12 +190,12 @@ class COVE_Asset_Manager_Settings {
 
   private function bulk_import_media_manager_asset_and_episode_ids($pagenum) {
     $client = $this->plugin_obj->get_media_manager_client();
-
+    $allowed_post_types = get_option('coveam_showonposttypes');
     $videos_to_update = array();
     $failed_videos = array();
     $args = array(
       'post_status' => 'publish', 
-      'post_type' => 'videos',
+      'post_type' => $allowed_post_types,
       'meta_query' => array(
         array(
           'key' => '_coveam_cove_player_id',

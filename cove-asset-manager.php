@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: COVE Asset Manager 
- * Version: 3.1.0
+ * Version: 3.1.1
  * Plugin URI: http://www.thirteen.org/
  * Description: COVE Asset Manager
  * Author: William Tam, WNET
@@ -168,7 +168,8 @@ function coveam_render_player( $id, $args = array() ) {
 
   $linkedpostid = $id;
   if (function_exists('wt_p2p_return_related_postid')) {
-    if (get_post_type($id) == 'videos') {
+    $allowed_post_types = get_option('coveam_showonposttypes');
+    if (in_array(get_post_type($id), $allowed_post_types)) {
       $linkedpost = wt_p2p_return_related_postid($id,'p2p_to','featured_video',1);
       $linkedpostid = $linkedpost[0][0];
     } else {
@@ -346,9 +347,10 @@ function coveam_sign_aws_request() {
 function coveam_daily_expire_videos() {
     $expire_vids_before_this_date = strtotime("-30 day", time());
     $ids_to_expire = array();
+    $allowed_post_types = get_option('coveam_showonposttypes');
     $args = array(
       'post_status' => 'publish',
-      'post_type' => 'videos',
+      'post_type' => $allowed_post_types,
       'meta_query' => array(
         'relation' => 'AND',
         array(
@@ -426,10 +428,11 @@ function coveam_check_inprogress_ingest_videos() {
     $ignore_vids_before_this_date = strtotime("-3 day", time());
     $inprogress_videos = array();
 
+    $allowed_post_types = get_option('coveam_showonposttypes');
 
     // see if there are youtube videos processing 
     $youtubeargs = array(
-      'post_type' => 'videos',
+      'post_type' => $allowed_post_types,
       'post_status' => array('publish', 'pending', 'draft', 'future'),
       'meta_query' => array(
         array(

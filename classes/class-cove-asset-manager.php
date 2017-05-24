@@ -90,36 +90,6 @@ class COVE_Asset_Manager {
         'taxonomies' => array('post_tag')
       ));
     }
-    if (!post_type_exists('videos')) {
-	    register_post_type('videos', array(
-        'labels' => array(
-            'name' => __('Videos'),
-            'singular_name' => __('Video'),
-            'search_items' => __('Search Videos'),
-            'add_new_item' => __('Add New Video'),
-            'edit_item' => __('Edit Video')
-        ),
-        'public' => true,
-        'has_archive' => true,
-        'rewrite' => array(
-            'slug' => 'videos'
-        ),
-        'query_var' => true,
-        'exclude_from_search' => true,
-        'menu_position' => 5,
-        'menu_icon' => 'dashicons-video-alt2',
-        'supports' => array(
-            'title',
-            'thumbnail',
-            'author',
-            'custom-fields'
-        ),
-        'taxonomies' => array(
-            'post_tag',
-            'topic'
-        )
-      ));
-    }
   }
 
   public function cove_player_shortcode( $atts ) {

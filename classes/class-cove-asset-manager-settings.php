@@ -46,9 +46,7 @@ class COVE_Asset_Manager_Settings {
 	}
 
   public function setup_custom_scripts() {
-    if ($this->plugin_obj->use_media_manager) { 
-      wp_enqueue_script( 'pbs_media_manager_settings_admin', $this->assets_url . 'js/mm_settings_page.js', array( 'jquery'), 1, true);
-    }
+    wp_enqueue_script( 'pbs_media_manager_settings_admin', $this->assets_url . 'js/mm_settings_page.js', array( 'jquery'), 1, true);
     wp_enqueue_media();
   }
 
@@ -78,26 +76,6 @@ class COVE_Asset_Manager_Settings {
     add_settings_field( 'coveam_aws_secret_key' , __( 'AWS Secret Key:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_aws_secret_key', '') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_aws_secret_key' );
 
-
-		add_settings_field( 'coveam_cove_channel' , __( 'COVE Channel:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_cove_channel', '') );
-		register_setting( 'cove_asset_manager_settings' , 'coveam_cove_channel' );
-
-		add_settings_field( 'coveam_cove_key' , __( 'COVE API Key:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_key', 'Must request from PBS Jira') );
-		register_setting( 'cove_asset_manager_settings' , 'coveam_cove_key' );
-
-		add_settings_field( 'coveam_cove_secret' , __( 'COVE API Secret:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_secret', '') );
-		register_setting( 'cove_asset_manager_settings' , 'coveam_cove_secret' );
-
-    add_settings_field( 'coveam_cove_batch_key' , __( 'COVE Batch API Key:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_batch_key', 'Specific to batch ingest, allows job creation in COVE. Ask Edgar Roman @ PBS') );
-    register_setting( 'cove_asset_manager_settings' , 'coveam_cove_batch_key' );
-
-   add_settings_field( 'coveam_cove_batch_secret' , __( 'COVE Batch API Secret:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_batch_secret', '') );
-   register_setting( 'cove_asset_manager_settings' , 'coveam_cove_batch_secret' );
-
-   add_settings_field( 'coveam_cove_taxonomy_name' , __( 'COVE Taxonomy Name:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_cove_taxonomy_name', '') );
-   register_setting( 'cove_asset_manager_settings' , 'coveam_cove_taxonomy_name' );
-
-
     add_settings_field( 'coveam_youtube_username' , __( 'YouTube username:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_youtube_username', 'ex: newshour@gmail.com') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_youtube_username' );
 
@@ -122,9 +100,6 @@ class COVE_Asset_Manager_Settings {
 
     add_settings_field( 'coveam_mm_api_endpoint' , 'PBS Media Manager API endpoint' , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_api_endpoint', 'Staging: https://media-staging.services.pbs.org/api/v1 Prod: https://media.services.pbs.org/api/v1') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_mm_api_endpoint' );
-
-    add_settings_field( 'coveam_use_mm_ingest' , __( 'Use Media Manager for ingest' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_use_mm_ingest', 'Making this true will switch ingest fields displayed and backend to use Media Manager API instead of COVE API') );
-    register_setting( 'cove_asset_manager_settings' , 'coveam_use_mm_ingest' );
 
     add_settings_field( 'coveam_mm_episode_autocreate' , __( 'Auto-create an episode every morning' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autocreate', 'Making this true will automatically generate a new episode post and media manager episode every morning') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_mm_episode_autocreate' );
@@ -198,10 +173,8 @@ class COVE_Asset_Manager_Settings {
 					</p>
 				</form>';
     $this->write_out_oAuth_JavaScript();
-    if ($this->plugin_obj->use_media_manager) {
-      echo '<p>&nbsp;</p><div id = "initiate_batch_import"><button>Batch import media manager data</button><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
-      echo '<p>&nbsp;</p><div id = "initiate_episode_match"><button>Match Episodes for season_id</button><input type="text" name="mm_season_import" /><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
-    } 
+    echo '<p>&nbsp;</p><div id = "initiate_batch_import"><button>Batch import media manager data</button><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
+    echo '<p>&nbsp;</p><div id = "initiate_episode_match"><button>Match Episodes for season_id</button><input type="text" name="mm_season_import" /><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
 	  echo '</div>';
 	}
 

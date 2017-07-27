@@ -66,7 +66,8 @@ jQuery(document).ready(function($) {
       data:{
         'action': 'bulk_match_media_manager_episodes',
         'pagenum': epbatchpage,
-        'season_id': $('#initiate_episode_match input').val()
+        'season_id': $('#initiate_episode_match input').val(),
+        'create_episodes': $('#create_episodes').prop("checked")
       },
       dataType:'json',
       success: function(response){

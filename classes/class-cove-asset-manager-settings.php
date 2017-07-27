@@ -101,8 +101,19 @@ class COVE_Asset_Manager_Settings {
     add_settings_field( 'coveam_mm_api_endpoint' , 'PBS Media Manager API endpoint' , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_api_endpoint', 'Staging: https://media-staging.services.pbs.org/api/v1 Prod: https://media.services.pbs.org/api/v1') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_mm_api_endpoint' );
 
-    add_settings_field( 'coveam_mm_episode_autocreate' , __( 'Auto-create an episode every morning' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autocreate', 'Making this true will automatically generate a new episode post and media manager episode every morning') );
+    add_settings_field( 'coveam_mm_episode_autocreate' , __( 'Auto-create an episode every morning' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autocreate', 'Making this true will automatically generate a new episode post and media manager episode every weekday morning') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_mm_episode_autocreate' );
+
+    add_settings_field( 'coveam_mm_episode_autocreate_weekend' , __( 'Auto-create weekend episodes' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autocreate_weekend', 'Making this true will automatically generate a new episode post and media manager episode weekend mornings also') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_mm_episode_autocreate_weekend' );
+
+
+    add_settings_field( 'coveam_mm_episode_autotitle' , __( 'Title template for auto-created episodes' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autotitle', 'Use all-uppercase word "DATESTRING" as a placeholder for the date. Use all-uppercase word "WEEKENDSTRING" if you want "Weekend" inserted on weekend titles. ex: PBS Newshour WEEKENDSTRING full episode for DATESTRING') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_mm_episode_autotitle' );
+
+    add_settings_field( 'coveam_mm_episode_autodateformat' , __( 'Date format for auto-created episodes' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autodateformat', 'The PHP-style date format that will replace DATESTRING above. ex: "F j, Y" will result in dates that look like "March 10, 2018". See http://php.net/manual/en/function.date.php') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_mm_episode_autodateformat' );
+
 
     add_settings_field( 'coveam_notify_email' , __( 'Email notifications to' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_notify_email', 'Comma-delimited list of addresses to send notices regarding ingest, expiration etc to') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_notify_email' );

@@ -29,7 +29,7 @@
       $coveplayer_autoplay = '&autoplay=true';
       $youtubevars["autoplay"]=1;
     }
-	  var $covepartnerplayer_template = "<div class='video-wrap' style='width:100%; padding-top: 62.5%; position:relative;'><iframe class='partnerPlayer' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' width='100%' height='100%' style='position:absolute; top:0;' src='http://player.pbs.org/widget/partnerplayer/COVEPLAYERID/?start=0&end=0&chapterbar=false&endscreen=false" + $coveplayer_chrome + $coveplayer_autoplay +"' allowfullscreen></iframe></div>";
+	  var $covepartnerplayer_template = "<div class='video-wrap' style='width:100%; padding-top: 62.5%; position:relative;'><iframe class='partnerPlayer' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' width='100%' height='100%' style='position:absolute; top:0;' src='//player.pbs.org/widget/partnerplayer/COVEPLAYERID/?start=0&end=0&chapterbar=false&endscreen=false" + $coveplayer_chrome + $coveplayer_autoplay +"' allowfullscreen></iframe></div>";
 	  var $youtubeplayer_template = '<div id="' + $divid + '_YouTubePlayer"></div>';
     var $videoid = $(".coveam_videoid", this).text();
 	  var $coveplayerid = $(".coveplayerid", this).text();
@@ -269,7 +269,8 @@
 
   var VideoPBSpolltimer = null;
   function receiveVideoPBSMessage(event){
-    if ( event.origin == 'http://player.pbs.org' ) {
+    if ( (event.origin == 'http://player.pbs.org') || (event.origin == 'https://player.pbs.org') ) {
+      var origin_uri = event.origin;
       if (! VideoPBSMessagesRecieved) {
         console.log("PBS Video messaging started");
       }
@@ -285,7 +286,7 @@
           VideoPBSpolltimer = null;
           VideoPBSpolltimer = setInterval(function() {
             var firstdiv = $(".video-wrapper").first().attr("id");
-            $('#' + firstdiv + ' .partnerPlayer')[0].contentWindow.postMessage('getState', 'http://player.pbs.org/');
+            $('#' + firstdiv + ' .partnerPlayer')[0].contentWindow.postMessage('getState', origin_uri);
           }, 1000);
         } else if (action==="video" && value==="finished") {
           console.log('Video has ended');

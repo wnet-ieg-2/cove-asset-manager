@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
         if (response.updated.length || response.failed.length) {
           $('#initiate_batch_import .success').append(response.updated.join(", ") + ", ");
           $('#initiate_batch_import .status').text(" page " + batchpage + " complete");
-          $('#initiate_batch_import .failed').append(response.failed);
+          $('#initiate_batch_import .failed').append(response.failed.join(", ") + ", ");
           if (response.errors) {
             $('#initiate_batch_import .status').append("error :" + JSON.stringify(response.errors));
           } else {
@@ -71,7 +71,7 @@ jQuery(document).ready(function($) {
       dataType:'json',
       success: function(response){
         console.log(response);
-        if (response.updated.length || response.failed.length) {
+        if ((typeof response.updated !== 'undefined') && (response.updated.length || response.failed.length )) {
           $('#initiate_episode_match .success').append(response.updated.join(", ") + ", ");
           $('#initiate_episode_match .status').text(" page " + epbatchpage + " complete");
           $('#initiate_episode_match .failed').append(response.failed.join(", ") + ", ");
@@ -82,6 +82,8 @@ jQuery(document).ready(function($) {
           }
         } else {
           $('#initiate_episode_match .status').text( " Batch Import COMPLETE" );
+          $('#initiate_episode_match button').text("Match another season ");
+          epbatchpage = 0;
         }
       },
       error: function(XMLHttpRequest, textStatus, errorThrown){

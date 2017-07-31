@@ -712,7 +712,7 @@ class COVE_Asset_Manager {
     }
     //ingest related -- submitting a null video or caption entry triggers a file delete, not submitting it at all does nothing
     if (!empty($fields['_coveam_video_url'])){
-      $attribs['video'] = array("profile" => "hd-1080p-mezzanine-16x9", "source" => $fields['_coveam_video_url']);
+      $attribs['video'] = array("profile" => "hd-16x9-mezzanine-1080p", "source" => $fields['_coveam_video_url']);
     } else if ($fields['delete_current_video'] == true) {
       $attribs['video'] = null;
     }

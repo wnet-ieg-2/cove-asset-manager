@@ -309,12 +309,7 @@ class COVE_Asset_Manager {
     $tz = !empty(get_option('timezone_string')) ? get_option('timezone_string') : 'America/New_York'; 
     $date = new DateTime('now', new DateTimeZone($tz));
     $yearstring = $date->format('Y');
-    $todaystring = $date->format('F j, Y');
-    $sitestring = 'PBS NewsHour';
-    //change the string to Weekend if day of week is Sunday or Saturday 
-    if (in_array($date->format('l'), array('Sunday', 'Saturday'))){
-      $sitestring .= " Weekend";
-    }
+
     // current timestamp
     $current_ts = $date->format('U'); 
     // set the time to 3am
@@ -350,8 +345,28 @@ class COVE_Asset_Manager {
         return array('errors' => $return);
       }
 
+      $create_episode_weekend = get_option('coveam_mm_episode_autocreate_weekend') ? get_option('coveam_mm_episode_autocreate_weekend') : false;
+      // reset the date stuff we want "now".
+      unset($date);
+      $date = new DateTime('now', new DateTimeZone($tz));
+
+      $dateformat = get_option('coveam_mm_episode_autodateformat') ? get_option('coveam_mm_episode_autodateformat') : 'F j, Y';
+
+      $todaystring = $date->format($dateformat);
+      $sitestring = get_option('coveam_mm_episode_autotitle') ? get_option('coveam_mm_episode_autotitle') : 'PBS NewsHour WEEKENDSTRING full episode DATESTRING ';;
+
+      //change the string to Weekend if day of week is Sunday or Saturday
+      if (in_array($date->format('l'), array('Sunday', 'Saturday'))){
+        if (!$create_episode_weekend) {
+          return;
+        }
+        $sitestring = str_replace(" WEEKENDSTRING", " Weekend", $sitestring);
+      } else {
+        $sitestring = str_replace(" WEEKENDSTRING", "", $sitestring);
+      }
+
       // check that there isn't already an episode post with this title 
-      $post_title = $sitestring . ' full episode ' . $todaystring;
+      $post_title = str_replace("DATESTRING", $todaystring, $sitestring);
  
       $return = new WP_Query( array( 'title' => $post_title, 'post_type' => 'episodes', post_status => 'any' ));
       if ($return->found_posts) {
@@ -667,7 +682,7 @@ class COVE_Asset_Manager {
     }
     //ingest related -- submitting a null video or caption entry triggers a file delete, not submitting it at all does nothing
     if (!empty($fields['_coveam_video_url'])){
-      $attribs['video'] = array("profile" => "hd-1080p-mezzanine-16x9", "source" => $fields['_coveam_video_url']);
+      $attribs['video'] = array("profile" => "hd-16x9-mezzanine-1080p", "source" => $fields['_coveam_video_url']);
     } else if ($fields['delete_current_video'] == true) {
       $attribs['video'] = null;
     }

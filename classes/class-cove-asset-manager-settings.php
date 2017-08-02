@@ -32,7 +32,7 @@ class COVE_Asset_Manager_Settings {
 
     // bulk importers
     add_action( 'wp_ajax_bulk_import_media_manager_asset_and_episode_ids', array( $this, 'ajax_bulk_import_media_manager_asset_and_episode_ids'), 10, 2);
-    add_action( 'wp_ajax_bulk_match_media_manager_episodes', array( $this, 'ajax_bulk_match_media_manager_episodes'), 10, 3);
+    add_action( 'wp_ajax_bulk_match_media_manager_episodes', array( $this, 'ajax_bulk_match_media_manager_episodes'), 10, 4);
 	}
 	
 	public function add_menu_item() {
@@ -101,8 +101,19 @@ class COVE_Asset_Manager_Settings {
     add_settings_field( 'coveam_mm_api_endpoint' , 'PBS Media Manager API endpoint' , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_api_endpoint', 'Staging: https://media-staging.services.pbs.org/api/v1 Prod: https://media.services.pbs.org/api/v1') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_mm_api_endpoint' );
 
-    add_settings_field( 'coveam_mm_episode_autocreate' , __( 'Auto-create an episode every morning' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autocreate', 'Making this true will automatically generate a new episode post and media manager episode every morning') );
+    add_settings_field( 'coveam_mm_episode_autocreate' , __( 'Auto-create an episode every morning' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autocreate', 'Making this true will automatically generate a new episode post and media manager episode every weekday morning') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_mm_episode_autocreate' );
+
+    add_settings_field( 'coveam_mm_episode_autocreate_weekend' , __( 'Auto-create weekend episodes' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autocreate_weekend', 'Making this true will automatically generate a new episode post and media manager episode weekend mornings also') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_mm_episode_autocreate_weekend' );
+
+
+    add_settings_field( 'coveam_mm_episode_autotitle' , __( 'Title template for auto-created episodes' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autotitle', 'Use all-uppercase word "DATESTRING" as a placeholder for the date. Use all-uppercase word "WEEKENDSTRING" if you want "Weekend" inserted on weekend titles. ex: PBS Newshour WEEKENDSTRING full episode for DATESTRING') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_mm_episode_autotitle' );
+
+    add_settings_field( 'coveam_mm_episode_autodateformat' , __( 'Date format for auto-created episodes' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_mm_episode_autodateformat', 'The PHP-style date format that will replace DATESTRING above. ex: "F j, Y" will result in dates that look like "March 10, 2018". See http://php.net/manual/en/function.date.php') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_mm_episode_autodateformat' );
+
 
     add_settings_field( 'coveam_notify_email' , __( 'Email notifications to' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_notify_email', 'Comma-delimited list of addresses to send notices regarding ingest, expiration etc to') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_notify_email' );
@@ -174,7 +185,7 @@ class COVE_Asset_Manager_Settings {
 				</form>';
     $this->write_out_oAuth_JavaScript();
     echo '<p>&nbsp;</p><div id = "initiate_batch_import"><button>Batch import media manager data</button><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
-    echo '<p>&nbsp;</p><div id = "initiate_episode_match"><button>Match Episodes for season_id</button><input type="text" name="mm_season_import" /><div class="status"></div><div class="failed"></div><div class="success"></div></div>';
+    echo '<p>&nbsp;</p><div id = "initiate_episode_match"><button>Match Episodes for season_id</button><input type="text" name="mm_season_import" /> <input type=checkbox id="create_episodes" value="true"> Check to create Episode posts if none exist for episodes found in the Media Manager <div class="status"></div><div class="failed"></div><div class="success"></div></div>';
 	  echo '</div>';
 	}
 
@@ -220,6 +231,8 @@ class COVE_Asset_Manager_Settings {
           } 
           $temp_obj = $asset['data'];
           update_post_meta($post_id, '_coveam_video_asset_guid', $temp_obj['id']);
+          $this->plugin_obj->import_media_manager_asset($post_id, $temp_obj['id']);
+          
           update_post_meta($post_id, '_pbs_media_manager_episode_cid', $temp_obj['attributes']['episode']['id']);
           update_post_meta($post_id, '_pbs_media_manager_episode_title', sanitize_text_field($temp_obj['attributes']['episode']['attributes']['title']));
           array_push($videos_to_update, $post_id);
@@ -229,11 +242,10 @@ class COVE_Asset_Manager_Settings {
     return array('updated' => $videos_to_update, 'failed' => $failed_videos);
   }
 
-  private function bulk_match_media_manager_episodes($season_id, $pagenum) {
+  private function bulk_match_media_manager_episodes($season_id, $pagenum, $create_episodes = false) {
     /* this goes through  season 
      * gets all of the episodes
      * tries to match each episode to a full_episode post by date */
-    
     $client = $this->plugin_obj->get_media_manager_client();
     $season = $client->get_season_episodes($season_id, array('page' => $pagenum));
     if (!empty($season['errors'])){
@@ -274,6 +286,24 @@ class COVE_Asset_Manager_Settings {
       }
       if (!$this_post_id) {
         array_push($not_found_episodes, $episode['attributes']['title']);
+        if (!$create_episodes) {
+          continue;
+        }
+        $postarr = array(
+          'post_author' => 1,
+          'post_title' => $episode['attributes']['title'],
+          'post_type' => 'episodes',
+          'post_date' => $episode['attributes']['premiered_on'] . " 19:00:00",
+          'post_status' => 'publish',
+          'meta_input' => array( '_pbs_media_manager_episode_id' => $episode_id )
+        );
+        // create the post
+        $post_id = -1;
+        $post_id = wp_insert_post($postarr);
+        if ($post_id < 1) {
+          return array('errors' => 'Episode post create failed');
+        }
+        $this->plugin_obj->import_media_manager_episode($post_id, $episode_id);
       }
     }
     return array('updated' => $found_episodes, 'failed' => $not_found_episodes);
@@ -293,7 +323,8 @@ class COVE_Asset_Manager_Settings {
   public function ajax_bulk_match_media_manager_episodes() {
     $pagenum = ( isset( $_POST['pagenum'] ) ) ? $_POST['pagenum'] : '';
     $season_id = ( isset( $_POST['season_id'] ) ) ? $_POST['season_id'] : '';
-    $returnarray = $this->bulk_match_media_manager_episodes($season_id, $pagenum) ;
+    $create_episodes = ( isset( $_POST['create_episodes'] ) ) ? $_POST['create_episodes'] : false;
+    $returnarray = $this->bulk_match_media_manager_episodes($season_id, $pagenum, $create_episodes) ;
     if ($returnarray ) {
       echo json_encode($returnarray);
     } else {

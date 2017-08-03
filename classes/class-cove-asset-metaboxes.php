@@ -654,7 +654,11 @@ class COVE_Asset_Metaboxes {
       // only should include the login form if we have the settings we need
       $wnet_youtube_obj= new WNET_Google_oAuth(__FILE__);
       $google_access_token = $wnet_youtube_obj->get_google_access_token();
-      $html .= '<div style="display:none;"><span id="coveam_youtube_username">' . get_option( 'coveam_youtube_username') . '</span><span id="coveam_google_apikey">' . get_option( 'coveam_google_backend_key') . '</span><span id="wp_siteurl">' . get_option( 'siteurl' ) . '</span><span id="coveam_google_redirect_uri">' . get_option("coveam_google_redirect_uri") . '</span><span id="_coveam_googleaccesstoken">' . $google_access_token . '</span></div>';
+      if (!$google_access_token) {
+        $html .= 'The server is not currently logged into Google/YouTube.  Someone with the username/password for the YouTube channel will need to go to Settings/COVE Asset Manager, scroll to the bottom of the page, and log the server in.';
+      } else {
+        $html .= '<div style="display:none;"><span id="coveam_youtube_username">' . get_option( 'coveam_youtube_username') . '</span><span id="coveam_google_apikey">' . get_option( 'coveam_google_backend_key') . '</span><span id="wp_siteurl">' . get_option( 'siteurl' ) . '</span><span id="coveam_google_redirect_uri">' . get_option("coveam_google_redirect_uri") . '</span><span id="_coveam_googleaccesstoken">' . $google_access_token . '</span></div>';
+      }
     }
     $html .= '</td></tr>';
     $html .= '<tr valign="top" class="youtube-asset-details"><th scope="row"><label for="_coveam_youtube_id">YouTube Video ID</label></th><td><input type="text" id="_coveam_youtube_id" name="_coveam_youtube_id" value="' . $youtubeid . '" /><p class="description">Paste in a YouTube ID or login below to upload a new video <a href="https://www.youtube.com/embed/' . $youtubeid . '?rel=0&TB_iframe=true&width=600&height=400" class="thickbox" style="display:none;" id="youtube-video-preview">Preview the current video <i>(opens new window)</i></a></p></td></tr>' . "\n";

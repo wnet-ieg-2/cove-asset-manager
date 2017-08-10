@@ -250,6 +250,9 @@ class COVE_Asset_Metaboxes {
 		if ( 0 < count( $field_data ) ) {
 			$html .= '<table class="form-table">' . "\n";
 			$html .= '<tbody>' . "\n";
+      if (!empty($fields['_coveam_last_error'])) {
+        $html .= '<tr valign="top"><th scope="row"><div class="error">The most recent attempt to update this asset in the Media Manager returned this error: ' . $fields['_coveam_last_error'][0] . ' </div></td></tr>';
+      }
 
       // display a shortcode for this video asset 
       $html .= '<tr valign="top"><th scope="row">Shortcode for this video asset:</th><td>[covevideoasset id=' . $post_id . ']</td></tr>' . "\n";

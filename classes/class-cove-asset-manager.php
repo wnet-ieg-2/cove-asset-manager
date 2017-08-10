@@ -648,6 +648,7 @@ class COVE_Asset_Manager {
       $attribs['tags'] = $tags_obj;
     }
     $result = $client->create_child($episode_id, 'episode', 'asset', $attribs);
+    $this->update_media_manager_asset_error_status($post_id, $result);
     if (!empty($result['errors'])) {
       return $result;
     }
@@ -799,6 +800,7 @@ class COVE_Asset_Manager {
       $attribs['tags'] = $tags_obj;
     }
     $response = $client->update_object($asset_id, 'asset', $attribs);
+    $this->update_media_manager_asset_error_status($post_id, $response);
     return $response;
   }
 
@@ -846,6 +848,37 @@ class COVE_Asset_Manager {
       $result = update_option('coveam_mm_season_id_list', $seasonary, false);
     }
     return $result;
+  }
+
+  private function find_deepest_element($ary, $elementname) {
+    $return = false;
+    if (!is_array($ary) && !is_object($ary)) {
+      return $ary;
+    }
+    foreach ($ary as $key => $value) {
+      if ($key == $elementname) {
+        $return = $value;
+      }
+      if (is_array($value) || is_object($value)) {
+        if ($deeper = $this->find_deepest_element($value, $elementname)) {
+          $return = $deeper; 
+        }
+      }
+    }
+    return $return;
+  }  
+
+  public function update_media_manager_asset_error_status($post_id, $response) {
+    if (empty($response['errors'])) {
+      delete_post_meta($post_id, '_coveam_last_error');
+      return;
+    }
+    $errors = $response['errors'];
+    if ($deepest = $this->find_deepest_element($response, 'errors')) {
+      $errors = $deepest; 
+    } 
+    update_post_meta($post_id, '_coveam_last_error', json_encode($errors));
+    return; 
   }
 
 }

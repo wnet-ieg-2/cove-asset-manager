@@ -312,20 +312,6 @@ class COVE_Asset_Manager {
     return "could_not_determine";
   }
 
-  public function get_latest_media_manager_episode($season_id = false) {
-    $client = $this->get_media_manager_client();
-    $result = $client->get_season_episodes($season_id);
-    if (!empty($result['errors'])) {
-      return $result;
-    }
-    foreach ($result as $episode) {
-      if (!empty($episode['attributes']['ordinal'])) {
-        // just return the first one, don't care about the others
-        return $episode['attributes'];
-      }
-    }
-  }
-
   public function do_daily_episode_generate() {
     /* function designed to be called from wp_cron
      * and also on plugin activation

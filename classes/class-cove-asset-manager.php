@@ -475,7 +475,7 @@ class COVE_Asset_Manager {
     }
     $client = $this->get_media_manager_client();
     if (!empty($client->errors)) { return $client; }
-    $episode = $client->get_episode($episode_id);
+    $episode = $client->get_episode($episode_id, array('platform-slug' => 'partnerplayer'));
     if (!empty($episode['errors'])) { return $episode; }
     update_post_meta($postid, '_pbs_media_manager_episode_cid', $episode_id);
     $temp_obj = $episode['data'];
@@ -565,6 +565,7 @@ class COVE_Asset_Manager {
     }
     $client = $this->get_media_manager_client();
     if (!empty($client->errors)) { return $client; }
+    // note that I don't specify playform-slug.  That's because the edit endpoint is called, and it doesn't require it.
     $asset = $client->get_asset($asset_id, true);
     if (!empty($asset['errors'])) { return $asset; }
     update_post_meta($postid, '_coveam_video_asset_guid', $asset_id);
@@ -633,7 +634,7 @@ class COVE_Asset_Manager {
     $slugtitle = $postary['_coveam_video_title'];
 
     if ($attribs['object_type'] == 'full_length') {
-      $episode = $client->get_episode($episode_id);
+      $episode = $client->get_episode($episode_id, array('platform-slug' => 'partnerplayer'));
       if (empty($episode['data'])) {
         return array('errors' => 'episode not found');
       }
@@ -837,7 +838,7 @@ class COVE_Asset_Manager {
     if (empty($show_id)) { return array('errors' => 'no show id set!'); }
     $client = $this->get_media_manager_client();
     if (!empty($client->errors)) { return $client; }
-    $seasons = $client->get_show_seasons($show_id);
+    $seasons = $client->get_show_seasons($show_id, array('platform-slug' => 'partnerplayer'));
     if (!empty($seasons['errors'])) { return $seasons; }
     $seasonary = array();
     foreach ($seasons as $season => $ary) {

@@ -574,7 +574,9 @@ class COVE_Asset_Manager {
     update_post_meta($postid, '_coveam_video_slug', $temp_obj['attributes']['slug']);
     update_post_meta($postid, '_coveam_cove_player_id', $temp_obj['attributes']['legacy_tp_media_id']);
     update_post_meta($postid, '_coveam_premiere_date', $temp_obj['attributes']['premiered_on']);
-    update_post_meta($postid, '_coveam_duration', $temp_obj['attributes']['duration']);
+    if (!empty($temp_obj['attributes']['duration'])) {
+      update_post_meta($postid, '_coveam_duration', $temp_obj['attributes']['duration']*1000);
+    }
     update_post_meta($postid, '_pbs_media_manager_episode_cid', $temp_obj['attributes']['episode']['id']);
     update_post_meta($postid, '_pbs_media_manager_episode_title', sanitize_text_field($temp_obj['attributes']['episode']['attributes']['title']));
 

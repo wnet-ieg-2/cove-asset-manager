@@ -247,7 +247,7 @@ class COVE_Asset_Manager_Settings {
      * gets all of the episodes
      * tries to match each episode to a full_episode post by date */
     $client = $this->plugin_obj->get_media_manager_client();
-    $season = $client->get_season_episodes($season_id, array('page' => $pagenum));
+    $season = $client->get_season_episodes($season_id, array('page' => $pagenum, 'platform-slug' => 'partnerplayer'));
     if (!empty($season['errors'])){
       return $season;
     }

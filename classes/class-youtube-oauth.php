@@ -188,6 +188,12 @@ class WNET_Google_oAuth {
       }
     }
     update_post_meta($postid, '_coveam_youtubestatus', $statusmessage);
+
+    // get the mezz image if not set
+    if (! get_post_meta($postid, '_coveam_video_image', true)) {
+      update_post_meta($postid, '_coveam_video_image', 'https://i3.ytimg.com/vi/' . $videoid . '/maxresdefault.jpg');
+    }
+
     coveam_update_video_status($postid);
     return $statusmessage;
   }

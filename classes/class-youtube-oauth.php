@@ -153,12 +153,12 @@ class WNET_Google_oAuth {
   }
 
 
-  public function get_youtube_status_from_google($videoid){
+  public function get_youtube_object_from_google($videoid){
     $accessToken = $this->get_google_access_token();
     if (! $accessToken) {
       return false;
     }
-    $url = 'https://www.googleapis.com/youtube/v3/videos?id=' . $videoid . '&part=status';
+    $url = 'https://www.googleapis.com/youtube/v3/videos?id=' . $videoid . '&part=status,contentDetails,snippet';
     $args = array(
       "headers" => array(
         "Authorization" => "Bearer " . $accessToken
@@ -166,8 +166,8 @@ class WNET_Google_oAuth {
     );
     $request = wp_remote_request($url, $args);
     $responseObj = json_decode(wp_remote_retrieve_body($request),true);
-    $status = $responseObj[items][0][status];	
-    return $status;
+    $obj = $responseObj[items][0];	
+    return $obj;
   }
 
   
@@ -176,9 +176,9 @@ class WNET_Google_oAuth {
     if (! $videoid) {
       return false;
     }
-    $statusobj = $this->get_youtube_status_from_google($videoid);
-    $uploadstatus = $statusobj[uploadStatus];
-    $privacystatus = $statusobj[privacyStatus];
+    $statusobj = $this->get_youtube_object_from_google($videoid);
+    $uploadstatus = $statusobj['status']['uploadStatus'];
+    $privacystatus = $statusobj['status']['privacyStatus'];
     $statusmessage = get_post_meta($postid, '_coveam_youtubestatus', true);
     if ($uploadstatus) {
       if ($uploadstatus == 'processed') {

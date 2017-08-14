@@ -194,6 +194,15 @@ class WNET_Google_oAuth {
       update_post_meta($postid, '_coveam_video_image', 'https://i3.ytimg.com/vi/' . $videoid . '/maxresdefault.jpg');
     }
 
+
+    // get the duration if not set
+    if (empty(get_post_meta($postid, '_coveam_duration', true)) && !empty($videoobj['contentDetails']['duration'])) {
+      $tstr = $videoobj['contentDetails']['duration'];
+      $duration = new DateInterval($tstr);
+      $calculated_seconds = ($duration->format('%h')*3600) + ($duration->format('%i')*60) + $duration->format('%s');
+      update_post_meta($postid, '_coveam_duration', $calculated_seconds*1000);
+    }
+
     coveam_update_video_status($postid);
     return $statusmessage;
   }

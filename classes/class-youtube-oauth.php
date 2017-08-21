@@ -191,7 +191,15 @@ class WNET_Google_oAuth {
 
     // get the mezz image if not set
     if (! get_post_meta($postid, '_coveam_video_image', true)) {
-      update_post_meta($postid, '_coveam_video_image', 'https://i3.ytimg.com/vi/' . $videoid . '/maxresdefault.jpg');
+      $youtubeurl = 'https://i3.ytimg.com/vi/' . $videoid . '/maxresdefault.jpg';
+      update_post_meta($postid, '_coveam_video_image', $youtubeurl);
+      // sideload it to the media library and set as thumbnail if no thumb set
+      if (! get_post_thumbnail_id( $post_id )) {
+        $new_thumb_response = $this->sideload_image_into_post_as_thumbnail($post_id, $youtubeurl);
+        if ($new_thumb_response !== TRUE ) {
+          error_log('failed to sideload youtube image ' . json_encode($new_thumb_response));
+        }
+      } 
     }
 
 
@@ -219,6 +227,34 @@ class WNET_Google_oAuth {
     exit;
   }
 
+  public function sideload_image_into_post_as_thumbnail($post_id = false, $url) { 
+    // adapted from https://codex.wordpress.org/Function_Reference/media_handle_sideload
+    $tmp = download_url( $url );
+
+    preg_match('/[^\?]+\.(jpg|jpe|jpeg|gif|png)/i', $url, $matches);
+    $file_array['name'] = basename($matches[0]);
+    $file_array['tmp_name'] = $tmp;
+
+    // If error storing temporarily, unlink
+    if ( is_wp_error( $tmp ) ) {
+      @unlink($file_array['tmp_name']);
+      $file_array['tmp_name'] = '';
+    }
+
+    $id = media_handle_sideload( $file_array, $post_id );
+
+    // If error storing permanently, unlink
+    if ( is_wp_error($id) ) {
+      @unlink($file_array['tmp_name']);
+      return $id;
+    }
+    $response = set_post_thumbnail($post_id, $id);
+    // will return either post_id on success or an error message/false on failure
+    if ($response == $post_id) {
+      return TRUE;
+    }
+    return $response;
+  }
 
 
 }

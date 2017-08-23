@@ -78,6 +78,9 @@ function AWSuploadToS3(file, url) {
       {
         AWSsetProgress(100, 'Upload completed.');
         var uploadedfile = 'https://s3.amazonaws.com/' + $('#s3_bucket').text();
+        if ($('#s3_proxy').text()) {
+          uploadedfile = $('#s3_proxy').text();
+        }
         if ($('#s3_bucket_dir').text()) {
           uploadedfile = uploadedfile + '/' + $('#s3_bucket_dir').text();     
         } 

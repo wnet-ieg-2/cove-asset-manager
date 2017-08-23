@@ -76,6 +76,10 @@ class COVE_Asset_Manager_Settings {
     add_settings_field( 'coveam_aws_secret_key' , __( 'AWS Secret Key:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_aws_secret_key', '') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_aws_secret_key' );
 
+    add_settings_field( 'coveam_s3_proxy' , __( 'Proxy/public hostname (optional)' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_s3_proxy', 'The hostname for unsecured web requests for files uploaded to your S3 bucket if direct web traffic to your S3 bucket is not allowed and has been put behind a proxy or CDN.') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_s3_proxy' );
+
+
     add_settings_field( 'coveam_youtube_username' , __( 'YouTube username:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_youtube_username', 'ex: newshour@gmail.com') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_youtube_username' );
 

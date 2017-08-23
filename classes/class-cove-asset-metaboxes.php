@@ -198,7 +198,7 @@ class COVE_Asset_Metaboxes {
     $currentimageurl = !empty($fields['_coveam_video_image'][0]) ? $fields['_coveam_video_image'][0] : '';
     $currentcaptionurl = !empty($fields['_coveam_video_caption'][0]) ? $fields['_coveam_video_caption'][0] : '';
 
-    $html .= '<tr valign="top" style="display:none;"><th></th><td><span id="plugin_assets_url">' .  $this->assets_url . '</span><span id="s3_bucket">' . get_option( 'coveam_s3_bucket' ) . '</span><span id="s3_bucket_dir">' . get_option( 'coveam_s3_bucket_dir' ) . '</span></td></tr>' . "\n";
+    $html .= '<tr valign="top" style="display:none;"><th></th><td><span id="plugin_assets_url">' .  $this->assets_url . '</span><span id="s3_bucket">' . get_option( 'coveam_s3_bucket' ) . '</span><span id="s3_bucket_dir">' . get_option( 'coveam_s3_bucket_dir' ) . '</span><span id="s3_proxy">' . get_option( 'coveam_s3_proxy' ) . '</span><</td></tr>' . "\n";
     $html .= '<tr valign="top" class="cove-ingest-fields"><th scope="row">';
     if ( $currentvideourl) {
       $html .= 'Archive Video URL</th><td>' . $currentvideourl . '<p class="description">Current asset status: <b>' . $fields['_coveam_covestatus'][0] . '</b><br />NOTE: Don\'t delete an in-progress deletion.  Deletion may take a few minutes to complete, and will unpublish a published asset. <br /> Save/update the post to get the most recent asset status.</p><label for="delete_current_video">Submitting a new video file requires deleting the current video file. Delete file?</label> <input type="checkbox" name="delete_current_video" value="true" /></td></tr>';

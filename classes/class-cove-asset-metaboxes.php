@@ -653,14 +653,15 @@ class COVE_Asset_Metaboxes {
       $youtubestatus = '';
     }
     $html = '<tr><td colspan=2><div style="border:1px solid #330000;"><table><tr><th><b>YouTube</b></th><td>';
-    if (get_option( 'coveam_youtube_username' ) && get_option( 'coveam_google_backend_key' )) {
+    $youtube_account_login = get_option( 'coveam_youtube_channel_email' ) ? get_option( 'coveam_youtube_channel_email' ) : get_option( 'coveam_youtube_username' ); 
+    if ($youtube_account_login && get_option( 'coveam_google_backend_key' )) {
       // only should include the login form if we have the settings we need
       $wnet_youtube_obj= new WNET_Google_oAuth(__FILE__);
       $google_access_token = $wnet_youtube_obj->get_google_access_token();
       if (!$google_access_token) {
         $html .= 'The server is not currently logged into Google/YouTube.  Someone with the username/password for the YouTube channel will need to go to Settings/COVE Asset Manager, scroll to the bottom of the page, and log the server in.';
       } else {
-        $html .= '<div style="display:none;"><span id="coveam_youtube_username">' . get_option( 'coveam_youtube_username') . '</span><span id="coveam_google_apikey">' . get_option( 'coveam_google_backend_key') . '</span><span id="wp_siteurl">' . get_option( 'siteurl' ) . '</span><span id="coveam_google_redirect_uri">' . get_option("coveam_google_redirect_uri") . '</span><span id="_coveam_googleaccesstoken">' . $google_access_token . '</span></div>';
+        $html .= '<div style="display:none;"><span id="coveam_youtube_username">' . $youtube_account_login . '</span><span id="coveam_google_apikey">' . get_option( 'coveam_google_backend_key') . '</span><span id="wp_siteurl">' . get_option( 'siteurl' ) . '</span><span id="coveam_google_redirect_uri">' . get_option("coveam_google_redirect_uri") . '</span><span id="_coveam_googleaccesstoken">' . $google_access_token . '</span></div>';
       }
     }
     $html .= '</td></tr>';
@@ -672,7 +673,7 @@ class COVE_Asset_Metaboxes {
     }
     $html .= '<tr valign="top" class="youtube-asset-details"><th scope="row"><label for="_coveam_youtubestatus">YouTube Video Status</label></th><td><span id="post-upload-youtube-status">' . $youtubestatus . '</span><p class="description">Only "public" means "ready".</p>'. $youtubecheckstatuslink .'</td></tr>' . "\n";
    
-    if (get_option( 'coveam_youtube_username' ) && get_option( 'coveam_google_backend_key' )) {
+    if ($youtube_account_login && get_option( 'coveam_google_backend_key' )) {
     // only should include this form if we have the settings we need
       // get the post tags for inclusion on this form
       $terms = get_the_terms( $postid, 'post_tag' );

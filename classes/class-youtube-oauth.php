@@ -229,6 +229,9 @@ class WNET_Google_oAuth {
 
   public function sideload_image_into_post_as_thumbnail($post_id = false, $url) { 
     // adapted from https://codex.wordpress.org/Function_Reference/media_handle_sideload
+    if (!function_exists('download_url')) {
+      return FALSE;
+    }
     $tmp = download_url( $url );
 
     preg_match('/[^\?]+\.(jpg|jpe|jpeg|gif|png)/i', $url, $matches);

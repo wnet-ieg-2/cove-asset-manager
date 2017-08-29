@@ -80,8 +80,12 @@ class COVE_Asset_Manager_Settings {
     register_setting( 'cove_asset_manager_settings' , 'coveam_s3_proxy' );
 
 
-    add_settings_field( 'coveam_youtube_username' , __( 'YouTube username:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_youtube_username', 'ex: newshour@gmail.com') );
+    add_settings_field( 'coveam_youtube_username' , __( 'YouTube login username:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_youtube_username', 'The account you login with to manage your YouTube channel ex: newshour@gmail.com') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_youtube_username' );
+
+    add_settings_field( 'coveam_youtube_channel_email' , __( 'YouTube Channel email:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_youtube_channel_email', '(Optional) If your channel is owned by a "Brand" or "Google+" account different from your login account, put that email in here. ex: something-0069@pages.plusgoogle.com') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_youtube_channel_email' );
+
 
 
     add_settings_field( 'coveam_google_backend_key' , __( 'Google API key for backend application:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_google_backend_key', 'You must register a separate "application" with Google specific to the URL of this server for automated server checks of YouTube status and expiring videos') );
@@ -402,7 +406,7 @@ class COVE_Asset_Manager_Settings {
       success: function(resp) {
         var user = resp;
         console.log(user);
-        $('#googleUserName').text('This server is now logged into Google and YouTube as ' + user.name);
+        $('#googleUserName').html('This server is now logged into Google and YouTube as ' + user.name + ' <i>(' + user.email + ')</i>');
         loggedInToGoogle = true;
         $('#google-login-block').hide();
         $('#google-logout-block').show();
@@ -442,7 +446,7 @@ class COVE_Asset_Manager_Settings {
   <h3>YouTube/Google Login Status</h3>
   <p>In order for YouTube integration to work, the server must be logged in and authorized with Google.</p>
   <a id="google-login-block">Login to Google and YouTube </a>
-  <span id="googleUserName">You are not logged in.  YouTube integration will not work!</span>
+  <span id="googleUserName"><i>If given multiple account options during login, choose the "brand account" -- it will say "YouTube, Google+" below it)</i><br />You are not logged in.  YouTube integration will not work!</span>
   <span id="google-logout-block"><a>Logout from Google and deauthorize this server.</a></span>
   <iframe id="googleAuthIFrame" style="visibility:hidden;" width=1 height=1></iframe>
   <?php

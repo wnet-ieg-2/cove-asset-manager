@@ -4,8 +4,8 @@ jQuery(document).ready(function($) {
   // these Google/YouTube variables pulled from the passing page
   var GOOGLECLIENTID = $('#coveam_google_apikey').text();
   var GOOGLECLIENTREDIRECT = $('#coveam_google_redirect_uri').text();
-  //var GOOGLEUSERNAME = $('#coveam_youtube_username').text();
-  var GOOGLEUSERNAME = 'nj-today-0069@pages.plusgoogle.com';
+  var GOOGLEUSERNAME = $('#coveam_youtube_username').text();
+
 
   // constants 
   var GoogleAccessToken = $('#_coveam_googleaccesstoken').text();

@@ -131,7 +131,7 @@ function coveam_update_video_status($id) {
     }
     if (!in_array($cove_status, array('expired', 'not_yet_available'))) {
       if ($youtube_status) {
-        if ($youtube_status == 'public') {
+        if (in_array($youtube_status, array("public", "live", "upcoming"))) {
           $video_status = 'publish';
         }
       }
@@ -207,7 +207,7 @@ function coveam_render_player( $id, $args = array() ) {
 				} else {
 					$playlink = "<iframe class='partnerPlayer' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' width='100%' height='100%' src='http://player.pbs.org/widget/partnerplayer/" . $video['coveplayerid'] . "/?start=0&end=0&chapterbar=false&endscreen=false' allowfullscreen></iframe>";
 				}		 
-			} elseif (($video['youtubestatus'] == "public") && $video['youtubeid'] ) {
+			} elseif ( in_array($video['youtubestatus'], array("public", "live", "upcoming")) && $video['youtubeid'] ) {
 				if ($whereami == "rss-description") {
 					$playlink = '<a href="http://www.youtube.com/watch?v=' . $video['youtubeid'] . '">[Watch Video]</a>';
 				} else {
@@ -250,7 +250,7 @@ function coveam_render_player( $id, $args = array() ) {
 		    $html .= $video['coveplayerid']; 
 	    }
       $html .= '</span><span class="youtubeid">';
-	    if (($video['youtubestatus'] == "public") && $video['youtubeid']) {
+	    if (in_array($video['youtubestatus'], array("public", "live", "upcoming")) && $video['youtubeid']) {
         $html .= $video['youtubeid'];
       }
 	    $html .= '</span><span class="coveam_covepreferred">' . $covepreferred . '</span><span class="coveam_video_override_encoded">';
@@ -437,7 +437,7 @@ function coveam_check_inprogress_ingest_videos() {
       'meta_query' => array(
         array(
           'key' => '_coveam_youtubestatus',
-          'value' => array('uploaded','processing'),
+          'value' => array('uploaded','processing','live','upcoming'),
           'compare' => 'IN'
         )
       ),

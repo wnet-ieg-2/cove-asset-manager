@@ -219,11 +219,6 @@ jQuery(document).ready(function($) {
       console.log(response);
       var uploadStatus = response.items[0].status.uploadStatus;
 
-      var liveBroadcast = response.items[0].snippet.liveBroadcastContent;
-      if (liveBroadcast != 'none') {
-        uploadStatus = liveBroadcast; 
-      }
-
       $('#post-upload-youtube-status').html('status: ' + uploadStatus);
 
       if (uploadStatus == 'uploaded') {
@@ -242,7 +237,7 @@ jQuery(document).ready(function($) {
           finalStatus = finalStatus + '-' + response.items[0].status.failureReason;
         }
         updateYouTubePostMeta(videoId,finalStatus);
-        $('#post-upload-youtube-status').html(' <b>Latest status: ' + finalStatus + '</b>');
+        $('#post-upload-youtube-status').append(' <b>Final status: ' + finalStatus + '</b>');
         $('.youtube-thumbnail-preview').attr('src', 'https://i.ytimg.com/vi/' + videoId + '/default.jpg?timestamp=' + new Date().getTime());
         $('.youtube-thumbnail-preview').show();
       }

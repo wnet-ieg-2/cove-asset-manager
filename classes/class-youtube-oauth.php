@@ -158,7 +158,7 @@ class WNET_Google_oAuth {
     if (! $accessToken) {
       return false;
     }
-    $url = 'https://www.googleapis.com/youtube/v3/videos?id=' . $videoid . '&part=status,snippet,contentDetails';
+    $url = 'https://www.googleapis.com/youtube/v3/videos?id=' . $videoid . '&part=status,contentDetails';
     $args = array(
       "headers" => array(
         "Authorization" => "Bearer " . $accessToken
@@ -179,11 +179,8 @@ class WNET_Google_oAuth {
     $videoobj = $this->get_youtube_object_from_google($videoid);
     $uploadstatus = $videoobj['status']['uploadStatus'];
     $privacystatus = $videoobj['status']['privacyStatus'];
-    $livebroadcast = $videoobj['snippet']['liveBroadcastContent'];
     $statusmessage = get_post_meta($postid, '_coveam_youtubestatus', true);
-    if ($livebroadcast == 'live' || $livebroadcast == 'upcoming') {
-      $statusmessage = $livebroadcast;
-    } else if ($uploadstatus) {
+    if ($uploadstatus) {
       if ($uploadstatus == 'processed') {
         $statusmessage = $privacystatus;
       } else {

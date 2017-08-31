@@ -308,8 +308,13 @@ class COVE_Asset_Manager {
  
     // schedule invoking this script in a day
     $this->clear_scheduled_episode_generation(); 
-    wp_schedule_single_event( $threeam_ts, 'coveam_do_daily_episode_generate' );
-    //error_log('scheduled for ' . $threeam_ts);
+    $schedresp = wp_schedule_single_event( $threeam_ts, 'coveam_do_daily_episode_generate' );
+    // NULL is success
+    if (is_null($scheduresp)) { 
+      error_log('scheduled for ' . $threeam_ts);
+    } else {
+      error_log('failed to schedule event for ' . $threeam_ts);
+    }
 
     //regen the season list
     $season_resp = $this->update_media_manager_season_list(); 
@@ -368,7 +373,7 @@ class COVE_Asset_Manager {
       );
       // create the post
       $post_id = -1;
-      $post_id = wp_insert_post($postarr); 
+      //$post_id = wp_insert_post($postarr); 
       if ($post_id < 1) {
         $return = 'Episode post create failed';
         error_log($return);

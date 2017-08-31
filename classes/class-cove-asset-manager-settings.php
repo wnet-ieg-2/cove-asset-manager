@@ -33,6 +33,10 @@ class COVE_Asset_Manager_Settings {
     // bulk importers
     add_action( 'wp_ajax_bulk_import_media_manager_asset_and_episode_ids', array( $this, 'ajax_bulk_import_media_manager_asset_and_episode_ids'), 10, 2);
     add_action( 'wp_ajax_bulk_match_media_manager_episodes', array( $this, 'ajax_bulk_match_media_manager_episodes'), 10, 4);
+
+    // check whenever setting for daily ep autogenerate is changed
+    add_action( 'update_option_coveam_mm_episode_autocreate', array( $this, 'update_episode_autocreate_status' ), 10, 2);
+
 	}
 	
 	public function add_menu_item() {
@@ -248,6 +252,16 @@ class COVE_Asset_Manager_Settings {
       endwhile;
     }
     return array('updated' => $videos_to_update, 'failed' => $failed_videos);
+  }
+
+  public function update_episode_autocreate_status($oldvalue, $newvalue) {
+    error_log('triggering episode create ' . $oldvalue . ' : ' . $newvalue );
+    $response = $this->plugin_obj->do_daily_episode_generate();
+    if (!empty($response['errors'])) {
+      error_log(json_encode($response));
+    } else {
+      error_log('successfully updated'); 
+    }
   }
 
   private function bulk_match_media_manager_episodes($season_id, $pagenum, $create_episodes = false) {

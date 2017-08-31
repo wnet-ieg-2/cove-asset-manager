@@ -373,7 +373,7 @@ class COVE_Asset_Manager {
       );
       // create the post
       $post_id = -1;
-      //$post_id = wp_insert_post($postarr); 
+      $post_id = wp_insert_post($postarr); 
       if ($post_id < 1) {
         $return = 'Episode post create failed';
         error_log($return);

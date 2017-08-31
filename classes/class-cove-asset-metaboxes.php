@@ -116,31 +116,34 @@ class COVE_Asset_Metaboxes {
     $html .= '<tr valign="top"><th scope="row">Media Manager Episode</th><td>';
     $currentVal = $fields['_pbs_media_manager_episode_cid'][0];
   	if (!empty($currentVal)) {
-      $html .= '<span id="_pbs_media_manager_episode_cid">' . $currentVal . "</span><br /><i>" . $fields['_pbs_media_manager_episode_title'][0] . "</i>";
-    } else { 
-      $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'asc', 'posts_per_page' => 1);
- 		  $my_query = new WP_Query($args); 
-      $thisyear = date('Y');
-		  while ($my_query->have_posts()) : $my_query->the_post(); 
-			  $oldest = get_the_date('Y');
-		  endwhile; 
-      $html .= '<select name="_pbs_media_manager_episode_cid" id="_pbs_media_manager_episode_cid">';
-      $html .= $this->get_episode_option_list(0, $thisyear);
-		  $html .= "</select>";
-	    $html .= "<br />Search: <select id='epyearselect'><option value=''>Year</option>";
-		  
-		  foreach (range( $thisyear, $oldest) as $year) {
-    		$html .= "<option value='$year'>$year</option>";
-		  }
-	    $html .= "</select>";
-	
-	    $html .= "<select id='epmonthselect'><option value=''>Month</option>";
-		  foreach (range(01, 12) as $month) {
-    		$html .= "<option value='$month'>$month</option>";
-		  }
-	    $html .= "</select>";
-      $html .= '<p class="description">NOTE: Episode assignment cannot be changed after initial asset creation.</p>';
+      $html .= 'Current value: <span id="_pbs_media_manager_episode_cid">' . $currentVal . "</span><br /><i>" . $fields['_pbs_media_manager_episode_title'][0] . "</i><br />";
+    }  
+    $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'asc', 'posts_per_page' => 1);
+	  $my_query = new WP_Query($args); 
+    $thisyear = date('Y');
+    while ($my_query->have_posts()) : $my_query->the_post(); 
+	    $oldest = get_the_date('Y');
+		endwhile; 
+    $html .= '<select name="_pbs_media_manager_episode_cid" id="_pbs_media_manager_episode_cid">';
+    if (!empty($currentVal)) {
+      $html .= '<option value = "">Only select if you want to change the episode</option>';
     }
+    $html .= $this->get_episode_option_list(0, $thisyear);
+		$html .= "</select>";
+	  $html .= "<br />Search: <select id='epyearselect'><option value=''>Year</option>";
+		
+	  foreach (range( $thisyear, $oldest) as $year) {
+  		$html .= "<option value='$year'>$year</option>";
+	  }
+	  $html .= "</select>";
+	
+	  $html .= "<select id='epmonthselect'><option value=''>Month</option>";
+	  foreach (range(01, 12) as $month) {
+   	  $html .= "<option value='$month'>$month</option>";
+		}
+	  $html .= "</select>";
+    $html .= '<p class="description">NOTE: If you change the episode assignment, any other changes made at the same time will be discarded.</p>';
+    
     $html .= '</td></tr>';
 
 
@@ -339,8 +342,6 @@ class COVE_Asset_Metaboxes {
       }
     } else {
       if ( $assetid ) {
-	    // episode is read-only
-        unset($_POST['_pbs_media_manager_episode_cid']);
         $returnval = $this->plugin_obj->update_media_manager_asset($post_id, $assetid, $_POST);
         if (!empty($returnval['errors'])) { 
           error_log(json_encode($returnval));

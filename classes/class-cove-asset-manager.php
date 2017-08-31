@@ -619,6 +619,10 @@ class COVE_Asset_Manager {
 
     $client = $this->get_media_manager_client();
 
+    // on create episode must not be set in attribs
+    if (!empty($postary['_pbs_media_manager_episode_cid'])) { 
+      unset($postary['_pbs_media_manager_episode_cid']);
+    } 
     $attribs = wp_unslash($this->map_post_fields_to_asset_array($postary)); 
 
     $slugtitle = $postary['_coveam_video_title'];
@@ -656,6 +660,13 @@ class COVE_Asset_Manager {
 
   private function map_post_fields_to_asset_array($fields) {
     $attribs = array();
+
+    // if the episode is changing, all other fields must be null
+    if (!empty($fields['_pbs_media_manager_episode_cid'])) {
+      $attribs['episode'] = $fields['_pbs_media_manager_episode_cid'];
+      return $attribs;
+    }
+
     // required fields first
     $attribs['title'] = $fields['_coveam_video_title'];
     $attribs['description_short'] =  !empty($fields['_coveam_shortdescription']) ? $fields['_coveam_shortdescription'] : $attribs['title'];
@@ -670,9 +681,6 @@ class COVE_Asset_Manager {
     $attribs['object_type'] = $this->COVETranslateNumberToType($fields['_coveam_video_fullprogram']);
     $attribs['auto_publish'] = true;
 
-    if (!empty($fields['_pbs_media_manager_episode_cid'])) {
-      //$attribs['episode'] = $fields['_pbs_media_manager_episode_cid'];
-    }
     //ingest related -- submitting a null video or caption entry triggers a file delete, not submitting it at all does nothing
     if (!empty($fields['_coveam_video_url'])){
       $attribs['video'] = array("profile" => "hd-16x9-mezzanine-1080p", "source" => $fields['_coveam_video_url']);

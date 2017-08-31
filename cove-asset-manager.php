@@ -407,18 +407,20 @@ function coveam_daily_expire_videos() {
       }
     }
 
-
+    if ($returnlist || $youtubelist) {
+      // only send an email if actual videos were expired
+      $subject = 'coveam videos expired on' . get_bloginfo('name'); 
+      $message = 'expiration date: ' . date('Y-m-d', $expire_vids_before_this_date);
+      $message .= "\n these videos were expired: " . $returnlist;
+      if ($youtubelist != '') {
+        $message .= "\n these youtube videos were set to private: " . $youtubelist;
+      }
+      $to = get_option('coveam_notify_email');
+      if (!empty($to)) {
+        wp_mail( $to, $subject, $message);
+      }
+    }
     // sanity check lets return the list of ids
-    $subject = 'coveam videos expired on' . get_bloginfo('name'); 
-    $message = 'expiration date: ' . date('Y-m-d', $expire_vids_before_this_date);
-    $message .= "\n these videos were expired: " . $returnlist;
-    if ($youtubelist != '') {
-      $message .= "\n these youtube videos were set to private: " . $youtubelist;
-    }
-    $to = get_option('coveam_notify_email');
-    if (!empty($to)) {
-      wp_mail( $to, $subject, $message);
-    }
     return $ids_to_expire;
 }
 

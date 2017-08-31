@@ -35,7 +35,6 @@ require_once( 'classes/class-youtube-oauth.php' );
 // Instantiate necessary classes
 global $plugin_obj;
 $plugin_obj = new COVE_Asset_Manager( __FILE__ );
-$plugin_settings_obj = new COVE_Asset_Manager_Settings( __FILE__ );
 
 $youtube_oauth_obj = new WNET_Google_oAuth(__FILE__);
 
@@ -44,13 +43,9 @@ if ( !class_exists('COVE_API_Request') ) {
 }
 
 
-//load up the metabox admin
-function call_COVE_Asset_Metaboxes() {
-  new COVE_Asset_Metaboxes( __FILE__ );
-}
 if ( is_admin() ) {
-    add_action( 'load-post.php', 'call_COVE_Asset_Metaboxes' );
-    add_action( 'load-post-new.php', 'call_COVE_Asset_Metaboxes' );
+  $plugin_metaboxes_obj = new COVE_Asset_Metaboxes( __FILE__ );
+  $plugin_settings_obj = new COVE_Asset_Manager_Settings( __FILE__ );
 }
 
 

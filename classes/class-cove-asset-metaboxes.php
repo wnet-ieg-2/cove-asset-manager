@@ -23,6 +23,7 @@ class COVE_Asset_Metaboxes {
 		add_action( 'save_post', array( $this, 'meta_box_save' ) );	
     add_action( 'admin_enqueue_scripts', array( $this, 'setup_custom_scripts' ) );
 
+    add_action( 'wp_ajax_coveam_get_episode_option_list', array( $this, 'ajax_get_episode_option_list'));
 
 	}
 
@@ -124,7 +125,7 @@ class COVE_Asset_Metaboxes {
 			  $oldest = get_the_date('Y');
 		  endwhile; 
       $html .= '<select name="_pbs_media_manager_episode_cid" id="_pbs_media_manager_episode_cid">';
-      $html .= $this->plugin_obj->get_episode_option_list(0, $thisyear);
+      $html .= $this->get_episode_option_list(0, $thisyear);
 		  $html .= "</select>";
 	    $html .= "<br />Search: <select id='epyearselect'><option value=''>Year</option>";
 		  
@@ -696,5 +697,32 @@ class COVE_Asset_Metaboxes {
       return $html;
     }
   }
- 
+
+  public function get_episode_option_list($monthnum = 0, $year = 0) {
+    $html = "";
+    $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'desc', 'posts_per_page' => 40);
+    if ($monthnum > 0) {
+      $args['monthnum'] = $monthnum;
+    }
+    if ($year > 0) {
+      $args['year'] = $year;
+    }
+    $my_query = new WP_Query($args);
+    while ($my_query->have_posts()) : $my_query->the_post();
+      $thiscid = get_post_meta(get_the_ID(), '_pbs_media_manager_episode_cid', true);
+      $html .= "<option value='". $thiscid . "'>".get_the_title(get_the_ID())."</option>";
+    endwhile;
+    return $html;
+  }
+
+  public function ajax_get_episode_option_list() {
+    $html = $this->get_episode_option_list($monthnum = $_GET['month'], $year = $_GET['year']);
+    if (empty($html)) {
+      $html .= "<option value=''>sorry, no results</option>";
+    } else {
+      $html = "<option value=''>select one</option>" . $html;
+    }
+    wp_die($html);
+  }
+
 }

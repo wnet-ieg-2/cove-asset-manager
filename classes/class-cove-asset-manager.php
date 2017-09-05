@@ -334,7 +334,7 @@ class COVE_Asset_Manager {
         return array('errors' => $return);
       }
 
-      $create_episode_weekend = get_option('coveam_mm_episode_autocreate_weekend') ? get_option('coveam_mm_episode_autocreate_weekend') : false;
+      $create_episode_weekend = get_option('coveam_mm_episode_autocreate_weekend') ? strtolower(get_option('coveam_mm_episode_autocreate_weekend')) : false;
       // reset the date stuff we want "now".
       unset($date);
       $date = new DateTime('now', new DateTimeZone($tz));
@@ -346,7 +346,8 @@ class COVE_Asset_Manager {
 
       //change the string to Weekend if day of week is Sunday or Saturday
       if (in_array($date->format('l'), array('Sunday', 'Saturday'))){
-        if (!$create_episode_weekend) {
+        if ($create_episode_weekend !== "true") {
+          // a literal string 'true' 
           return;
         }
         $sitestring = str_replace(" WEEKENDSTRING", " Weekend", $sitestring);

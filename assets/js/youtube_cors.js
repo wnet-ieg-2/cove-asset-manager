@@ -83,6 +83,10 @@ jQuery(document).ready(function($) {
     var file = $('#youtube_video_file_to_upload').get(0).files[0];
     var thistitle = $('#_coveam_video_title').val();
     var thisdescription = $('#_coveam_description').val();
+    //if ($('#_coveam_youtube_default_text')) {
+    if (typeof('_coveam_youtube_default_text' !== 'undefined')) {
+      thisdescription = thisdescription + _coveam_youtube_default_text;
+    }
     var thesetags = $('#youtube_tag_array').val();
     if (file && thistitle && thisdescription && thesetags) {
       $('#youtube-upload-submit').hide();

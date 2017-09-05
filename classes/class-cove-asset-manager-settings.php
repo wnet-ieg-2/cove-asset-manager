@@ -90,6 +90,8 @@ class COVE_Asset_Manager_Settings {
     add_settings_field( 'coveam_youtube_channel_email' , __( 'YouTube Channel email:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_youtube_channel_email', '(Optional) If your channel is owned by a "Brand" or "Google+" account different from your login account, put that email in here. ex: something-0069@pages.plusgoogle.com') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_youtube_channel_email' );
 
+    add_settings_field( 'coveam_youtube_default_text' , __( 'YouTube video default description:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_youtube_default_text', '(Optional) Default text to be inserted when uploading a video to YouTube.  This will be appended to any description on ingest.  Use \n for newlines.') );
+    register_setting( 'cove_asset_manager_settings' , 'coveam_youtube_default_text' );
 
 
     add_settings_field( 'coveam_google_backend_key' , __( 'Google API key for backend application:' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_google_backend_key', 'You must register a separate "application" with Google specific to the URL of this server for automated server checks of YouTube status and expiring videos') );

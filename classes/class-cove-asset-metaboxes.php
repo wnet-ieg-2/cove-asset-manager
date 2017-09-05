@@ -663,7 +663,7 @@ class COVE_Asset_Metaboxes {
       if (!$google_access_token) {
         $html .= 'The server is not currently logged into Google/YouTube.  Someone with the username/password for the YouTube channel will need to go to Settings/COVE Asset Manager, scroll to the bottom of the page, and log the server in.';
       } else {
-        $html .= '<div style="display:none;"><span id="coveam_youtube_username">' . $youtube_account_login . '</span><span id="coveam_google_apikey">' . get_option( 'coveam_google_backend_key') . '</span><span id="wp_siteurl">' . get_option( 'siteurl' ) . '</span><span id="coveam_google_redirect_uri">' . get_option("coveam_google_redirect_uri") . '</span><span id="_coveam_googleaccesstoken">' . $google_access_token . '</span></div>';
+        $html .= '<div style="display:none;"><span id="coveam_youtube_username">' . $youtube_account_login . '</span><span id="coveam_google_apikey">' . get_option( 'coveam_google_backend_key') . '</span><span id="wp_siteurl">' . get_option( 'siteurl' ) . '</span><span id="coveam_google_redirect_uri">' . get_option("coveam_google_redirect_uri") . '</span><span id="_coveam_googleaccesstoken">' . $google_access_token . '</span><script language="javascript">var _coveam_youtube_default_text = "' .  get_option("coveam_youtube_default_text") . '"; </script></div>';
       }
     }
     $html .= '</td></tr>';

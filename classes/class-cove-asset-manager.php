@@ -795,10 +795,13 @@ class COVE_Asset_Manager {
     }
     $client = $this->get_media_manager_client();
     if (!empty($client->errors)) { return $client; }
-    $attribs = wp_unslash($this->map_post_fields_to_asset_array($postary)); 
-    $tags_obj = wp_get_object_terms( $post_id, 'post_tag', array('fields' => 'names') );
-    if (is_array($tags_obj) && (count($tags_obj) > 0)) {
-      $attribs['tags'] = $tags_obj;
+    $attribs = wp_unslash($this->map_post_fields_to_asset_array($postary));
+    if (!isset($attribs['episode'])) { 
+      //only update the attribs if this isn't an episode re-assigment
+      $tags_obj = wp_get_object_terms( $post_id, 'post_tag', array('fields' => 'names') );
+      if (is_array($tags_obj) && (count($tags_obj) > 0)) {
+        $attribs['tags'] = $tags_obj;
+      }
     }
     $response = $client->update_object($asset_id, 'asset', $attribs);
     $this->update_media_manager_asset_error_status($post_id, $response);

@@ -116,7 +116,7 @@ class COVE_Asset_Metaboxes {
     $html .= '<tr valign="top"><th scope="row">Media Manager Episode</th><td>';
     $currentVal = $fields['_pbs_media_manager_episode_cid'][0];
   	if (!empty($currentVal)) {
-      $html .= 'Current value: <span id="_pbs_media_manager_episode_cid">' . $currentVal . "</span><br /><i>" . $fields['_pbs_media_manager_episode_title'][0] . "</i><br />";
+      $html .= 'Current value: ' . $currentVal . " <br /><i>" . $fields['_pbs_media_manager_episode_title'][0] . "</i><br />";
     }  
     $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'asc', 'posts_per_page' => 1);
 	  $my_query = new WP_Query($args); 

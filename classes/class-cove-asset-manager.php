@@ -364,7 +364,7 @@ class COVE_Asset_Manager {
         error_log($return);
         return array('errors' => $return);
       }
-
+      wp_reset_postdata();
       $postarr = array(
         'post_author' => 1,
         'post_title' => $post_title,

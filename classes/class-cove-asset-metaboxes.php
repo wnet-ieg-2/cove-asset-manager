@@ -108,7 +108,7 @@ class COVE_Asset_Metaboxes {
      * and we can get the status directly from the created object 
      * including during ingest.  So the during-ingest cases 
      * are no longer used, but the 'video id' and 'video guid' fields are either null or read-only  */
-
+    global $post;
     if ( empty($fields['_coveam_cove_player_id'][0]) && empty($fields['_coveam_video_asset_guid'][0]) ) {
       // once populated, these fields are read-only.  so prompt to either create a new asset or pull in asset data 
       $html .= '<tr valign="top"><th scope="row">New Media Manager record creation</th><td>Either <br /><input type="radio" name="media_manager_action" value="noaction"><b>Neither create nor import</b> a Media Manager record, or<br /><input type="radio" name="media_manager_action" value="create" checked><b>create</b> a new asset record in the Media Manager or <br /><input type="radio" name="media_manager_action" value="import"><b>import</b> an existing Media Manager record with the following PBS Content ID: <input name="media_manager_import_content_id" type="text" class="regular-text" /></td></tr>';
@@ -118,12 +118,14 @@ class COVE_Asset_Metaboxes {
   	if (!empty($currentVal)) {
       $html .= 'Current value: ' . $currentVal . " <br /><i>" . $fields['_pbs_media_manager_episode_title'][0] . "</i><br />";
     }  
-    $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'asc', 'posts_per_page' => 1);
-	  $my_query = new WP_Query($args); 
+    $these_episode_args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'asc', 'posts_per_page' => 1);
+	  $another_episode_query = new WP_Query($these_episode_args); 
     $thisyear = date('Y');
-    while ($my_query->have_posts()) : $my_query->the_post(); 
-	    $oldest = get_the_date('Y');
-		endwhile; 
+    $oldest = $thisyear;
+    foreach ($another_episode_query->get_posts() as $thispost) {
+	    $oldest = get_the_date('Y', $thispost->ID);
+    }
+    wp_reset_postdata(); 
     $html .= '<select name="_pbs_media_manager_episode_cid" id="_pbs_media_manager_episode_cid">';
     if (!empty($currentVal)) {
       $html .= '<option value = "">Only select if you want to change the episode</option>';
@@ -242,7 +244,8 @@ class COVE_Asset_Metaboxes {
 
 
 	public function meta_box_content() {
-		global $post_id;
+    global $post;
+		$post_id = $post->ID;
 		$fields = get_post_custom( $post_id );
 		$field_data = $this->get_custom_fields_settings();
     add_thickbox();
@@ -275,7 +278,7 @@ class COVE_Asset_Metaboxes {
 		
         // santalone testing
         $html .= get_post_type();
-        
+        $html .= $post->ID; 
 		echo $html;	
 	}
 
@@ -704,18 +707,21 @@ class COVE_Asset_Metaboxes {
 
   public function get_episode_option_list($monthnum = 0, $year = 0) {
     $html = "";
-    $args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'desc', 'posts_per_page' => 40);
+    $episode_args = array('post_type' => 'episodes', 'meta_key' => '_pbs_media_manager_episode_cid', 'orderby' => 'date', 'order' => 'DESC', 'posts_per_page' => 40);
     if ($monthnum > 0) {
-      $args['monthnum'] = $monthnum;
+      $episode_args['monthnum'] = $monthnum;
     }
     if ($year > 0) {
-      $args['year'] = $year;
+      $episode_args['year'] = $year;
     }
-    $my_query = new WP_Query($args);
-    while ($my_query->have_posts()) : $my_query->the_post();
-      $thiscid = get_post_meta(get_the_ID(), '_pbs_media_manager_episode_cid', true);
-      $html .= "<option value='". $thiscid . "'>".get_the_title(get_the_ID())."</option>";
-    endwhile;
+    $this_option_query = new WP_Query($episode_args);
+    foreach($this_option_query->get_posts() as $this_episode_post) {
+      $this_ep_id = $this_episode_post->ID;
+      $this_title = $this_episode_post->post_title;
+      $thiscid = get_post_meta($this_ep_id, '_pbs_media_manager_episode_cid', true);
+      $html .= "<option value='". $thiscid . "'>" . $this_ep_id . " " . $this_title . "</option>";
+    }
+    wp_reset_postdata();
     return $html;
   }
 

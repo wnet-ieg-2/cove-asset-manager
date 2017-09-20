@@ -275,10 +275,6 @@ class COVE_Asset_Metaboxes {
 			$html .= '</tbody>' . "\n";
 			$html .= '</table>' . "\n";
 		}
-		
-        // santalone testing
-        $html .= get_post_type();
-        $html .= $post->ID; 
 		echo $html;	
 	}
 

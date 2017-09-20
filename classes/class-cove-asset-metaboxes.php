@@ -124,7 +124,6 @@ class COVE_Asset_Metaboxes {
     while ($my_query->have_posts()) : $my_query->the_post(); 
 	    $oldest = get_the_date('Y');
 		endwhile; 
-      wp_reset_query();
     $html .= '<select name="_pbs_media_manager_episode_cid" id="_pbs_media_manager_episode_cid">';
     if (!empty($currentVal)) {
       $html .= '<option value = "">Only select if you want to change the episode</option>';
@@ -274,6 +273,9 @@ class COVE_Asset_Metaboxes {
 			$html .= '</table>' . "\n";
 		}
 		
+        // santalone testing
+        $html .= get_post_type();
+        
 		echo $html;	
 	}
 
@@ -714,7 +716,6 @@ class COVE_Asset_Metaboxes {
       $thiscid = get_post_meta(get_the_ID(), '_pbs_media_manager_episode_cid', true);
       $html .= "<option value='". $thiscid . "'>".get_the_title(get_the_ID())."</option>";
     endwhile;
-     wp_reset_query();
     return $html;
   }
 

@@ -252,6 +252,7 @@ class COVE_Asset_Manager_Settings {
           array_push($videos_to_update, $post_id);
         } 
       endwhile;
+      wp_reset_postdata();
     }
     return array('updated' => $videos_to_update, 'failed' => $failed_videos);
   }
@@ -307,6 +308,7 @@ class COVE_Asset_Manager_Settings {
             break;
           }
         endwhile;
+        wp_reset_postdata();
       }
       if (!$this_post_id) {
         array_push($not_found_episodes, $episode['attributes']['title']);

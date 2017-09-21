@@ -715,7 +715,7 @@ class COVE_Asset_Metaboxes {
       $this_ep_id = $this_episode_post->ID;
       $this_title = $this_episode_post->post_title;
       $thiscid = get_post_meta($this_ep_id, '_pbs_media_manager_episode_cid', true);
-      $html .= "<option value='". $thiscid . "'>" . $this_ep_id . " " . $this_title . "</option>";
+      $html .= "<option value='". $thiscid . "'>" . $this_title . "</option>";
     }
     wp_reset_postdata();
     return $html;

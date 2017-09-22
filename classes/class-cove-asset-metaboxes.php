@@ -234,7 +234,11 @@ class COVE_Asset_Metaboxes {
 
 
     if ( !empty($fields['_coveam_video_asset_guid'][0]) ) {
-      $html .= '<tr valign="top"><th scope="row"><label for="media_manager_action">Import but don\'t update Media Manager</label></th><td><p><input type="checkbox" name="media_manager_action" value="import">Check this box and update/save the post to <b>import</b> the current data from the PBS Media Manager console and <b>ignore</b> the fields above</p><input name="media_manager_import_content_id" type="hidden" value="' . $fields['_coveam_video_asset_guid'][0]  . '" /><p class="description">Why might I do this?  If you have a custom expiration date setup, or an error in this form. Every time this form is submitted it first overwrites all of the data for the record in the PBS Media Manager with all of the field data on this page, and then imports the latest data from the PBS Media Manager.  Checking this box disables the update part of the process for this one time.  Do not check this box when trying to submit files for ingest.</p></td></tr>';
+      $html .= '<tr valign="top"><th scope="row">Media Manager Asset actions</th><td><p><input type="radio" name="media_manager_action" value="" checked><b>Update</b> Media Manager asset ' . $fields['_coveam_video_asset_guid'][0]  . ' with the above data <i>(default)</i></p><input name="_coveam_video_asset_guid" type="hidden" value="' . $fields['_coveam_video_asset_guid'][0]  . '" />';
+      $html .= '<p><input type="radio" name="media_manager_action" value="import"><b>Import</b> the current data from the PBS Media Manager and <b>ignore</b> the fields above.</p><input name="media_manager_import_content_id" type="hidden" value="' . $fields['_coveam_video_asset_guid'][0]  . '" /><p class="description"><b>Do not check this box when trying to submit files for ingest.</b> Every time this form is submitted it first overwrites all of the data for the record in the PBS Media Manager with the data in the fields above, and then imports the resulting data from the PBS Media Manager.  Checking this box disables overwriting the Media Manager record for this one time.</p>';
+      $html .= '<p><input type="radio" name="media_manager_action" value="disconnect"><b>Disconnect</b> this post from the current Media Manager asset.</p><p class="description">This doesn\'t delete or otherwise alter the Media Manager record. If you have made a mistake assigning an asset to this post, or the asset has been deleted from the Media Manager, this will remove the connection between the post and that asset.  The "import/create/do nothing" box will re-appear at the top of the post; your current title, description, etc and the YouTube fields will be unchanged.</p>';
+      $html .= '</td></tr>';
+
     }
 
 
@@ -341,6 +345,16 @@ class COVE_Asset_Metaboxes {
         } else {
           $assetid = $returnval;
         }
+      } else if ($_POST['media_manager_action'] == 'disconnect') {
+        delete_post_meta($post_id, '_coveam_video_asset_guid');
+        delete_post_meta($post_id, '_coveam_cove_player_id');
+        delete_post_meta($post_id, '_coveam_covestatus');
+        delete_post_meta($post_id, '_coveam_video_url');
+        delete_post_meta($post_id, '_coveam_video_image');
+        delete_post_meta($post_id, '_coveam_ingest_task');
+        delete_post_meta($post_id, '_coveam_notice_sent_ts');
+        delete_post_meta($post_id, '_coveam_last_error');
+        $assetid = false;
       }
     } else {
       if ( $assetid ) {
@@ -460,6 +474,7 @@ class COVE_Asset_Metaboxes {
         'name' => 'PBS Content ID:',
         'type' => 'spanonly',
         'default' => '',
+        'suppress' => true,
         'description' => 'Unique ID for this asset in COVE and the Media Manager',
         'section' => 'cove-asset-details'
     );

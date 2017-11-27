@@ -340,7 +340,7 @@ class COVE_Asset_Metaboxes {
       } else if ($_POST['media_manager_action'] == 'create' && !empty($_POST['_pbs_media_manager_episode_cid'])) {
         $returnval = $this->plugin_obj->create_media_manager_asset($post_id, $_POST['_pbs_media_manager_episode_cid'], $_POST);
         if (!empty($returnval['errors'])) { 
-          error_log(json_encode($returnval));
+          error_log(json_encode($returnval) . ' in ' . $_SERVER['SCRIPT_FILENAME']);
           $assetid = false;
         } else {
           $assetid = $returnval;
@@ -360,7 +360,7 @@ class COVE_Asset_Metaboxes {
       if ( $assetid ) {
         $returnval = $this->plugin_obj->update_media_manager_asset($post_id, $assetid, $_POST);
         if (!empty($returnval['errors'])) { 
-          error_log(json_encode($returnval));
+          error_log(json_encode($returnval) . ' in ' . $_SERVER['SCRIPT_FILENAME']);
         }
         // if updating something that may've caused an error clear the flag for being messaged previsouly
         if ( !empty($_POST['delete_current_video']) || !empty($_POST['delete_current_caption']) || !empty($_POST['_coveam_video_image']) ) {
@@ -373,7 +373,7 @@ class COVE_Asset_Metaboxes {
     if ($assetid) {
       $returnval = $this->plugin_obj->import_media_manager_asset($post_id, $assetid);
       if (!empty($returnval['errors'])) { 
-        error_log(json_encode($returnval));
+        error_log(json_encode($returnval) . ' in ' . $_SERVER['SCRIPT_FILENAME']);
       }
     }
 
@@ -386,7 +386,7 @@ class COVE_Asset_Metaboxes {
       } else if ($_POST['media_manager_episode_action'] == 'create' && !empty($_POST['_pbs_media_manager_season_cid'])) {
         $returnval = $this->plugin_obj->create_media_manager_episode($post_id, $_POST['_pbs_media_manager_season_cid'], $_POST);
         if (!empty($returnval['errors'])) { 
-          error_log(json_encode($returnval));
+          error_log(json_encode($returnval) . ' in ' . $_SERVER['SCRIPT_FILENAME']);
           $episode_id = false;
         } else {
           $episode_id = $returnval;
@@ -396,14 +396,14 @@ class COVE_Asset_Metaboxes {
       if ( $episode_id && $_POST['media_manager_episode_action'] == 'update') {
         $returnval = $this->plugin_obj->update_media_manager_episode($post_id, $episode_id, $_POST);
         if (!empty($returnval['errors'])) { 
-          error_log(json_encode($returnval));
+          error_log(json_encode($returnval) . ' in ' . $_SERVER['SCRIPT_FILENAME']);
         }
       }
       // always get the latest data from the API
       if ($episode_id) {
         $returnval = $this->plugin_obj->import_media_manager_episode($post_id, $episode_id);
         if (!empty($returnval['errors'])) { 
-          error_log(json_encode($returnval));
+          error_log(json_encode($returnval) . ' in ' . $_SERVER['SCRIPT_FILENAME']);
         }
       }
     }

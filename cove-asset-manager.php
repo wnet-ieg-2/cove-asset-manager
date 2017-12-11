@@ -250,7 +250,11 @@ function coveam_render_player( $id, $args = array() ) {
       }
 	    $html .= '</span><span class="coveam_covepreferred">' . $covepreferred . '</span><span class="coveam_video_override_encoded">';
       if ($video['video_override_url']) {
-        $html .= rawurlencode("<div class='cam-oembed'>".  wp_oembed_get( $video['video_override_url'] ) . "</div>" );
+          
+          if (strpos($video['video_override_url'], 'facebook')) {$extraClass = "facebook";}
+          else {$extraClass = "";}
+          
+        $html .= rawurlencode("<div class='cam-oembed $extraClass'>".  wp_oembed_get( $video['video_override_url'] ) . "</div>" );
       }
       $html .= '</span>';
       if ($args['show_related'] == 'show') {

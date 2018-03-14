@@ -280,7 +280,7 @@ class COVE_Asset_Manager_Settings {
     $not_found_episodes = array();
     foreach($season as $episode) {
       $airdate = $episode['attributes']['premiered_on'];
-      $dateary = split('-', $airdate); // input format is 2017-01-01 
+      $dateary = explode('-', $airdate); // input format is 2017-01-01 
       $args = array(
         'post_status' => array('publish','private'), 
         'post_type' => 'episodes',

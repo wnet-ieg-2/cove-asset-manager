@@ -317,7 +317,7 @@ class COVE_Asset_Manager {
     //regen the season list
     $season_resp = $this->update_media_manager_season_list(); 
     if (!empty($season_resp['errors'])) {
-      error_log(json_encode($season_resp) . ' in ' . $_SERVER['SCRIPT_FILENAME']);
+      error_log("Error in COVE Asset Manager updating the seaon list :" . json_encode($season_resp) . ' in ' . $_SERVER['SCRIPT_FILENAME']);
     }
     $seasons = get_option('coveam_mm_season_id_list');
 
@@ -383,7 +383,7 @@ class COVE_Asset_Manager {
       $postary = array('_pbs_media_manager_episode_title' => $post_title);
       $result = $this->create_media_manager_episode( $post_id, false, $postary );
       if (!empty($result['errors'])) {
-        error_log(json_encode($result) . ' in ' . $_SERVER['SCRIPT_FILENAME']);
+        error_log("Error in COVE Asset manager creating an episode : " . json_encode($result) . ' in ' . $_SERVER['SCRIPT_FILENAME']);
         return $result;
       } 
       return 'new episode created: ' . $result;

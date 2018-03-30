@@ -38,9 +38,6 @@ $plugin_obj = new COVE_Asset_Manager( __FILE__ );
 
 $youtube_oauth_obj = new WNET_Google_oAuth(__FILE__);
 
-if ( !class_exists('COVE_API_Request') ) {
-  require_once( 'classes/class-cove-request-api.php' );
-}
 
 
 if ( is_admin() ) {

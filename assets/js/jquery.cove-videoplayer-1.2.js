@@ -62,7 +62,7 @@
       $thisplayer = '<div class="errormessage">This video is not currently available.</div>';
       $playertype = null;
     }
-	  $(".coveam_player", this).html($thisplayer);
+	  $(".coveam_player", this).delay(100).html($thisplayer);
     //cove listener can only be started AFTER the players are instantiated
     if ($playertype == 'cove') {
       SetUpCoveListener();

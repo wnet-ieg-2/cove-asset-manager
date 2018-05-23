@@ -41,7 +41,7 @@ class COVE_Asset_Manager {
 
 	public function enqueue_scripts () {
     $scriptPath = $this->assets_url . 'js/jquery.cove-videoplayer-1.2.js';
-	  wp_register_script( 'coveam_video-player', $scriptPath,  array('jquery'), 1.9, true );
+	  wp_register_script( 'coveam_video-player', $scriptPath,  array('jquery'), 2.0, true );
     wp_enqueue_script( 'coveam_video-player' );
 	}
 	public function load_localisation () {

@@ -22,6 +22,9 @@
     $youtubevars["showinfo"]=0;
     $youtubevars["autohide"]=1;
     $youtubevars["modestbranding"]=1;
+    if ($(window).width() < '769') {
+      $showchrome = "hide";
+    }
     if ($showchrome == "hide") {
       $coveplayer_chrome = "&topbar=false";
       padding_top_value = '56.25%';

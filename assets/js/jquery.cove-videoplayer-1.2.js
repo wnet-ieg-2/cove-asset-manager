@@ -15,6 +15,7 @@
     var $divid = $(this).attr("id");
     var $showchrome = $(".coveam_playerchrome", this).text();
     var $coveplayer_chrome = "&topbar=true";
+    var padding_top_value = '62.5%';
     var $autoplay = $(".coveam_autoplay", this).text();
     var $youtubevars = {};
     $youtubevars["rel"]=0;
@@ -23,13 +24,14 @@
     $youtubevars["modestbranding"]=1;
     if ($showchrome == "hide") {
       $coveplayer_chrome = "&topbar=false";
+      padding_top_value = '56.25%';
     }
     var $coveplayer_autoplay = '&autoplay=false';
     if ($autoplay == "autoplay") {
       $coveplayer_autoplay = '&autoplay=true';
       $youtubevars["autoplay"]=1;
     }
-	  var $covepartnerplayer_template = "<div class='video-wrap' style='width:100%; padding-top: 62.5%; position:relative;'><iframe class='partnerPlayer' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' width='100%' height='100%' style='position:absolute; top:0;' src='//player.pbs.org/widget/partnerplayer/COVEPLAYERID/?start=0&end=0&chapterbar=false&endscreen=false" + $coveplayer_chrome + $coveplayer_autoplay +"' allowfullscreen></iframe></div>";
+	  var $covepartnerplayer_template = "<div class='video-wrap' style='width:100%; padding-top: " + padding_top_value + "; position:relative;'><iframe class='partnerPlayer' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' width='100%' height='100%' style='position:absolute; top:0;' src='//player.pbs.org/widget/partnerplayer/COVEPLAYERID/?start=0&end=0&chapterbar=false&endscreen=false" + $coveplayer_chrome + $coveplayer_autoplay +"' allowfullscreen></iframe></div>";
 	  var $youtubeplayer_template = '<div id="' + $divid + '_YouTubePlayer"></div>';
     var $videoid = $(".coveam_videoid", this).text();
 	  var $coveplayerid = $(".coveplayerid", this).text();

@@ -25,10 +25,13 @@ class COVE_Asset_Metaboxes {
 
     add_action( 'wp_ajax_coveam_get_episode_option_list', array( $this, 'ajax_get_episode_option_list'));
 
+    // endpoint to get the latest google/youtube access token
+    add_action( 'wp_ajax_coveam_get_youtube_access_token', array( $this, 'ajax_get_youtube_access_token'));
+
 	}
 
   public function setup_custom_scripts() {
-    wp_enqueue_script( 'youtube_cors', $this->assets_url . 'js/youtube_cors.js', array( 'jquery' ), 2, true );
+    wp_enqueue_script( 'youtube_cors', $this->assets_url . 'js/youtube_cors.js', array( 'jquery' ), 3.0, true );
     wp_enqueue_script( 'amazon_cors', $this->assets_url . 'js/amazon_cors.js', array( 'jquery' ), 2, true );
     wp_enqueue_script( 'pbs_media_manager_admin', $this->assets_url . 'js/media_manager_admin.js', array( 'jquery'), 1, true);
     wp_enqueue_media();
@@ -680,7 +683,7 @@ class COVE_Asset_Metaboxes {
       if (!$google_access_token) {
         $html .= 'The server is not currently logged into Google/YouTube.  Someone with the username/password for the YouTube channel will need to go to Settings/COVE Asset Manager, scroll to the bottom of the page, and log the server in.';
       } else {
-        $html .= '<div style="display:none;"><span id="coveam_youtube_username">' . $youtube_account_login . '</span><span id="coveam_google_apikey">' . get_option( 'coveam_google_backend_key') . '</span><span id="wp_siteurl">' . get_option( 'siteurl' ) . '</span><span id="coveam_google_redirect_uri">' . get_option("coveam_google_redirect_uri") . '</span><span id="_coveam_googleaccesstoken">' . $google_access_token . '</span><script language="javascript">var _coveam_youtube_default_text = "' .  get_option("coveam_youtube_default_text") . '"; </script></div>';
+        $html .= '<div style="display:none;"><span id="coveam_youtube_access_token_nonce">' . wp_create_nonce($this->token . "_get_youtube_access_token") . '</span><span id="coveam_youtube_username">' . $youtube_account_login . '</span><span id="coveam_google_apikey">' . get_option( 'coveam_google_backend_key') . '</span><span id="wp_siteurl">' . get_option( 'siteurl' ) . '</span><span id="coveam_google_redirect_uri">' . get_option("coveam_google_redirect_uri") . '</span><span id="_coveam_googleaccesstoken">' . $google_access_token . '</span><script language="javascript">var _coveam_youtube_default_text = "' .  get_option("coveam_youtube_default_text") . '"; </script></div>';
       }
     }
     $html .= '</td></tr>';
@@ -744,6 +747,16 @@ class COVE_Asset_Metaboxes {
       $html = "<option value=''>select one</option>" . $html;
     }
     wp_die($html);
+  }
+
+  public function ajax_get_youtube_access_token() {
+    check_ajax_referer($this->token . "_get_youtube_access_token", 'nonce');
+    if(!current_user_can('edit_posts')) {
+      exit("Request not permitted");
+    }
+    $wnet_youtube_obj= new WNET_Google_oAuth(__FILE__);
+    $google_access_token = $wnet_youtube_obj->get_google_access_token();
+    wp_die($google_access_token);
   }
 
 }

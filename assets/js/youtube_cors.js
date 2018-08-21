@@ -13,6 +13,26 @@ jQuery(document).ready(function($) {
   var GoogleTokenExpiresIn;
   var loggedInToGoogle    =   false;
   var youtube_tag_array;
+
+  function getCurrentGoogleTokenFromWP() {
+    var wp_nonce = $('#coveam_youtube_access_token_nonce').text();
+    $.ajax({
+      type: "POST",
+      async: false,
+      url: ajaxurl,
+      data:{
+        'action': 'coveam_get_youtube_access_token',
+        'nonce': wp_nonce
+      },
+      dataType:'text',
+      success: function(response){
+        GoogleAccessToken = response;
+      },
+      error: function(response){
+        console.log(response);
+      }
+    });
+  }
     
   function validateGoogleToken(GoogleAccessToken) {
     $.ajax({
@@ -100,6 +120,7 @@ jQuery(document).ready(function($) {
           privacyStatus: "public"
         }
       };
+      getCurrentGoogleTokenFromWP();
       var formdata = new FormData();
       var params = JSON.stringify(metadata);
       var jsonBlob = new Blob([ params ], { "type" : "application\/json" });
@@ -168,6 +189,7 @@ jQuery(document).ready(function($) {
     if (file && videoId) {
       $('#youtube-thumbnail-upload-submit').hide();
       $('#youtube-thumbnail-response').html('<p>Working...</p>');
+      getCurrentGoogleTokenFromWP();
       var formdata = new FormData();
       formdata.append("file", file);
       var ajax = $.ajax({

@@ -297,10 +297,6 @@ class COVE_Asset_Metaboxes {
 		if ( ! current_user_can( 'edit_post', $post_id ) ) { 
 			return $post_id;
 		}
-    //save the google access token to the user metadata
-    if( isset( $_POST['_coveam_googleaccesstoken'])) {
-      update_user_meta( get_current_user_id(), '_coveam_googleaccesstoken', $_POST['_coveam_googleaccesstoken']);
-    }
 
     $coveid = '';		
 		// Handle custom fields

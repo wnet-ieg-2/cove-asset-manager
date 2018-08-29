@@ -14,11 +14,10 @@ jQuery(document).ready(function($) {
   var loggedInToGoogle    =   false;
   var youtube_tag_array;
 
-  function getCurrentGoogleTokenFromWP() {
+  function authenticateAndProcessYouTube(mediatype) {
     var wp_nonce = $('#coveam_youtube_access_token_nonce').text();
     $.ajax({
       type: "POST",
-      async: false,
       url: ajaxurl,
       data:{
         'action': 'coveam_get_youtube_access_token',
@@ -27,8 +26,18 @@ jQuery(document).ready(function($) {
       dataType:'text',
       success: function(response){
         GoogleAccessToken = response;
+        if (!response) {
+          alert("Could not get updated access token for YouTube.  Please save the page and try again");
+        } else {
+          if (mediatype == 'thumbnail') {
+            processYoutubeThumbnailUpload();
+          } else {
+            processYoutubeVideoUpload();
+          }
+        }
       },
       error: function(response){
+        alert("Could not get updated access token for YouTube.  Please save the page and try again");
         console.log(response);
       }
     });
@@ -100,6 +109,10 @@ jQuery(document).ready(function($) {
 
   function initiateYoutubeUpload(event) {
     event.preventDefault();
+    authenticateAndProcessYouTube('video');
+  }
+
+  function processYoutubeVideoUpload() {
     var file = $('#youtube_video_file_to_upload').get(0).files[0];
     var thistitle = $('#_coveam_video_title').val();
     var thisdescription = $('#_coveam_description').val();
@@ -120,7 +133,6 @@ jQuery(document).ready(function($) {
           privacyStatus: "public"
         }
       };
-      getCurrentGoogleTokenFromWP();
       var formdata = new FormData();
       var params = JSON.stringify(metadata);
       var jsonBlob = new Blob([ params ], { "type" : "application\/json" });
@@ -184,12 +196,15 @@ jQuery(document).ready(function($) {
 
   function initiateYoutubeThumbnailUpload(event) {
     event.preventDefault();
+    authenticateAndProcessYouTube('thumbnail'); 
+  }
+
+  function processYoutubeThumbnailUpload() {
     var videoId = $('#_coveam_youtube_id').val();
     var file = $('#youtube_video_thumbnail_to_upload').get(0).files[0];
     if (file && videoId) {
       $('#youtube-thumbnail-upload-submit').hide();
       $('#youtube-thumbnail-response').html('<p>Working...</p>');
-      getCurrentGoogleTokenFromWP();
       var formdata = new FormData();
       formdata.append("file", file);
       var ajax = $.ajax({

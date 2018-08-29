@@ -31,7 +31,7 @@ class COVE_Asset_Metaboxes {
 	}
 
   public function setup_custom_scripts() {
-    wp_enqueue_script( 'youtube_cors', $this->assets_url . 'js/youtube_cors.js', array( 'jquery' ), 3.0, true );
+    wp_enqueue_script( 'youtube_cors', $this->assets_url . 'js/youtube_cors.js', array( 'jquery' ), 3.2, true );
     wp_enqueue_script( 'amazon_cors', $this->assets_url . 'js/amazon_cors.js', array( 'jquery' ), 2, true );
     wp_enqueue_script( 'pbs_media_manager_admin', $this->assets_url . 'js/media_manager_admin.js', array( 'jquery'), 1, true);
     wp_enqueue_media();
@@ -752,6 +752,9 @@ class COVE_Asset_Metaboxes {
     }
     $wnet_youtube_obj= new WNET_Google_oAuth(__FILE__);
     $google_access_token = $wnet_youtube_obj->get_google_access_token();
+    if (!$google_access_token) {
+      error_log("ajax request for google access token failed");
+    }
     wp_die($google_access_token);
   }
 

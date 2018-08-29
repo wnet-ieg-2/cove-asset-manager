@@ -67,7 +67,10 @@ class WNET_Google_oAuth {
       }
     }
     // if there were any errors $success will be false, otherwise it'll be the access token
-    if (!$success) { $success=false; }
+    if (!$success) { 
+      $success=false; 
+      error_log("access token not returned in cove asset manager: " . json_encode($response));
+    }
     return $success;
   }
 

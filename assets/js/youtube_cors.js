@@ -71,7 +71,7 @@ jQuery(document).ready(function($) {
       success: function(resp) {
         var user = resp;
         console.log(user);
-        if (user.email == GOOGLEUSERNAME) {
+        if (typeof(user.name) !== undefined) {
           $('#googleUserName').text('You are logged in to YouTube as ' + user.name);
           loggedInToGoogle = true;
           $('#_coveam_googleaccesstoken').val(GoogleAccessToken);
@@ -83,7 +83,7 @@ jQuery(document).ready(function($) {
         } else {
           $('#google-login-block').hide();
           $('#google-logout-block').show();
-          $('#googleUserName').text('You have logged in as ' + user.email + ' but you must logout and login as ' + GOOGLEUSERNAME + ' to upload to our YouTube channel.');
+          $('#googleUserName').text('You have logged in as ' + user.name + ' but you must logout and login as ' + GOOGLEUSERNAME + ' to upload to our YouTube channel.');
         }
       },
       dataType: "jsonp"

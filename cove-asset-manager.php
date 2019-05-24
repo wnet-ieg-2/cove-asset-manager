@@ -185,9 +185,9 @@ function coveam_render_player( $id, $args = array() ) {
       if ((time() > $video_expire_date)) {
         $available = false;
         $error = 'We\'re sorry, the rights for this video have expired.';
-		if ( is_feed() ) {
-			return $error;
-		}
+		    if ( is_feed() ) {
+			    return $error;
+		    }
       }
     } 
     
@@ -219,7 +219,7 @@ function coveam_render_player( $id, $args = array() ) {
     } else {
     // print out a div with a class, a unique id, title, description, youtube_id, cove_id
     $html = '<div class="video-wrapper coveam-videoplayer" id="' . $div_id . '">';
-    
+ 
     //check if we've got anything
     if ($video && $available) {
       $html .= '<div class="coveam_vars" style="display:none;">';
@@ -233,25 +233,33 @@ function coveam_render_player( $id, $args = array() ) {
       // these are blank on purpose, only updated by jquery
       $html .= '<span class="coveam_autoplay">disabled</span>';
 
+      $playerhtml = '';
+
       if ($args['player_chrome'] == 'hide') {
         $html .= '<span class="coveam_playerchrome">hide</span>';
 	    }
 	    // check status of cove and youtube and if there's a server-setting to use cove
       $html .= '<span class="coveplayerid">';
       if ($video['coveplayerid'] && ($video['covestatus'] == 'available')) {
-		    $html .= $video['coveplayerid']; 
+		    $html .= $video['coveplayerid'];
+        $playerhtml = '<div class="video-wrap" style="width:100%; padding-top: 62.5%; position:relative;"><iframe class="partnerPlayer" marginwidth="0" marginheight="0" scrolling="no" style="position:absolute; top:0;" src="//player.pbs.org/widget/partnerplayer/' . $video['coveplayerid'] . '/?start=0&amp;end=0&amp;chapterbar=false&amp;endscreen=false&amp;topbar=true&amp;autoplay=false" allowfullscreen="" width="100%" height="100%" frameborder="0"></iframe></div>'; 
 	    }
       $html .= '</span><span class="youtubeid">';
 	    if (($video['youtubestatus'] == "public") && $video['youtubeid']) {
         $html .= $video['youtubeid'];
+        if (empty($playerhtml)) {
+          // youtube player code
+        $playerhtml = '<div class="video-wrap" style="width:100%; padding-bottom: 56.25%; position:relative;" ><iframe width="100%" height="100%" style="position:absolute; top:0;" src="//www.youtube.com/embed/' . $video['youtubeid'] . '" frameborder="0" allowfullscreen></iframe></div>';
+        }
       }
 	    $html .= '</span><span class="coveam_covepreferred">' . $covepreferred . '</span><span class="coveam_video_override_encoded">';
       if ($video['video_override_url']) {
-          
           if (strpos($video['video_override_url'], 'facebook')) {$extraClass = "facebook";}
           else {$extraClass = "";}
-          
-        $html .= rawurlencode("<div class='cam-oembed $extraClass'>".  wp_oembed_get( $video['video_override_url'] ) . "</div>" );
+           
+        $override = "<div class='cam-oembed $extraClass'>".  wp_oembed_get( $video['video_override_url'] ) . "</div>";
+        $html .= rawurlencode($override);
+        $playerhtml = '<div class="video-wrap">' . $override . '</div>';
       }
       $html .= '</span>';
       if ($args['show_related'] == 'show') {
@@ -273,11 +281,15 @@ function coveam_render_player( $id, $args = array() ) {
           }
         }
       }
-	    $html .= '</div><div class="coveam_player"></div></div>';
-      if ($args['display'] == "ajax") {
-        //fire the display player script if called after page load ie via ajax
-	      $html .= '<script type="text/javascript"> jQuery(function(){ jQuery("#' . $div_id . '").coveamDisplayPlayer(); }); </script>';
+	    $html .= '</div><div class="coveam_player">';
+      if (!empty($playerhtml)) {
+         $html .= $playerhtml;
       }
+      $html .= '</div></div>';
+      //if ($args['display'] == "ajax") {
+        //fire the display player script if called after page load ie via ajax
+	      //$html .= '<script type="text/javascript"> jQuery(function(){ jQuery("#' . $div_id . '").coveamDisplayPlayer(); }); </script>';
+      //}
     } else {
 	    $html .= '<div class="errormessage">' . $error . '</div></div>';
     }

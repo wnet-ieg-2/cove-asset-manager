@@ -24,7 +24,7 @@ class COVE_Asset_Manager {
     add_action( 'init', array( $this, 'register_post_types' ), 0 );  
 
 		// Load public-facing style sheet and JavaScript.
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		//add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
     // Setup the shortcode
     add_shortcode( 'covevideoasset', array($this, 'cove_player_shortcode') );
@@ -40,10 +40,8 @@ class COVE_Asset_Manager {
 
 
 	public function enqueue_scripts () {
-    $scriptPath = $this->assets_url . 'js/jquery.cove-videoplayer-1.2.js';
-	  wp_register_script( 'coveam_video-player', $scriptPath,  array('jquery'), 2.0, true );
-    wp_enqueue_script( 'coveam_video-player' );
-	}
+    //	
+  }
 	public function load_localisation () {
 		load_plugin_textdomain( 'cove_asset_manager' , false , dirname( plugin_basename( $this->file )  . '/lang/' ) );
 	}

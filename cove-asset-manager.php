@@ -254,12 +254,14 @@ function coveam_render_player( $id, $args = array() ) {
       }
 	    $html .= '</span><span class="coveam_covepreferred">' . $covepreferred . '</span><span class="coveam_video_override_encoded">';
       if ($video['video_override_url']) {
+        if (empty($playerhtml)) {
           if (strpos($video['video_override_url'], 'facebook')) {$extraClass = "facebook";}
           else {$extraClass = "";}
            
-        $override = "<div class='cam-oembed $extraClass'>".  wp_oembed_get( $video['video_override_url'] ) . "</div>";
-        $html .= rawurlencode($override);
-        $playerhtml = '<div class="video-wrap">' . $override . '</div>';
+          $override = "<div class='cam-oembed $extraClass'>".  wp_oembed_get( $video['video_override_url'] ) . "</div>";
+          $html .= rawurlencode($override);
+          $playerhtml = '<div class="video-wrap">' . $override . '</div>';
+        }
       }
       $html .= '</span>';
       if ($args['show_related'] == 'show') {

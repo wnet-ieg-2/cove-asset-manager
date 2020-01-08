@@ -218,7 +218,7 @@ function coveam_render_player( $id, $args = array() ) {
 		}
     } else {
     // print out a div with a class, a unique id, title, description, youtube_id, cove_id
-    $html = '<div class="video-wrapper coveam-videoplayer" id="' . $div_id . '">';
+    $html = '<div class="video-wrapper coveam-videoplayer no-content nocontent" id="' . $div_id . '">';
  
     //check if we've got anything
     if ($video && $available) {

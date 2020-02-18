@@ -104,6 +104,8 @@ jQuery(document).ready(function($) {
   	}).done(function(response) {
      	$('#channel-name').text(response.items[0].snippet.title);
      	$('#channel-thumbnail').attr('src', response.items[0].snippet.thumbnails.default.url);
+    }).fail(function(response) {
+      alert("There was an error -- please copy/paste the text below for debugging purposes.  Then you can dismiss this alert\n\n" + JSON.stringify(response));
   	});
 	}
 
@@ -157,6 +159,7 @@ jQuery(document).ready(function($) {
         data: formdata
       });
       ajax.done(function(response) {
+        alert("This was a success but please copy/paste the text below into an email.  Then you can dismiss this alert\n\n" + JSON.stringify(response));
         var videoId = response.id;
         $('#youtube-uploaded-video-id').text(videoId);
         $('#_coveam_youtube_id').val(videoId);
@@ -166,6 +169,8 @@ jQuery(document).ready(function($) {
         checkVideoStatus(videoId, 30 * 1000);
         updateYouTubePostMeta(videoId,"uploaded");
         $('#upload-progress').after('<p><b>YouTube video ID updated: ' + videoId + '</b></p>');
+      }).fail(function(response) {
+        alert("There was an error -- please copy/paste the text below for debugging purposes.  Then you can dismiss this alert\n\n" + JSON.stringify(response));
       });
 
       ajax.fail(function(response) {
@@ -246,6 +251,7 @@ jQuery(document).ready(function($) {
   function checkVideoStatus(videoId, waitForNextPoll) {
     $('#check-youtube-status').hide();
     $.ajax({
+      cache: false,
       url: 'https://www.googleapis.com/youtube/v3/videos',
       method: 'GET',
       headers: {
@@ -281,6 +287,8 @@ jQuery(document).ready(function($) {
         $('.youtube-thumbnail-preview').attr('src', 'https://i.ytimg.com/vi/' + videoId + '/default.jpg?timestamp=' + new Date().getTime());
         $('.youtube-thumbnail-preview').show();
       }
+    }).fail(function(response) {
+      alert("There was an error -- please copy/paste the text below for debugging purposes.  Then you can dismiss this alert\n\n" + JSON.stringify(response));
     });
   }
 
@@ -288,7 +296,7 @@ jQuery(document).ready(function($) {
   function updateYouTubePostMeta( $videoid, $status ) {
     var $this_post_id = $('#this_post_id').text();
     $.ajax({
-      type: "post",
+      type: 'POST',
       url: ajaxurl,
       data:{
         'action': 'coveam_update_youtube_postmeta',

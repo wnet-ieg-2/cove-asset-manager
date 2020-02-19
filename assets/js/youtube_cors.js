@@ -165,7 +165,7 @@ jQuery(document).ready(function($) {
         $('.youtube-thumbnail-preview').hide();
         $('#youtube-video-preview').hide();
         $('.post-youtube-upload').show();
-        checkVideoStatus(videoId, 30 * 1000);
+        checkVideoStatus(videoId, 30000);
         updateYouTubePostMeta(videoId,"uploaded");
         $('#upload-progress').after('<p><b>YouTube video ID updated: ' + videoId + '</b></p>');
       }).fail(function(response) {
@@ -267,6 +267,7 @@ jQuery(document).ready(function($) {
       $('#post-upload-youtube-status').html('status: ' + uploadStatus);
 
       if (uploadStatus == 'uploaded') {
+        console.log("rechecking status in " + waitForNextPoll + " milliseconds");
         setTimeout(function() {
           checkVideoStatus(videoId, waitForNextPoll * 2);
         }, waitForNextPoll);
@@ -332,7 +333,7 @@ jQuery(document).ready(function($) {
   }
   function checkInProgressVideoStatus() {
     var videoId = $('#_coveam_youtube_id').val();
-    checkVideoStatus(videoId, 30 * 1000);
+    checkVideoStatus(videoId, 30000);
   }
   $(function() {
     $('#youtube-upload-submit').click(initiateYoutubeUpload);

@@ -159,7 +159,6 @@ jQuery(document).ready(function($) {
         data: formdata
       });
       ajax.done(function(response) {
-        alert("This was a success but please copy/paste the text below into an email.  Then you can dismiss this alert\n\n" + JSON.stringify(response));
         var videoId = response.id;
         $('#youtube-uploaded-video-id').text(videoId);
         $('#_coveam_youtube_id').val(videoId);

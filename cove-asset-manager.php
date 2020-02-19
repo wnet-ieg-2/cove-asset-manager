@@ -437,7 +437,8 @@ function coveam_daily_expire_videos() {
 
 function coveam_check_inprogress_ingest_videos() {
     $plugin_obj = new COVE_Asset_Manager( __FILE__ );
-    $ignore_vids_before_this_date = strtotime("-3 day", time());
+    $ignore_vids_before_this_date = date("Y-m-d", strtotime("-3 day", time()));
+    error_log("ignoring vids before $ignore_vids_before_this_date");
     $inprogress_videos = array();
 
     $allowed_post_types = get_option('coveam_showonposttypes');
@@ -452,6 +453,9 @@ function coveam_check_inprogress_ingest_videos() {
           'value' => array('uploaded','processing'),
           'compare' => 'IN'
         )
+      ),
+      'date_query' => array(
+        array('after' => $ignore_vids_before_this_date)
       ),
       'posts_per_page' => 100,
       'orderby' => 'date',

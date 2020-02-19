@@ -131,6 +131,7 @@ class WNET_Google_oAuth {
       error_log("no access token for $videoid");
       return false;
     }
+    error_log("expiring youtube video $videoid");
     $bodyargs = array(
         "id" => $videoid,
         "kind" => "youtube#video",
@@ -161,6 +162,7 @@ class WNET_Google_oAuth {
     if (! $accessToken) {
       return false;
     }
+    error_log("requesting youtube object from google for $videoid");
     $url = 'https://www.googleapis.com/youtube/v3/videos?id=' . $videoid . '&part=status,contentDetails';
     $args = array(
       "headers" => array(
@@ -179,6 +181,7 @@ class WNET_Google_oAuth {
     if (! $videoid) {
       return false;
     }
+    error_log("getting youtube status for post $postid and video $videoid");
     $videoobj = $this->get_youtube_object_from_google($videoid);
     $uploadstatus = $videoobj['status']['uploadStatus'];
     $privacystatus = $videoobj['status']['privacyStatus'];

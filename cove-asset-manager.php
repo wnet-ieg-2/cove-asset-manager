@@ -242,7 +242,7 @@ function coveam_render_player( $id, $args = array() ) {
       $html .= '<span class="coveplayerid">';
       if ($video['coveplayerid'] && ($video['covestatus'] == 'available')) {
 		    $html .= $video['coveplayerid'];
-        $playerhtml = '<div class="video-wrap" style="width:100%; padding-top: 62.5%; position:relative;"><iframe class="partnerPlayer" marginwidth="0" marginheight="0" scrolling="no" style="position:absolute; top:0;" src="//player.pbs.org/widget/partnerplayer/' . $video['coveplayerid'] . '/?start=0&amp;end=0&amp;chapterbar=false&amp;endscreen=false&amp;topbar=true&amp;autoplay=false" allowfullscreen="" width="100%" height="100%" frameborder="0"></iframe></div>'; 
+        $playerhtml = '<div class="video-wrap" style="width:100%; padding-top: 56.25%; position:relative;"><iframe class="partnerPlayer" marginwidth="0" marginheight="0" scrolling="no" style="position:absolute; top:0;" src="//player.pbs.org/widget/partnerplayer/' . $video['coveplayerid'] . '/?start=0&amp;end=0&amp;chapterbar=false&amp;endscreen=false&amp;topbar=true&amp;autoplay=false" allowfullscreen="" width="100%" height="100%" frameborder="0"></iframe></div>'; 
 	    }
       $html .= '</span><span class="youtubeid">';
 	    if (($video['youtubestatus'] == "public") && $video['youtubeid']) {

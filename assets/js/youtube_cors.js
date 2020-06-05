@@ -257,6 +257,9 @@ jQuery(document).ready(function($) {
 
   function checkVideoStatus(videoId, waitForNextPoll) {
     $('#check-youtube-status').hide();
+    if ($('#post-upload-youtube-status').html() == 'public') {
+      return;
+    }
     $.ajax({
       cache: false,
       url: 'https://www.googleapis.com/youtube/v3/videos',

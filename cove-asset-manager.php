@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: COVE Asset Manager 
- * Version: 3.2 -- autogenerate Media Manager season if needed
+ * Version: 3.3 -- fixes to YouTube upload
  * Plugin URI: http://www.thirteen.org/
  * Description: COVE Asset Manager
  * Author: William Tam, WNET

@@ -45,11 +45,19 @@ jQuery(document).ready(function($) {
     
   function validateGoogleToken(GoogleAccessToken) {
     $.ajax({
-      url: 'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' + GoogleAccessToken,
+      url: 'https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=' + GoogleAccessToken,
       data: null,
       dataType: "jsonp",
-      success: function(responseText){ 
-        getGoogleUserInfo();
+      success: function(responseText){
+        if (typeof(responseText.email !== undefined)) {
+          loggedInToGoogle = true;
+          $('#_coveam_googleaccesstoken').val(GoogleAccessToken);
+          $('#google-login-block').hide();
+          $('#google-logout-block').show();
+          $('.google-pre-sign-in').hide();
+          $('.google-post-sign-in').show();
+          makeYouTubeFieldInputsWritable();
+        }
       },
       error: function(responseText){
         console.log(responseText);

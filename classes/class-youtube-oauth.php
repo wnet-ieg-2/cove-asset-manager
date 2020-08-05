@@ -171,7 +171,7 @@ class WNET_Google_oAuth {
     );
     $request = wp_remote_request($url, $args);
     $responseObj = json_decode(wp_remote_retrieve_body($request),true);
-    $obj = $responseObj[items][0];	
+    $obj = $responseObj['items'][0];	
     return $obj;
   }
 

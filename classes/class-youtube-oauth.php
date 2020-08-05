@@ -58,12 +58,12 @@ class WNET_Google_oAuth {
       // the final 'false' is so we don't autoload this value into memory on every page load
     }
     if ($success) {
-      $success = update_option('coveam_google_access_token_expires',  strtotime("+" . $authObj[expires_in] . " seconds"));
+      $success = update_option('coveam_google_access_token_expires',  strtotime("+" . $authObj['expires_in'] . " seconds"));
     }
     if ($success) {
-      $success = update_option('coveam_google_access_token', $authObj[access_token], false);
+      $success = update_option('coveam_google_access_token', $authObj['access_token'], false);
       if ($success) {
-        $success = $authObj[access_token];
+        $success = $authObj['access_token'];
       }
     }
     // if there were any errors $success will be false, otherwise it'll be the access token

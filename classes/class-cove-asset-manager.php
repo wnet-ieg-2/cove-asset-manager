@@ -357,7 +357,7 @@ class COVE_Asset_Manager {
       // check that there isn't already an episode post with this title 
       $post_title = str_replace("DATESTRING", $todaystring, $sitestring);
  
-      $return = new WP_Query( array( 'title' => $post_title, 'post_type' => 'episodes', post_status => 'any' ));
+      $return = new WP_Query( array( 'title' => $post_title, 'post_type' => 'episodes', 'post_status' => 'any' ));
       if ($return->found_posts) {
         $return = 'Episode post already exists: ' . $post_title;
         error_log($return);

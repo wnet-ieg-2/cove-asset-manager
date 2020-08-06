@@ -52,8 +52,8 @@ class WNET_Google_oAuth {
      );
     $response = wp_remote_post($oauth2token_url, $postargs );
     $authObj = json_decode(wp_remote_retrieve_body( $response ), true);
-    if (isset($authObj[refresh_token])){
-      $refreshToken = $authObj[refresh_token];
+    if (isset($authObj['refresh_token'])){
+      $refreshToken = $authObj['refresh_token'];
       $success = update_option('coveam_google_refresh_token', $refreshToken, false); 
       // the final 'false' is so we don't autoload this value into memory on every page load
     }

@@ -283,8 +283,6 @@ class COVE_Asset_Manager {
      * and also on plugin activation
      * to generate a new episode post and the corresponding 
      * media manager episode.  It imports the season list also. 
-     * It will fail automatically on Jan 1 of each year if 
-     * the new season hasn't yet been created and imported 
      * Any time it's invoked, it will setup the next scheduled job */
 
     

@@ -37,6 +37,10 @@ class COVE_Asset_Manager_Settings {
     // check whenever setting for daily ep autogenerate is changed
     add_action( 'update_option_coveam_mm_episode_autocreate', array( $this, 'update_episode_autocreate_status' ), 10, 2);
 
+    // Run this after show id is updated
+    add_action( 'update_option_coveam_mm_show_id', array( $this, 'run_after_show_id_changed'), 10, 2);
+
+
 	}
 	
 	public function add_menu_item() {
@@ -202,6 +206,17 @@ class COVE_Asset_Manager_Settings {
     echo '<p>&nbsp;</p><div id = "initiate_episode_match"><button>Match Episodes for season_id</button><input type="text" name="mm_season_import" /> <input type=checkbox id="create_episodes" value="true"> Check to create Episode posts if none exist for episodes found in the Media Manager <div class="status"></div><div class="failed"></div><div class="success"></div></div>';
 	  echo '</div>';
 	}
+
+
+  public function run_after_show_id_changed() {
+    // regen the season list
+    $season_resp = $this->plugin_obj->update_media_manager_season_list(TRUE);
+    error_log(json_encode($season_resp));
+    // 
+  }
+
+
+
 
   private function bulk_import_media_manager_asset_and_episode_ids($pagenum) {
     $client = $this->plugin_obj->get_media_manager_client();

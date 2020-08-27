@@ -404,10 +404,22 @@ class COVE_Asset_Manager {
     if (!$post_id) {
       return array('errors' => 'no post_id' );
     }
+
+    $seasons = get_option('coveam_mm_season_id_list');
+
     if (!$season_id) {
-      $seasons = get_option('coveam_mm_season_id_list');
       $season_id = $seasons[0]['value'];
-    }
+    } else {
+      // shortcut this if trying to create an episode in a season for a different show
+      $season_valid = FALSE;
+      foreach ($seasons as $season) {
+        if ($season['value'] == $season_id) {
+          $season_valid = TRUE;
+          break;
+        } 
+      }
+      $season_id = $season_valid ? $season_id : FALSE;
+    } 
     if (!$season_id) {
       return array( 'errors' => 'no season_id' ); 
     }

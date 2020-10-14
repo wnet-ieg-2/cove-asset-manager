@@ -292,7 +292,10 @@ class COVE_Asset_Metaboxes {
 		if ( ! wp_verify_nonce( $_POST[ $this->token . '_nonce'], plugin_basename( $this->dir ) ) ) {  
 			return $post_id;  
 		}
-
+    // don't do this stuff on revision/autosave
+    if( ( wp_is_post_revision( $post_id) || wp_is_post_autosave( $post_id ) ) ) {
+      return $post_id;
+    } // end if
 		// Verify user permissions
 		if ( ! current_user_can( 'edit_post', $post_id ) ) { 
 			return $post_id;

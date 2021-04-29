@@ -464,6 +464,28 @@ class COVE_Asset_Metaboxes {
        'default' => '',
        'section' => 'cove-asset-details'
     );
+    $fields['_coveam_preferred_player'] = array(
+       'name' => __( 'Preferred player:' , 'cove_asset_manager' ),
+       'description' => __( 'Use this to force the player to be something other than COVE.  If the selected player is not available, the next best option will be used' , 'cove_asset_manager' ),
+       'type' => 'radio',
+       'options' => array (
+          'cove' => array(
+            'label' => 'COVE',
+            'value' => 'cove'
+          ), 
+          'youtube' => array(
+            'label' => 'YouTube',
+            'value' => 'youtube'
+          ),
+          'alternate'  => array(
+            'label' => 'Alternate Video URL',
+            'value' => 'alternate'
+          )
+        ),
+        'default' => 'cove',
+       'section' => 'cove-asset-details'
+    );
+
     $fields['_coveam_covestatus'] = array(
         'name' => __( 'COVE status:' , 'cove_asset_manager' ),
         'type' => 'spanonly',

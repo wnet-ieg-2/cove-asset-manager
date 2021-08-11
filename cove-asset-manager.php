@@ -449,7 +449,7 @@ function coveam_check_inprogress_ingest_videos() {
       'meta_query' => array(
         array(
           'key' => '_coveam_youtubestatus',
-          'value' => array('uploaded','processing'),
+          'value' => array('uploaded','processing','private'),
           'compare' => 'IN'
         )
       ),

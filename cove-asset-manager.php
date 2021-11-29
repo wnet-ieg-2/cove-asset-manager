@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: COVE Asset Manager 
- * Version: 3.3 -- fixes to YouTube upload
+ * Version: 3.4 -- adds DRM code for partner player
  * Plugin URI: http://www.thirteen.org/
  * Description: COVE Asset Manager
  * Author: William Tam, WNET
@@ -195,9 +195,9 @@ function coveam_render_player( $id, $args = array() ) {
 		if ($video && $available) {
 			if ($video['coveplayerid'] && ($video['covestatus'] == 'available')) {
 				if ($whereami == "rss-description") {
-					$playlink = '<a href="http://video.pbs.org/video/' . $video['coveplayerid']. '/">[Watch Video]</a>';
+					$playlink = '<a href="https://video.pbs.org/video/' . $video['coveplayerid']. '/">[Watch Video]</a>';
 				} else {
-					$playlink = "<iframe class='partnerPlayer' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' width='100%' height='100%' src='http://player.pbs.org/widget/partnerplayer/" . $video['coveplayerid'] . "/?start=0&end=0&chapterbar=false&endscreen=false' allowfullscreen></iframe>";
+					$playlink = "<iframe class='partnerPlayer' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' width='100%' height='100%' src='https://player.pbs.org/widget/partnerplayer/" . $video['coveplayerid'] . "/?start=0&end=0&chapterbar=false&endscreen=false' allow='encrypted-media' allowfullscreen></iframe>";
 				}		 
 			} elseif (($video['youtubestatus'] == "public") && $video['youtubeid'] ) {
 				if ($whereami == "rss-description") {
@@ -242,7 +242,7 @@ function coveam_render_player( $id, $args = array() ) {
       $html .= '<span class="coveplayerid">';
       if ($video['coveplayerid'] && ($video['covestatus'] == 'available')) {
 		    $html .= $video['coveplayerid'];
-        $playerhtml = '<div class="video-wrap" style="width:100%; padding-bottom: 56.25%; position:relative;"><iframe class="partnerPlayer" marginwidth="0" marginheight="0" scrolling="no" style="position:absolute; top:0;" src="//player.pbs.org/widget/partnerplayer/' . $video['coveplayerid'] . '/?start=0&amp;end=0&amp;chapterbar=false&amp;endscreen=false&amp;topbar=true&amp;autoplay=false" allowfullscreen="" width="100%" height="100%" frameborder="0"></iframe></div>'; 
+        $playerhtml = '<div class="video-wrap" style="width:100%; padding-bottom: 56.25%; position:relative;"><iframe class="partnerPlayer" marginwidth="0" marginheight="0" scrolling="no" style="position:absolute; top:0;" src="//player.pbs.org/widget/partnerplayer/' . $video['coveplayerid'] . '/?start=0&amp;end=0&amp;chapterbar=false&amp;endscreen=false&amp;topbar=true&amp;autoplay=false" allow="encrypted-media" allowfullscreen="" width="100%" height="100%" frameborder="0"></iframe></div>'; 
 	    }
       $html .= '</span><span class="youtubeid">';
 	    if (($video['youtubestatus'] == "public") && $video['youtubeid']) {

@@ -242,14 +242,14 @@ function coveam_render_player( $id, $args = array() ) {
       $html .= '<span class="coveplayerid">';
       if ($video['coveplayerid'] && ($video['covestatus'] == 'available')) {
 		    $html .= $video['coveplayerid'];
-        $playerhtml = '<div class="video-wrap" style="width:100%; padding-bottom: 56.25%; position:relative;"><IFRAME class="partnerPlayer" marginwidth="0" marginheight="0" scrolling="no" style="position:absolute; top:0;" src="//player.pbs.org/widget/partnerplayer/' . $video['coveplayerid'] . '/?start=0&amp;end=0&amp;chapterbar=false&amp;endscreen=false&amp;topbar=true&amp;autoplay=false" allow="encrypted-media" allowfullscreen="" width="100%" height="100%" frameborder="0"></IFRAME></div>'; 
+        $playerhtml = '<div class="video-wrap" style="width:100%; padding-bottom: 56.25%; position:relative;"><iframe class="partnerPlayer" marginwidth="0" marginheight="0" scrolling="no" style="position:absolute; top:0;" src="//player.pbs.org/widget/partnerplayer/' . $video['coveplayerid'] . '/?start=0&amp;end=0&amp;chapterbar=false&amp;endscreen=false&amp;topbar=true&amp;autoplay=false" allow="encrypted-media" allowfullscreen="" width="100%" height="100%" frameborder="0"></iframe></div>'; 
 	    }
       $html .= '</span><span class="youtubeid">';
 	    if (($video['youtubestatus'] == "public") && $video['youtubeid']) {
         $html .= $video['youtubeid'];
         if (empty($playerhtml)) {
           // youtube player code
-        $playerhtml = '<div class="video-wrap" style="width:100%; padding-bottom: 56.25%; position:relative;" ><iframe width="100%" height="100%" style="position:absolute; top:0;" src="//www.youtube.com/embed/' . $video['youtubeid'] . '" frameborder="0" allowfullscreen allow="encrypted-media"></iframe></div>';
+        $playerhtml = '<div class="video-wrap" style="width:100%; padding-bottom: 56.25%; position:relative;" ><iframe width="100%" height="100%" style="position:absolute; top:0;" src="//www.youtube.com/embed/' . $video['youtubeid'] . '" frameborder="0" allowfullscreen></iframe></div>';
         }
       }
 	    $html .= '</span><span class="coveam_covepreferred">' . $covepreferred . '</span><span class="coveam_video_override_encoded">';

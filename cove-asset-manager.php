@@ -249,7 +249,7 @@ function coveam_render_player( $id, $args = array() ) {
         $html .= $video['youtubeid'];
         if (empty($playerhtml)) {
           // youtube player code
-        $playerhtml = '<div class="video-wrap" style="width:100%; padding-bottom: 56.25%; position:relative;" ><iframe width="100%" height="100%" style="position:absolute; top:0;" src="//www.youtube.com/embed/' . $video['youtubeid'] . '" frameborder="0" allowfullscreen></iframe></div>';
+        $playerhtml = '<div class="video-wrap" style="width:100%; padding-bottom: 56.25%; position:relative;" ><iframe width="100%" height="100%" style="position:absolute; top:0;" src="//www.youtube.com/embed/' . $video['youtubeid'] . '?enablejsapi=1" frameborder="0" allowfullscreen></iframe></div>';
         }
       }
 	    $html .= '</span><span class="coveam_covepreferred">' . $covepreferred . '</span><span class="coveam_video_override_encoded">';
@@ -482,9 +482,9 @@ function coveam_check_inprogress_ingest_videos() {
 
     
     // sanity check lets return the list of ids
+    /*
     $json_response = json_encode($affected_videos);
     echo $json_response;
-    /* 
     $subject = 'coveam_check_inprogress_ingest_videos on ' . get_bloginfo('name');
     $message = 'These posts inprogress: ' . join(",", $inprogress_videos);
     $message .= 'These videos ready with timestamp: ' . join(",", $waiting_videos);

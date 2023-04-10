@@ -482,9 +482,9 @@ function coveam_check_inprogress_ingest_videos() {
 
     
     // sanity check lets return the list of ids
+    /*
     $json_response = json_encode($affected_videos);
     echo $json_response;
-    /* 
     $subject = 'coveam_check_inprogress_ingest_videos on ' . get_bloginfo('name');
     $message = 'These posts inprogress: ' . join(",", $inprogress_videos);
     $message .= 'These videos ready with timestamp: ' . join(",", $waiting_videos);

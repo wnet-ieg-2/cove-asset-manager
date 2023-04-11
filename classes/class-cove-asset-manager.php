@@ -304,7 +304,7 @@ class COVE_Asset_Manager {
     $this->clear_scheduled_episode_generation(); 
     $schedresp = wp_schedule_single_event( $threeam_ts, 'coveam_do_daily_episode_generate' );
     // NULL is success
-    if (is_null($scheduresp)) { 
+    if (is_null($schedresp)) { 
       error_log('scheduled for ' . $threeam_ts);
     } else {
       error_log('failed to schedule event for ' . $threeam_ts);

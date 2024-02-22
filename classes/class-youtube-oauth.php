@@ -246,8 +246,6 @@ class WNET_Google_oAuth {
     error_log(json_encode($tmp)); 
     // If error storing temporarily, unlink
     if ( is_wp_error( $tmp ) ) {
-      $tmp_name = (string) $tmp;
-      @unlink($tmp_name);
       $file_array['tmp_name'] = '';
     }
 

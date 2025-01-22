@@ -1,11 +1,11 @@
 <?php
 /*
  * Plugin Name: COVE Asset Manager 
- * Version: 3.4 -- adds DRM code for partner player
- * Plugin URI: http://www.thirteen.org/
+ * Version: 3.5 -- adds DRM code for partner player
+ * Plugin URI: https://www.thirteen.org/
  * Description: COVE Asset Manager
  * Author: William Tam, WNET
- * Author URI: http://ieg.wnet.org/
+ * Author URI: https://www.wnet.org/
  * Requires at least: 4.6
  * Tested up to: 3.5.1
  * 
@@ -54,11 +54,13 @@ function coveam_get_video( $id ) {
 	$postmeta = get_post_custom($id);
 	$videofields['title'] = $postmeta['_coveam_video_title'][0];
 	$videofields['description'] = $postmeta['_coveam_description'][0];
-  $videofields['status'] = $postmeta['_coveam_video_status'][0];
+	$videofields['status'] = $postmeta['_coveam_video_status'][0];
 	$videofields['short_description'] = $postmeta['_coveam_shortdescription'][0];
 	$videofields['airdate'] = $postmeta['_coveam_airdate'][0];
 	$videofields['youtubeid'] = $postmeta['_coveam_youtube_id'][0];
 	$videofields['coveplayerid'] = $postmeta['_coveam_cove_player_id'][0];
+	$videofields['preferred_player'] = $postmeta['_coveam_preferred_player'][0];
+
 	$videofields['rights'] = $postmeta['_coveam_rights'][0];
 	$videofields['fullprogram'] = $postmeta['_coveam_video_fullprogram'][0];
   $videofields['duration'] = $postmeta['_coveam_duration'][0];
@@ -148,159 +150,88 @@ function coveam_update_video_status($id) {
 
 
 function coveam_render_player( $id, $args = array() ) {
-  global $whereami;
-  $defaults = array('player_chrome' => 'show',
-                    'show_related' => 'hide',
-                    'display' => 'static'
-                  );
-  if (! is_array($args)) {
-    $args = array();
-  }
-  $args = array_merge($defaults, $args);
+	global $whereami;
+	$defaults = array( 'amp' => false, 'rss' => false );
+	if ( ! is_array($args) ) { $args = array(); }
+	$args = array_merge($defaults, $args);
 
-  $linkedpostid = $id;
-  if (function_exists('wt_p2p_return_related_postid')) {
-    $allowed_post_types = get_option('coveam_showonposttypes');
-    if (in_array(get_post_type($id), $allowed_post_types)) {
-      $linkedpost = wt_p2p_return_related_postid($id,'p2p_to','featured_video',1);
-      $linkedpostid = $linkedpost[0][0];
-    } else {
-      $videopost = wt_p2p_return_related_postid($id,'p2p_from','featured_video',1);
-      $id = $videopost[0][0];
+	$player_to_display = ""; $extraClass = "";
+
+	// get all the data about the video -- maybe there won't be any data
+	if (function_exists('coveam_get_video')) {
+    	$video = coveam_get_video( $id );
+    	$available = true;
+    	$error = "We're sorry, no data exists for this video (" . $id . ").";
+    	if (strtolower($video["rights"]) == "limited") {
+      		$video_expire_date = $video["airdate"];
+      		$video_expire_date = strtotime($video_expire_date);
+      		$video_expire_date = strtotime("+30 day", $video_expire_date);
+      		if ((time() > $video_expire_date)) {
+        		$available = false;
+        		$error = 'We\'re sorry, the rights for this video have expired.';
+		    	if ( is_feed() ) { return $error; }
+      		}
+		}		
     }
-  }
-	
-  // generate a unique id for the div.  It is possible for the same video to appear multiple times on the page so add a rand
-  $div_id = "coveam_player_" . $id . "_" . rand(10,100);
-	
-  // get all the data about the video -- maybe there won't be any data
-  if (function_exists('coveam_get_video')) {
-    $video = coveam_get_video( $id );
-    $available = true;
-    $error = "We're sorry, no data exists for this video(" . $id . ")";
-    if (strtolower($video["rights"]) == "limited") {
-      $video_expire_date = $video["airdate"];
-      $video_expire_date = strtotime($video_expire_date);
-      $video_expire_date = strtotime("+30 day", $video_expire_date);
-      if ((time() > $video_expire_date)) {
-        $available = false;
-        $error = 'We\'re sorry, the rights for this video have expired.';
-		    if ( is_feed() ) {
-			    return $error;
-		    }
-      }
-    } 
-    
-    if ( is_feed() ) {
-		if ($video && $available) {
-			if ($video['coveplayerid'] && ($video['covestatus'] == 'available')) {
-				if ($whereami == "rss-description") {
-					$playlink = '<a href="https://video.pbs.org/video/' . $video['coveplayerid']. '/">[Watch Video]</a>';
-				} else {
-					$playlink = "<iframe class='partnerPlayer' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' width='100%' height='100%' src='https://player.pbs.org/widget/partnerplayer/" . $video['coveplayerid'] . "/?start=0&end=0&chapterbar=false&endscreen=false' allow='encrypted-media' allowfullscreen></iframe>";
-				}		 
-			} elseif (($video['youtubestatus'] == "public") && $video['youtubeid'] ) {
-				if ($whereami == "rss-description") {
-					$playlink = '<a href="http://www.youtube.com/watch?v=' . $video['youtubeid'] . '">[Watch Video]</a>';
-				} else {
-					$playlink = '<iframe width="100%" height="100%" src="http://www.youtube.com/embed/' . $video['youtubeid'] . '" frameborder="0" allowfullscreen></iframe>';
-				}          
+
+
+	if ($video && $available) {
+		$available_players = array();
+		$preferred_player = $video['preferred_player'];
+		if ( $video['covestatus'] == 'available' && !empty($video['coveplayerid']) ) { $available_players[] = 'cove'; }
+		if ( $video['youtubestatus'] == "public" && !empty($video['youtubeid']) ) { $available_players[] = 'youtube'; }
+		if ( !empty($video['video_override_url']) ) { $available_players[] = 'alternate'; }	 
+		$player_to_display = in_array($preferred_player, $available_players) ? $preferred_player : $available_players[0]; 
+		if (empty($player_to_display)) {
+      		// no available players
+      		return false;
+    	} 
+	}
+	else {
+		return '<div class="cove-am errormessage" style="border: 1px solid silver; padding: 2em; text-align: center;">' . $error . '</div>';
+	}
+
+
+	if (!empty($player_to_display)) {
+		if ( is_feed() || !empty($args['rss']) ) {
+			if ($player_to_display == 'cove') {
+				if ($whereami == "rss-description") {$playlink = '<a href="https://video.pbs.org/video/' . $video['coveplayerid']. '/">[Watch Video]</a>'; }
+				else { $playlink = "<iframe class='partnerPlayer' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' width='100%' height='100%' src='https://player.pbs.org/widget/partnerplayer/" . $video['coveplayerid'] . "/?start=0&end=0&chapterbar=false&endscreen=false' allow='encrypted-media' allowfullscreen></iframe>"; }		 
+			} elseif ( $player_to_display == 'youtube' ) {
+				if ($whereami == "rss-description") { $playlink = '<a href="http://www.youtube.com/watch?v=' . $video['youtubeid'] . '">[Watch Video]</a>'; } 
+				else { $playlink = '<iframe width="100%" height="100%" src="http://www.youtube.com/embed/' . $video['youtubeid'] . '" frameborder="0" allowfullscreen></iframe>'; }          
 			} elseif ($video['video_override_url']) {
-				if ($whereami == "rss-description") {
-					$playlink = 'There should be an embedded item here. Please visit the original post to view it.';
-				} else {
-					$playlink = wp_oembed_get( $video['video_override_url'] );
-				}
+				if ($whereami == "rss-description") {$playlink = 'There should be an embedded item here. Please visit the original post to view it.'; } 
+				else { $playlink = wp_oembed_get( $video['video_override_url'] );	}
 			} else {
 				$playlink = "This video is not currently available.";
 			}
 			return $playlink;
+		} else {
+			// return the regular player embeds...
+			if ($player_to_display == 'cove') {
+				$playerhtml = '<div class="video-wrap cove-am media-manager" style="aspect-ratio: 16/9; position:relative;"><iframe class="partnerPlayer" marginwidth="0" marginheight="0" scrolling="no" style="" src="https://player.pbs.org/widget/partnerplayer/' . $video['coveplayerid'] . '/?start=0&amp;end=0&amp;chapterbar=false&amp;endscreen=false&amp;topbar=true&amp;autoplay=false" allow="encrypted-media" allowfullscreen="" width="100%" height="100%" frameborder="0"></iframe></div>'; 
+			}
+			else if ($player_to_display == 'youtube') {
+				$playerhtml = '<div class="video-wrap cove-am youtube" style="aspect-ratio: 16/9; position:relative;" ><iframe width="100%" height="100%" style="" src="https://www.youtube.com/embed/' . $video['youtubeid'] . '?enablejsapi=1" frameborder="0" allowfullscreen></iframe></div>';
+			}
+			else if ($player_to_display == 'alternate') {
+				if (strpos($video['video_override_url'], 'facebook')) { $extraClass = "facebook"; }
+				else if (strpos($video['video_override_url'], 'youtube')) { $extraClass = "youtube"; }
+				$playerhtml = '<div class="video-wrap cove-am oembed-video ' . $extraClass . '">' . wp_oembed_get( $video['video_override_url'] ) . '</div>';
+			}
+	
+			if (!empty($playerhtml)) {
+				return $playerhtml;
+			}
+	
 		}
-    } else {
-    // print out a div with a class, a unique id, title, description, youtube_id, cove_id
-    $html = '<div class="video-wrapper coveam-videoplayer no-content nocontent" id="' . $div_id . '">';
- 
-    //check if we've got anything
-    if ($video && $available) {
-      $html .= '<div class="coveam_vars" style="display:none;">';
-      $covepreferred = get_option( 'coveam_cove_preferred', 'true' );
-      $html .= '<span class="coveam_videoid">' . $id . '</span>';
-      $html .= '<span class="coveam_linkedpostid">' . $linkedpostid . '</span><span class="coveam_excluded">' . $linkedpostid . '</span>';
-	    $html .= '<span class="coveam_videotitle">' . $video['title'] . '</span>';
-      $html .= '<span class="coveam_videodescription">' . $video['description'] . '</span>';	
-      $html .= '<span class="coveam_airdate">' . $video['airdate'] . '</span>';
-
-      // these are blank on purpose, only updated by jquery
-      $html .= '<span class="coveam_autoplay">disabled</span>';
-
-      $playerhtml = '';
-
-      if ($args['player_chrome'] == 'hide') {
-        $html .= '<span class="coveam_playerchrome">hide</span>';
-	    }
-	    // check status of cove and youtube and if there's a server-setting to use cove
-      $html .= '<span class="coveplayerid">';
-      if ($video['coveplayerid'] && ($video['covestatus'] == 'available')) {
-		    $html .= $video['coveplayerid'];
-        $playerhtml = '<div class="video-wrap" style="width:100%; padding-bottom: 56.25%; position:relative;"><iframe class="partnerPlayer" marginwidth="0" marginheight="0" scrolling="no" style="position:absolute; top:0;" src="//player.pbs.org/widget/partnerplayer/' . $video['coveplayerid'] . '/?start=0&amp;end=0&amp;chapterbar=false&amp;endscreen=false&amp;topbar=true&amp;autoplay=false" allow="encrypted-media" allowfullscreen="" width="100%" height="100%" frameborder="0"></iframe></div>'; 
-	    }
-      $html .= '</span><span class="youtubeid">';
-	    if (($video['youtubestatus'] == "public") && $video['youtubeid']) {
-        $html .= $video['youtubeid'];
-        if (empty($playerhtml)) {
-          // youtube player code
-        $playerhtml = '<div class="video-wrap" style="width:100%; padding-bottom: 56.25%; position:relative;" ><iframe width="100%" height="100%" style="position:absolute; top:0;" src="//www.youtube.com/embed/' . $video['youtubeid'] . '?enablejsapi=1" frameborder="0" allowfullscreen></iframe></div>';
-        }
-      }
-	    $html .= '</span><span class="coveam_covepreferred">' . $covepreferred . '</span><span class="coveam_video_override_encoded">';
-      if ($video['video_override_url']) {
-        if (empty($playerhtml)) {
-          if (strpos($video['video_override_url'], 'facebook')) {$extraClass = "facebook";}
-          else {$extraClass = "";}
-           
-          $override = "<div class='cam-oembed $extraClass'>".  wp_oembed_get( $video['video_override_url'] ) . "</div>";
-          $html .= rawurlencode($override);
-          $playerhtml = '<div class="video-wrap">' . $override . '</div>';
-        }
-      }
-      $html .= '</span>';
-      if ($args['show_related'] == 'show') {
-        $relatedvideos = wt_p2p_related_videos($id, 3, null);
-        if(is_array($relatedvideos)){
-          $vidcount=1;
-          foreach($relatedvideos as $relatedvideo) {
-            $html .= '<span class="coveam_relatedvid_linkedpostid_' . $vidcount . '">' . $relatedvideo['ID'] . '</span>';
-            $html .= '<span class="coveam_relatedvid_id_' . $vidcount . '">' . $relatedvideo['video_post'] . '</span>';
-            $html .= '<span class="coveam_relatedvid_permalink_' . $vidcount . '">' . $relatedvideo['permalink'] . '</span>';
-            $html .= '<span class="coveam_relatedvid_title_' . $vidcount . '">' . $relatedvideo['title'] . '</span>';
-            $html .= '<span class="coveam_relatedvid_description_' . $vidcount . '">' . $relatedvideo['description'] . '</span>';
-            $html .= '<span class="coveam_relatedvid_airdate_' . $vidcount . '">' . $relatedvideo['airdate'] . '</span>';
-            $html .= '<span class="coveam_relatedvid_img_' . $vidcount . '">' . $relatedvideo['thumbnail_url'] . '</span>';
-            $html .= '<span class="coveam_relatedvid_coveplayerid_' . $vidcount . '">' . $relatedvideo['coveplayerid'] . '</span>';
-            $html .= '<span class="coveam_relatedvid_youtubeid_' . $vidcount . '">' . $relatedvideo['youtubeid'] . '</span>';
-            $html .= '<span class="coveam_relatedvid_video_override_encoded_' . $vidcount . '">' . rawurlencode( wp_oembed_get($relatedvideo['video_override_url']) ) . '</span>';
-            $vidcount++;
-          }
-        }
-      }
-	    $html .= '</div><div class="coveam_player">';
-      if (!empty($playerhtml)) {
-         $html .= $playerhtml;
-      }
-      $html .= '</div></div>';
-      //if ($args['display'] == "ajax") {
-        //fire the display player script if called after page load ie via ajax
-	      //$html .= '<script type="text/javascript"> jQuery(function(){ jQuery("#' . $div_id . '").coveamDisplayPlayer(); }); </script>';
-      //}
-    } else {
-	    $html .= '<div class="errormessage">' . $error . '</div></div>';
-    }
-    return $html;
-    }
-  } else {
-    return false;
-  }
+	}
+	else {
+    	return false;
+  	}
 }
+
 
 function coveam_remove_watchvideo_from_excerpt($excerpt) {
   return preg_replace("/\[Watch Video\](.*)/", "$1", $excerpt);

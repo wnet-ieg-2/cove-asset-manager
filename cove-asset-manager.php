@@ -59,7 +59,6 @@ function coveam_get_video( $id ) {
 	$videofields['airdate'] = $postmeta['_coveam_airdate'][0];
 	$videofields['youtubeid'] = $postmeta['_coveam_youtube_id'][0];
 	$videofields['coveplayerid'] = $postmeta['_coveam_cove_player_id'][0];
-	$videofields['preferred_player'] = $postmeta['_coveam_preferred_player'][0];
 
 	$videofields['rights'] = $postmeta['_coveam_rights'][0];
 	$videofields['fullprogram'] = $postmeta['_coveam_video_fullprogram'][0];
@@ -174,13 +173,17 @@ function coveam_render_player( $id, $args = array() ) {
 		}		
     }
 
-
 	if ($video && $available) {
+		// when the video override is set we use that by default... else we look at the cove / youtube results and use the preferred player set on the options page.
+
 		$available_players = array();
-		$preferred_player = $video['preferred_player'];
-		if ( $video['covestatus'] == 'available' && !empty($video['coveplayerid']) ) { $available_players[] = 'cove'; }
-		if ( $video['youtubestatus'] == "public" && !empty($video['youtubeid']) ) { $available_players[] = 'youtube'; }
+		$preferred_player = get_option('coveam_preferred_player') ? get_option('coveam_preferred_player') : 'cove';
 		if ( !empty($video['video_override_url']) ) { $available_players[] = 'alternate'; }	 
+		else {
+			if ( $video['covestatus'] == 'available' && !empty($video['coveplayerid']) ) { $available_players[] = 'cove'; }
+			if ( $video['youtubestatus'] == "public" && !empty($video['youtubeid']) ) { $available_players[] = 'youtube'; }
+		}
+
 		$player_to_display = in_array($preferred_player, $available_players) ? $preferred_player : $available_players[0]; 
 		if (empty($player_to_display)) {
       		// no available players

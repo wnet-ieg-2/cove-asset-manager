@@ -202,7 +202,7 @@ function coveam_render_player( $id, $args = array() ) {
 				else { $playlink = "<iframe class='partnerPlayer' frameborder='0' marginwidth='0' marginheight='0' scrolling='no' width='100%' height='100%' src='https://player.pbs.org/widget/partnerplayer/" . $video['coveplayerid'] . "/?start=0&end=0&chapterbar=false&endscreen=false' allow='encrypted-media' allowfullscreen></iframe>"; }		 
 			} elseif ( $player_to_display == 'youtube' ) {
 				if ($whereami == "rss-description") { $playlink = '<a href="http://www.youtube.com/watch?v=' . $video['youtubeid'] . '">[Watch Video]</a>'; } 
-				else { $playlink = '<iframe width="100%" height="100%" src="http://www.youtube.com/embed/' . $video['youtubeid'] . '" frameborder="0" allowfullscreen></iframe>'; }          
+				else { $playlink = '<iframe width="100%" height="100%" src="http://www.youtube.com/embed/' . $video['youtubeid'] . '?rel=0" frameborder="0" allowfullscreen></iframe>'; }          
 			} elseif ($video['video_override_url']) {
 				if ($whereami == "rss-description") {$playlink = 'There should be an embedded item here. Please visit the original post to view it.'; } 
 				else { $playlink = wp_oembed_get( $video['video_override_url'] );	}
@@ -216,7 +216,7 @@ function coveam_render_player( $id, $args = array() ) {
 				$playerhtml = '<div class="video-wrap cove-am media-manager" style="aspect-ratio: 16/9; position:relative;"><iframe class="partnerPlayer" marginwidth="0" marginheight="0" scrolling="no" style="" src="https://player.pbs.org/widget/partnerplayer/' . $video['coveplayerid'] . '/?start=0&amp;end=0&amp;chapterbar=false&amp;endscreen=false&amp;topbar=true&amp;autoplay=false" allow="encrypted-media" allowfullscreen="" width="100%" height="100%" frameborder="0"></iframe></div>'; 
 			}
 			else if ($player_to_display == 'youtube') {
-				$playerhtml = '<div class="video-wrap cove-am youtube" style="aspect-ratio: 16/9; position:relative;" ><iframe width="100%" height="100%" style="" src="https://www.youtube.com/embed/' . $video['youtubeid'] . '?enablejsapi=1" frameborder="0" allowfullscreen></iframe></div>';
+				$playerhtml = '<div class="video-wrap cove-am youtube" style="aspect-ratio: 16/9; position:relative;" ><iframe width="100%" height="100%" style="" src="https://www.youtube.com/embed/' . $video['youtubeid'] . '?enablejsapi=1&rel=0" frameborder="0" allowfullscreen></iframe></div>';
 			}
 			else if ($player_to_display == 'alternate') {
 				if (strpos($video['video_override_url'], 'facebook')) { $extraClass = "facebook"; }

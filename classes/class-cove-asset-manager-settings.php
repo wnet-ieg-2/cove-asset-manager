@@ -173,12 +173,15 @@ class COVE_Asset_Manager_Settings {
     $html = '<label for="' . $fieldid . '"><p class="description">' . __( $fieldlabel , 'cove-asset-manager' ) . '</p></label>';
     $post_types = get_post_types( '', 'objects' ); 
     foreach($post_types as $post_type) {
-      $slug = $post_type->name;
-      $label = $post_type->label;
+		// santalone.. lets just use the public post types..
+		if ( !empty( $post_type->public ) ) {
+			$slug = $post_type->name;
+      		$label = $post_type->label;
+			$checked = in_array($slug, $option) ? 'checked="checked"' : '';
+			$html .= sprintf( '<div style="display: inline-block;"><input type="checkbox" id="%1$s[%2$s]" name="%1$s[]" value="%2$s" %3$s />', $fieldid, $slug, $checked );
+			$html .= sprintf( '<label for="%1$s[%3$s]"> %2$s</label> &nbsp; &nbsp; </div>', $fieldid, $label, $slug );
+		}
 
-      $checked = in_array($slug, $option) ? 'checked="checked"' : '';
-      $html .= sprintf( '<div style="display: inline-block;"><input type="checkbox" id="%1$s[%2$s]" name="%1$s[]" value="%2$s" %3$s />', $fieldid, $slug, $checked );
-      $html .= sprintf( '<label for="%1$s[%3$s]"> %2$s</label> &nbsp; &nbsp; </div>', $fieldid, $label, $slug );
     }
     echo $html;
   }

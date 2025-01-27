@@ -243,10 +243,9 @@ class WNET_Google_oAuth {
     preg_match('/[^\?]+\.(jpg|jpe|jpeg|gif|png)/i', $url, $matches);
     $file_array['name'] = basename($matches[0]);
     $file_array['tmp_name'] = $tmp;
-
+    error_log(json_encode($tmp)); 
     // If error storing temporarily, unlink
     if ( is_wp_error( $tmp ) ) {
-      @unlink($file_array['tmp_name']);
       $file_array['tmp_name'] = '';
     }
 

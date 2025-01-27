@@ -276,7 +276,7 @@ class COVE_Asset_Metaboxes {
       $html .= $this->build_youtube_upload_form($post_id, $fields['_coveam_youtube_id'][0], $fields['_coveam_youtubestatus'][0]);
    
       // always put the video override field at the end.
-      $html .= '<tr valign="top" class="other-asset-details"><th scope="row"><label for="_coveam_video_override_url">Alternative Video URL</label></th><td><input type="url" id="_coveam_video_override_url" name="_coveam_video_override_url" class="widefat" value="' . $fields['_coveam_video_override_url'][0] . '" /><p class="description">The URL to a Vimeo or UStream video to fall back to in case of ingest problems. <br />oEmbed will automatically convert this URL to embed HTML</p></td></tr>' . "\n";
+      $html .= '<tr valign="top" class="other-asset-details"><th scope="row"><label for="_coveam_video_override_url">Alternative Video URL</label></th><td><input type="url" id="_coveam_video_override_url" name="_coveam_video_override_url" class="widefat" value="' . $fields['_coveam_video_override_url'][0] . '" /><p class="description">Using this field will take precendence over the above players. Enter the URL to a Vimeo or UStream video to fall back to in case of ingest problems. oEmbed will automatically convert this URL to embed HTML</p></td></tr>' . "\n";
 
       $html .= '<tr valign="top" style="display:none;"><th></th><td>'. $s3titletext . '<span id="plugin_assets_url">' .  $this->assets_url . '</span><span id="s3_bucket">' . get_option( 'coveam_s3_bucket' ) . '</td></tr>' . "\n";
 			$html .= '</tbody>' . "\n";
@@ -464,6 +464,8 @@ class COVE_Asset_Metaboxes {
        'default' => '',
        'section' => 'cove-asset-details'
     );
+
+	/*
     $fields['_coveam_preferred_player'] = array(
        'name' => __( 'Preferred player:' , 'cove_asset_manager' ),
        'description' => __( 'Use this to force the player to be something other than COVE.  If the selected player is not available, the next best option will be used' , 'cove_asset_manager' ),
@@ -485,6 +487,7 @@ class COVE_Asset_Metaboxes {
         'default' => 'cove',
        'section' => 'cove-asset-details'
     );
+	*/
 
     $fields['_coveam_covestatus'] = array(
         'name' => __( 'COVE status:' , 'cove_asset_manager' ),

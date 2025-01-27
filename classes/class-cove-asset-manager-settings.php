@@ -65,8 +65,12 @@ class COVE_Asset_Manager_Settings {
     add_settings_section( 'main_settings' , __( 'Modify plugin settings' , 'cove-asset-manager' ) , array( $this , 'main_settings' ) , 'cove_asset_manager_settings' );
 		
 		// Add settings fields
-    add_settings_field( 'coveam_cove_preferred' , __( 'Display COVE video by default' , 'cove-asset-manager' ) , array( $this , 'settings_field' )  , 'cove_asset_manager_settings' , 'main_settings' , array('coveam_cove_preferred', 'Making this false will make YouTube version display when available') );
-    register_setting( 'cove_asset_manager_settings' , 'coveam_cove_preferred' );
+
+	add_settings_field( 'coveam_preferred_player', 'Preferred Player', array( $this, 'settings_field_radio'), 'cove_asset_manager_settings', 'main_settings', array( 'field' => 'coveam_preferred_player', 'options' => array('cove','youtube'), 'note' => 'When available the preferred player will be displayed with fallback to other player. The Alternative Video URL field takes precedence over this selection.' ) );
+	register_setting( 'cove_asset_manager_settings' , 'coveam_preferred_player' );
+
+
+    
 
     add_settings_field( 'coveam_showonposttypes' , __( 'Show the COVE metaboxes on these post types:' , 'cove-asset-manager' ) , array( $this , 'settings_field_allowed_post_types' )  , 'cove_asset_manager_settings' , 'main_settings'  , array('coveam_showonposttypes', '') );
     register_setting( 'cove_asset_manager_settings' , 'coveam_showonposttypes' );
@@ -169,16 +173,42 @@ class COVE_Asset_Manager_Settings {
     $html = '<label for="' . $fieldid . '"><p class="description">' . __( $fieldlabel , 'cove-asset-manager' ) . '</p></label>';
     $post_types = get_post_types( '', 'objects' ); 
     foreach($post_types as $post_type) {
-      $slug = $post_type->name;
-      $label = $post_type->label;
+		// santalone.. lets just use the public post types..
+		if ( !empty( $post_type->public ) ) {
+			$slug = $post_type->name;
+      		$label = $post_type->label;
+			$checked = in_array($slug, $option) ? 'checked="checked"' : '';
+			$html .= sprintf( '<div style="display: inline-block;"><input type="checkbox" id="%1$s[%2$s]" name="%1$s[]" value="%2$s" %3$s />', $fieldid, $slug, $checked );
+			$html .= sprintf( '<label for="%1$s[%3$s]"> %2$s</label> &nbsp; &nbsp; </div>', $fieldid, $label, $slug );
+		}
 
-      $checked = in_array($slug, $option) ? 'checked="checked"' : '';
-      $html .= sprintf( '<div style="display: inline-block;"><input type="checkbox" id="%1$s[%2$s]" name="%1$s[]" value="%2$s" %3$s />', $fieldid, $slug, $checked );
-      $html .= sprintf( '<label for="%1$s[%3$s]"> %2$s</label> &nbsp; &nbsp; </div>', $fieldid, $label, $slug );
     }
     echo $html;
   }
 
+
+  public function settings_field_radio( $args ) {
+    $settingname = esc_attr( $args['field'] );
+	$field = isset($args['field']) ? esc_attr( $args['field'] ) : '';
+	$note = isset($args['note']) ? esc_attr( $args['note'] ) : '';
+	$value = get_option($settingname) ? get_option($settingname) : '';
+
+    $data = array();
+    if( is_array($value) ) {
+      $data = $value;
+    } else {
+      array_push($data, $value);
+    }
+    $html = ''; 
+
+    foreach($args['options'] as $radio) {
+		$checked = '';
+		if ($radio == $value) { $checked = ' checked'; }
+		$html .= '<input type="radio" name="' . $field . '" value="' . $radio . '" ' . $checked . ' />&nbsp;' . $radio . '  &nbsp; ';
+    }
+    $html .= '<label for="' . $field . '"><p class="description">' . $note . '</p></label>'; 
+    echo $html;
+  }
 
 	public function validate_field( $slug ) {
 		if( $slug && strlen( $slug ) > 0 && $slug != '' ) {
